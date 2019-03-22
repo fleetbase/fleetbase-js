@@ -1,0 +1,11 @@
+{
+  "name": "@fleetbase/sdk",
+  "version": "1.0.0",
+  "description": "Fleetbase JS & Node SDK",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ronald A. Richardson <ron@rarbuilt.com> (http://iamronald.com)",
+  "license": "MIT"
+}
