@@ -7,5 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ronald A. Richardson <ron@rarbuilt.com> (http://iamronald.com)",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "rollup-plugin-eslint": "^5.1.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-terser": "^4.0.4"
+  }
 }
