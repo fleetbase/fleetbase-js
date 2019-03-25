@@ -2,15 +2,19 @@
   "name": "@fleetbase/sdk",
   "version": "1.0.0",
   "description": "Fleetbase JS & Node SDK",
-  "main": "index.js",
+  "main": "lib/Fleetbase.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bundle": "rollup -c",
+    "test": "node --experimental-modules tests/index.mjs && exit 1"
   },
   "author": "Ronald A. Richardson <ron@rarbuilt.com> (http://iamronald.com)",
   "license": "MIT",
   "devDependencies": {
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
     "rollup-plugin-eslint": "^5.1.0",
     "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-terser": "^4.0.4"
+    "rollup-plugin-terser": "^4.0.4",
+    "@fleetbase/sdl": "file:./"
   }
 }

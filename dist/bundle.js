@@ -1,8 +1,1 @@
-(function (factory) {
-	typeof define === 'function' && define.amd ? define(factory) :
-	factory();
-}(function () { 'use strict';
-
-
-
-}));
+!function(e,s){"object"==typeof exports&&"undefined"!=typeof module?module.exports=s(require("resources/v1")):"function"==typeof define&&define.amd?define(["resources/v1"],s):(e=e||self)["@fleetbase/sdk"]=s(e.v1)}(this,function(e){"use strict";return class{constructor(e,s,t="v1"){return this.publicKey=e,this.secretKey=s,this.version=t,this.setResources(t),this}get resources(){return{v1:{place:new e.Place,payload:new e.Payload},v2:{opsMile:{}}}}setResources(e="v1"){for(let s in this.resources[e])this[s]=this.resource[e][s]}}});
