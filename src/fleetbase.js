@@ -1,9 +1,6 @@
 'use strict';
 
-import {
-	Place,
-	Payload
-} from 'resources/v1';
+import { Place, Payload } from 'resources';
 
 class Fleetbase {
 	/**
@@ -14,13 +11,11 @@ class Fleetbase {
 	 * @param  {String} version   The version of resource to access
 	 * @return {Fletbase}        Instance
 	 */
-	constructor(publicKey, secretKey, version = 'v1') {
+	constructor(publicKey, version = 'v1') {
 		this.publicKey = publicKey;
-		this.secretKey = secretKey;
 		this.version = version;
-		// set resources
 		this.setResources(version);
-		// return self
+
 		return this;
 	}
 
@@ -31,7 +26,7 @@ class Fleetbase {
 				payload: new Payload,
 			},
 			v2: {
-				opsMile: {
+				fleetOps: {
 
 				}
 			}

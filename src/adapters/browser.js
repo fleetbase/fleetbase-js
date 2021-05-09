@@ -1,0 +1,5 @@
+/**
+ * Fetch based adapter
+ * 
+ * @todo
+ */

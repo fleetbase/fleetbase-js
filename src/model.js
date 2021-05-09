@@ -6,9 +6,9 @@ class Model {
 
 	 * @return {[type]} [description]
 	 */
-	constructor(fleetbase, resource, version = 'v1') {
-		this.fleetbase = fleetbase;
+	constructor(resource, attributes = {}, version = 'v1') {
 		this.resource = resource;
+		this.attributes = attributes;
 		this.version = version;
 	}
 
@@ -18,8 +18,8 @@ class Model {
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
 	 */
-	create(payload = {}) {
-
+	create(attributes = {}) {
+		this.attributes = [...this.attributes, ...attributes];
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Model {
 	 * @return {[type]} [description]
 	 */
 	save() {
-
+		
 	}
 
 	/**
