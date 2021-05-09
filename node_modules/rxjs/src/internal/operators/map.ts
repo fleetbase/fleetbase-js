@@ -19,7 +19,7 @@ import { OperatorFunction } from '../types';
  *
  * ## Example
  * Map every click to the clientX position of that click
- * ```javascript
+ * ```ts
  * import { fromEvent } from 'rxjs';
  * import { map } from 'rxjs/operators';
  *
@@ -79,7 +79,7 @@ class MapSubscriber<T, R> extends Subscriber<T> {
   // NOTE: This looks unoptimized, but it's actually purposefully NOT
   // using try/catch optimizations.
   protected _next(value: T) {
-    let result: any;
+    let result: R;
     try {
       result = this.project.call(this.thisArg, value, this.count++);
     } catch (err) {

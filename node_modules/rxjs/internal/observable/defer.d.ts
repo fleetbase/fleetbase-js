@@ -20,7 +20,7 @@ import { ObservedValueOf, ObservableInput } from '../types';
  *
  * ## Example
  * ### Subscribe to either an Observable of clicks or an Observable of interval, at random
- * ```javascript
+ * ```ts
  * import { defer, fromEvent, interval } from 'rxjs';
  *
  * const clicksOrInterval = defer(function () {
@@ -49,4 +49,4 @@ import { ObservedValueOf, ObservableInput } from '../types';
  * @name defer
  * @owner Observable
  */
-export declare function defer<O extends ObservableInput<any>>(observableFactory: () => O | void): Observable<ObservedValueOf<O>>;
+export declare function defer<R extends ObservableInput<any> | void>(observableFactory: () => R): Observable<ObservedValueOf<R>>;

@@ -10,11 +10,11 @@
   "author": "Ronald A. Richardson <ron@rarbuilt.com> (http://iamronald.com)",
   "license": "MIT",
   "devDependencies": {
+    "@fleetbase/sdk": "file:.",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "rollup-plugin-eslint": "^5.1.0",
     "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-terser": "^4.0.4",
-    "@fleetbase/sdl": "file:./"
+    "rollup-plugin-terser": "^4.0.4"
   }
 }

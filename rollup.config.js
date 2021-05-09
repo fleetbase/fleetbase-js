@@ -4,7 +4,7 @@ import { eslint } from 'rollup-plugin-eslint';
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
-	input: 'lib/Fleetbase.js',
+	input: 'src/fleetbase.js',
 	output: {
 		format: 'umd',
 		file: 'dist/bundle.js',

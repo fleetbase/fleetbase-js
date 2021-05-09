@@ -20,7 +20,7 @@ export declare const EMPTY: Observable<never>;
  *
  * ## Examples
  * ### Emit the number 7, then complete
- * ```javascript
+ * ```ts
  * import { empty } from 'rxjs';
  * import { startWith } from 'rxjs/operators';
  *
@@ -29,12 +29,12 @@ export declare const EMPTY: Observable<never>;
  * ```
  *
  * ### Map and flatten only odd numbers to the sequence 'a', 'b', 'c'
- * ```javascript
- * import { empty, interval } from 'rxjs';
+ * ```ts
+ * import { empty, interval, of } from 'rxjs';
  * import { mergeMap } from 'rxjs/operators';
  *
  * const interval$ = interval(1000);
- * result = interval$.pipe(
+ * const result = interval$.pipe(
  *   mergeMap(x => x % 2 === 1 ? of('a', 'b', 'c') : empty()),
  * );
  * result.subscribe(x => console.log(x));
@@ -51,14 +51,10 @@ export declare const EMPTY: Observable<never>;
  * @see {@link of}
  * @see {@link throwError}
  *
- * @param {SchedulerLike} [scheduler] A {@link SchedulerLike} to use for scheduling
+ * @param scheduler A {@link SchedulerLike} to use for scheduling
  * the emission of the complete notification.
- * @return {Observable} An "empty" Observable: emits only the complete
+ * @return An "empty" Observable: emits only the complete
  * notification.
- * @static true
- * @name empty
- * @owner Observable
- * @deprecated Deprecated in favor of using {@link index/EMPTY} constant.
+ * @deprecated Deprecated in favor of using {@link EMPTY} constant, or {@link scheduled} (e.g. `scheduled([], scheduler)`)
  */
 export declare function empty(scheduler?: SchedulerLike): Observable<never>;
-export declare function emptyScheduled(scheduler: SchedulerLike): Observable<never>;
