@@ -1,17 +1,12 @@
 'use strict';
 
-import Model from './model';
+import Model from '../model';
 
 class Place extends Model {
-	/**
-	 * The base model for all resources
+	getCoordinates() {
+		const latitude, longitude;
 
-	 * @return {Fleetbase} fleetbase
-	 */
-	constructor(attributes = []) {
-		super.constructor(...arguments);
-
-		this.attributes = attributes;
+		return [latitude, longitude];
 	}
 };
 

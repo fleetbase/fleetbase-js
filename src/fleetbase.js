@@ -19,6 +19,10 @@ class Fleetbase {
 		return this;
 	}
 
+	static newInstance(publicKey, version = 'v1') {
+		return new Fleetbase(publicKey, version);
+	}
+
 	get resources() {
 		return {
 			v1: {

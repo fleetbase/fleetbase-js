@@ -1,6 +1,6 @@
 'use strict';
 
-import Model from './model';
+import Model from '../model';
 import Collection from '../utils/collection';
 
 class Payload extends Model {
