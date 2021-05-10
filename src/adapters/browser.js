@@ -14,7 +14,8 @@ class BrowserAdapter extends Adapter {
 
         this.setHeaders({
             'Authorization': `Bearer ${config.publicKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'User-Agent': '@fleetbase/sdk;browser'
         });
     }
 
