@@ -3,11 +3,9 @@
 import Model from '../model';
 
 class Place extends Model {
-	getCoordinates() {
-		const latitude, longitude;
-
-		return [latitude, longitude];
-	}
+    constructor(attributes = {}, version = 'v1', adapter) {
+        super(attributes, version, 'place', adapter);
+    }
 };
 
 export default Place;

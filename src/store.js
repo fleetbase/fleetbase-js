@@ -12,7 +12,7 @@ class Store {
     }
 
     deposit(resourceInstance) {
-        this.storage[pluralize(this.resource)].pushObject(resourceInstance);
+        this.storage[this.namespace].pushObject(resourceInstance);
 
         return resourceInstance;
     }
@@ -39,6 +39,10 @@ class Store {
 
     create(attributes = {}) {
         return this.adapter.post(`${this.namespace}`, attributes).then(this.afterFetch);
+    }
+
+    update(id, attributes = {}) {
+        return this.adapter.put(`${this.namespace}/${id}`, attributes).then(this.afterFetch);
     }
 
     findRecord(id) {

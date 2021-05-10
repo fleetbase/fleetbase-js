@@ -28,6 +28,18 @@ class Model {
 	}
 
 	/**
+	 * Creates a new model on the server
+	 * 
+	 * @param  {Object} payload [description]
+	 * @return {[type]}         [description]
+	 */
+	update(attributes = {}) {
+		this.attributes = [...this.attributes, ...attributes];
+		
+		return this.store.update(this.attributes.id, this.attributes);
+	}
+
+	/**
 	 * Deletes the model instance on the server
 	 * 
 	 * @return {[type]} [description]
@@ -64,6 +76,15 @@ class Model {
 
 	}
 	
+	/**
+	 * Get an attribute
+	 * 
+	 * @param {[type]} proprty [description]
+	 * @param {[type]} value   [description]
+	 */
+	 getAttribute(attribute) {
+		return this.attributes[attribute];
+	}
 };
 
 export default Model;

@@ -56,4 +56,4 @@ class Collection extends Array {
 	}
 };
 
-export default Colllection;
+export default Collection;

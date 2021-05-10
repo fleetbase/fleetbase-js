@@ -1,7 +1,7 @@
 'use strict';
 
 import Store from './store';
-import { resolve } from './resolve';
+import { resolve } from './resolver';
 
 /**
  * // instancr
@@ -52,8 +52,6 @@ class Fleetbase {
 		this.vehicles = new Store('vehicle', this.adapter);
 		this.vendors = new Store('vendor', this.adapter);
 		this.contacts = new Store('contact', this.adapter);
-
-		return this;
 	}
 
 	static newInstance(publicKey, version = 'v1') {
@@ -62,26 +60,6 @@ class Fleetbase {
 
 	setAdapter(adapter) {
 		this.adapter = adapter;
-	}
-
-	get resources() {
-		return {
-			v1: {
-				place: new Place,
-				payload: new Payload,
-			},
-			v2: {
-				fleetOps: {
-
-				}
-			}
-		};
-	}
-
-	setResources(version = 'v1') {
-		for(let resource in this.resources[version]) {
-			this[pluralize(resource)] = new Store()
-		}
 	}
 };
 

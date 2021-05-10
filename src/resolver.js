@@ -1,7 +1,8 @@
 'use strict';
 
 import { Place, Payload, Order } from './resources';
-import { BrowserAdapter } from './adapters';
+import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
+import { pluralize, singularize } from './utils/string';
 
 const models = {
     Place,
@@ -10,7 +11,9 @@ const models = {
 };
 
 const adapters = {
-    BrowserAdapter
+    BrowserAdapter,
+    NodeAdapter, 
+    EmberJsAdapter
 };
 
 class Resolver {
@@ -22,7 +25,17 @@ class Resolver {
     }
 
     resolve(type, className, options = {}) {
-        return this[type][className](options);
+        const key = pluralize(type);
+
+        if (!this[key]) {
+            throw new Error('Attempted to resolve invalid type');
+        }
+
+        if (!this[key][className]) {
+            throw new Error(`No ${singularize(type)} named ${className} to resolve`);
+        }
+
+        return new this[key][className](options);
     }
 }
 

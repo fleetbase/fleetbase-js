@@ -5,15 +5,6 @@ import Collection from '../utils/collection';
 
 class Payload extends Model {
 	/**
-	 * The base model for all resources
-
-	 * @return {[type]} [description]
-	 */
-	constructor() {
-
-	}
-
-	/**
 	 * Attaches an entity to an existing payload and returns 
 	 * the payload with the entity attached
 	 * 
