@@ -1,15 +1,18 @@
 'use strict';
 
+import Store from './Store';
+
 class Model {
 	/**
 	 * The base model for all resources
 
 	 * @return {[type]} [description]
 	 */
-	constructor(resource, attributes = {}, version = 'v1') {
-		this.resource = resource;
+	constructor(attributes = {}, version = 'v1', resource, adapter) {
 		this.attributes = attributes;
 		this.version = version;
+		this.resource = resource;
+		this.store = new Store(resource, adapter);
 	}
 
 	/**
@@ -20,6 +23,8 @@ class Model {
 	 */
 	create(attributes = {}) {
 		this.attributes = [...this.attributes, ...attributes];
+		
+		return this.store.create(this.attributes);
 	}
 
 	/**
@@ -37,7 +42,7 @@ class Model {
 	 * @return {[type]} [description]
 	 */
 	save() {
-		
+
 	}
 
 	/**

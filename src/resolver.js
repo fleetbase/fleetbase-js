@@ -1,6 +1,7 @@
 'use strict';
 
 import { Place, Payload, Order } from './resources';
+import { BrowserAdapter } from './adapters';
 
 const models = {
     Place,
@@ -8,9 +9,14 @@ const models = {
     Order
 };
 
+const adapters = {
+    BrowserAdapter
+};
+
 class Resolver {
     constructor () {
         this.models = models;
+        this.adapters = adapters;
 
         return this.resolve(...arguments);
     }

@@ -1,5 +1,7 @@
-/**
- * An adapter for ember.js
- * 
- * @todo
- */
+'use strict';
+
+import Adapter from '../adapter';
+
+class EmberJsAdapter extends Adapter {}
+
+export default EmberJsAdapter;

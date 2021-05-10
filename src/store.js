@@ -1,13 +1,13 @@
 'use strict';
 
 import { resolve } from './resolver';
-import { pluralize } from './utils/string';
+import { pluralize, classify } from './utils/string';
 import { isArray } from './utils/array';
 
 class Store {
     constructor(resource, adapter) {
         this.resource = resource;
-        this.adapter = adapter;
+        this.adapter = adapter || resolve('adapter', 'BrowserAdapter');
         this.namespace = pluralize(resource);
     }
 
@@ -18,7 +18,7 @@ class Store {
     }
 
     serialize(options) {
-        return resolve('model', this.resource, options);
+        return resolve('model', classify(this.resource), options);
     }
 
     afterFetch(json) {
