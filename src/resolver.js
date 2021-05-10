@@ -21,10 +21,10 @@ class Resolver {
         this.models = models;
         this.adapters = adapters;
 
-        return this.resolve(...arguments);
+        return this.lookup(...arguments);
     }
 
-    resolve(type, className, options = {}) {
+    lookup(type, className, options = {}) {
         const key = pluralize(type);
 
         if (!this[key]) {
@@ -39,11 +39,11 @@ class Resolver {
     }
 }
 
-const resolve = (type, className, options = {}) => {
+const lookup = (type, className, options = {}) => {
     return new Resolver(type, className, options);
 }
 
 export {
     Resolver,
-    resolve
+    lookup
 }

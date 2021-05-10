@@ -2,13 +2,15 @@
 
 class Adapter {
 	/**
-	 * New instance of the Fleetbase adapter
+	 * Creates a configured base adapter for Fleetbase.
 	 * 
-	 * @param  {String} version [description]
-	 * @return {[type]}         [description]
+	 * @param  {Object} config Configuration options for adapter
 	 */
-	constructor(version = 'v1') {
-		this.version = version;
+	constructor(config = {}) {
+		this.version = config.version || 'v1';
+		this.host = config.host || null;
+		this.namespace = config.namespace || null;
+		this.headers = config.headers || {};
 	}
 };
 

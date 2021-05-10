@@ -6,7 +6,7 @@ import { Place } from '../src/resources';
 
 // create an instance of the fleetbase sdk
 describe('Create a Fleetbase SDK instance', () => {
-	const fleetbase = new Fleetbase('pk_testpublickey');
+	const fleetbase = new Fleetbase('flb_test_lxHdcBHAHeuDCQS9udhZ');
 	
 	it('should be an instance of Fleetbase', () => {
         assert.instanceOf(fleetbase, Fleetbase);
@@ -15,6 +15,15 @@ describe('Create a Fleetbase SDK instance', () => {
 	describe('#places', () => {
 		it('should have places store instance', () => {
 			assert.instanceOf(fleetbase.places, Store);
+		});
+		it('should be able to create() a place', async () => {
+			const place = await fleetbase.places.create({
+				name: 'Warehouse',
+				street1: '23 Serangoon Central Nex',
+				country: 'Singapore'
+			});
+
+			assert.instanceOf(place, Place);
 		});
 	})
 });

@@ -8,7 +8,7 @@ class Collection extends Array {
 	 * @return {[type]}          [description]
 	 */
 	constructor(...items) {
-
+		super(...arguments);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 'use strict';
 
 import Store from './store';
-import { resolve } from './resolver';
+import { lookup } from './resolver';
 
 /**
  * // instancr
@@ -29,19 +29,25 @@ class Fleetbase {
 	 * 
 	 * @param  {String} publicKey The public key issued
 	 * @param  {String} version   The version of resource to access
-	 * @param  {Adapter} adapter   The adapter to use
+	 * @param  {Object} config    Config to overwrite
 	 * @return {Fletbase}        Instance
 	 */
-	constructor(publicKey, version = 'v1', adapter = null) {
-		this.publicKey = publicKey;
-		this.version = version;
-		this.adapter = adapter || resolve('adapter', 'BrowserAdapter');
-		
+	constructor(publicKey, debug = false, config = {}) {
+		this.version = config.version || 'v1';
+		this.options = {
+			version: this.version,
+			host: 'https://api.fleetbase.io',
+			namespace: this.version || config.namespace,
+			debug,
+			publicKey
+		};
+		this.adapter = config.adapter || lookup('adapter', 'BrowserAdapter', this.options);
+
 		if (typeof publicKey !== 'string' || publicKey.length === 0) {
 			throw new Error('⚠️ Invalid public key given to Fleetbase SDK');
 		}
 
-		if (publicKey.toLowerCase().startsWith('sk_')) {
+		if (publicKey.toLowerCase().startsWith('$')) {
 			throw new Error('Secret key provided. You must use a public key with Fleetbase Javascript SDK!');
 		  }
 
@@ -54,8 +60,8 @@ class Fleetbase {
 		this.contacts = new Store('contact', this.adapter);
 	}
 
-	static newInstance(publicKey, version = 'v1') {
-		return new Fleetbase(publicKey, version);
+	static newInstance(publicKey, debug = false, config = {}) {
+		return new Fleetbase(publicKey, debug, config);
 	}
 
 	setAdapter(adapter) {
