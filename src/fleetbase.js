@@ -67,6 +67,10 @@ class Fleetbase {
 	setAdapter(adapter) {
 		this.adapter = adapter;
 	}
+
+	getAdapter() {
+		return this.adapter
+	}
 };
 
 export default Fleetbase;

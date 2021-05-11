@@ -1,6 +1,7 @@
 'use strict';
 
 import Store from './Store';
+import { isEmpty } from './utils';
 
 class Model {
 	/**
@@ -13,6 +14,15 @@ class Model {
 		this.version = version;
 		this.resource = resource;
 		this.store = new Store(resource, adapter);
+	}
+
+	/**
+	 * Getter for id attribute
+	 * 
+	 * @var {String}
+	 */
+	get id() {
+		return this.getAttribute('id');
 	}
 
 	/**
@@ -45,7 +55,7 @@ class Model {
 	 * @return {[type]} [description]
 	 */
 	destroy() {
-
+		return this.store.delete(this.this.attributes.id);
 	}
 
 	/**
@@ -54,7 +64,13 @@ class Model {
 	 * @return {[type]} [description]
 	 */
 	save() {
+		const attributes = this.attributes;
 
+		if (isEmpty(this.attributes.id)) {
+			return this.create(attributes);
+		}
+
+		return this.update(attributes);
 	}
 
 	/**
@@ -64,7 +80,7 @@ class Model {
 	 * @param {[type]} value   [description]
 	 */
 	set(proprty, value = null) {
-
+		this.attributes[property] = value;
 	}
 
 	/**
@@ -72,8 +88,8 @@ class Model {
 	 * 
 	 * @param {Object} properties [description]
 	 */
-	setProperties(properties = {}) {
-
+	setAttributes(attributes = {}) {
+		this.attributes = [...this.attributes, ...attributes];
 	}
 	
 	/**

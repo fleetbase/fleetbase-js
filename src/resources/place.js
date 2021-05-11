@@ -3,7 +3,7 @@
 import Model from '../model';
 
 class Place extends Model {
-    constructor(attributes = {}, version = 'v1', adapter) {
+    constructor(attributes = {}, adapter, version = 'v1') {
         super(attributes, version, 'place', adapter);
     }
 };
