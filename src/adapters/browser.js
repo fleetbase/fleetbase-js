@@ -77,6 +77,7 @@ class BrowserAdapter extends Adapter {
             })
                 .then(this.parseJSON)
                 .then((response) => {
+                    console.log('[request:response]', response);
                     if (response.ok) {
                         return resolve(response.json);
                     }

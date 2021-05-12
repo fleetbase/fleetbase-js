@@ -7,11 +7,12 @@ import { Collection } from './utils';
 import Model from './model';
 
 class Store {
-    constructor(resource, adapter) {
+    constructor(resource, adapter, options = {}) {
         this.resource = resource;
         this.adapter = adapter || lookup('adapter', 'BrowserAdapter');
         this.namespace = pluralize(resource);
         this.storage = new Collection();
+        this.options = options;
     }
 
     deposit(resourceInstance) {
@@ -25,6 +26,10 @@ class Store {
     }
 
     afterFetch(json) {
+        if (typeof this.options.onAfterFetch === 'function') {
+            this.options.onAfterFetch(json);
+        }
+
         if (isArray(json)) {
             let serialized = [];
 
@@ -36,44 +41,67 @@ class Store {
         }
 
         const resourceInstance = this.serialize(json);
-
         return this.deposit(resourceInstance);
     }
 
-    create(attributes = {}) {
-        return this.adapter.post(`${this.namespace}`, attributes).then(this.afterFetch.bind(this));
+    create(attributes = {}, options = {}) {
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.post(`${this.namespace}`, attributes).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 
-    update(id, attributes = {}) {
-        return this.adapter.put(`${this.namespace}/${id}`, attributes).then(this.afterFetch);
+    update(id, attributes = {}, options = {}) {
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.put(`${this.namespace}/${id}`, attributes).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 
-    findRecord(id) {
-        return this.adapter.get(`${this.namespace}/${id}`).then(this.afterFetch);
+    findRecord(id, options = {}) {
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.get(`${this.namespace}/${id}`).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 
     findAll() {
-        return this.adapter.get(`${this.namespace}`).then(this.afterFetch);
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.get(`${this.namespace}`).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 
-    query(query = {}) {
-        return this.adapter.get(`${this.namespace}`, query).then(this.afterFetch);
+    query(query = {}, options = {}) {
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.get(`${this.namespace}`, query).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 
-    queryRecord(query = {}) {
+    queryRecord(query = {}, options = {}) {
         query.single = true;
 
-        return this.adapter.get(`${this.namespace}`, query).then(this.afterFetch);
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.get(`${this.namespace}`, query).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 
-    destroy(record) {
-        if (typeof record === 'string') {
-            return this.adapter.delete(`${this.namespace}/${record}`).then(this.afterFetch);
-        }
+    destroy(record, options = {}) {
+        const id = record instanceof Model ? record.getAttribute('id') : record;
 
-        if (record instanceof Model) {
-            return this.adapter.delete(`${this.namespace}/${record.getAttribute('id')}`).then(this.afterFetch);
-        }
+        return new Promise(async (resolve, reject) => {
+            const response = await this.adapter.delete(`${this.namespace}/${id}`).then(this.afterFetch.bind(this)).catch(reject);
+
+            resolve(response);
+        });
     }
 }
 

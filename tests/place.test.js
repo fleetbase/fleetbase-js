@@ -1,79 +1,114 @@
 import { assert } from 'chai';
 import Fleetbase from '../src/fleetbase';
 import Model from '../src/model';
+import Store from '../src/store';
 import { Place } from '../src/resources';
 
 const fleetbase = new Fleetbase('flb_test_lxHdcBHAHeuDCQS9udhZ');
 const adapter = fleetbase.getAdapter();
 
 // create an instance of the fleetbase sdk
-describe('Create a Place using SDK', async () => {
-    const place = await fleetbase.places.create({
-        name: 'Warehouse',
-        street1: '23 Serangoon Central Nex',
-        country: 'Singapore'
-    });
+describe('fleetbase.places', () => {
 
-	it('should be an instance of Place', () => assert.instanceOf(place, Place));
-	
-	it('should be an instance of Model', () => assert.instanceOf(place, Model));
-	
-	it('should be able to get street1 attribute', () => assert.equal(place.getAttribute('street1'), '23 Serangoon Central Nex'));
+	const context = { id: null };
 
-	describe('Update the Place resource instance', async () => {
-		const updatedPlace = await fleetbase.places.update(place.id, {
-			street2: '#5-22'
+	describe('#create()', () => {
+		it('Should create a Place resource', async () => {
+			const place = await fleetbase.places.create({
+				name: 'Warehouse',
+				street1: '23 Serangoon Central Nex',
+				country: 'Singapore'
+			});
+	
+			context.id = place.id;
+	
+			assert.instanceOf(place, Place);
+			assert.instanceOf(place, Model);
 		});
-
-		it('should be an instance of Place', () => assert.instanceOf(updatedPlace, Place));
 	
-		it('should be an instance of Model', () => assert.instanceOf(updatedPlace, Model));
-		
-		it('street2 attribute should be updated', () => assert.equal(updatedPlace.getAttribute('street2'), '#5-22'));
+		it('Should have an id', () => {
+			assert.isString(context.id);
+			assert.include(context.id, 'place', `id: ${context.id}`);
+		});
 	});
-
-	describe('Delete the Place resource instance', async () => {
-		const deletedPlace = await fleetbase.places.destroy(place);
-
-		it('should be an instance of Place', () => assert.instanceOf(deletedPlace, Place));
 	
-		it('should be an instance of Model', () => assert.instanceOf(deletedPlace, Model));
+	describe('#update()', () => {
+		it('Should update the Place resource instance', async () => {
+			const { id } = context;
+			const place = await fleetbase.places.update(id, {
+				street2: '#5-22'
+			});
+	
+			assert.instanceOf(place, Place);
+			assert.instanceOf(place, Model);
+			assert.equal(place.getAttribute('street2'), '#5-22');
+		});
+	});
+	
+	describe('#delete()', () => {
+		it('Should delete the Place resource instance', async () => {
+			const { id } = context;
+			const place = await fleetbase.places.destroy(id);
+	
+			assert.instanceOf(place, Place);
+			assert.instanceOf(place, Model);
+			assert.isTrue(place.getAttribute('deleted'));
+		});
 	});
 });
 
 // create a place instance without fleetbase sdk
-describe('Create a Place by Model Instance', async () => {
-	const place = new Place({
-		name: 'Warehouse',
-		street1: '23 Serangoon Central Nex',
-		country: 'Singapore'
-	}, adapter);
+describe('Place', async () => {
 
-    await place.save();
-	
-	it('should be an instance of Place', () => assert.instanceOf(place, Place));
-	
-	it('should be an instance of Model', () => assert.instanceOf(place, Model));
-	
-	it('should be able to get street1 attribute', () => assert.equal(place.getAttribute('street1'), '23 Serangoon Central Nex'));
+	const context = {
+		place: new Place({
+			name: 'Warehouse',
+			street1: '23 Serangoon Central Nex',
+			country: 'Singapore'
+		}, adapter)
+	};
 
-	describe('Update the Place resource instance', async () => {
-		place.setAttribute('street2', '#5-22');
+	describe('#create()', () => {
+		it('Should create a Place resource', async () => {
+			const { place } = context;
 
-		await place.save();
+			await place.save();
 
-		it('should be an instance of Place', () => assert.instanceOf(place, Place));
-	
-		it('should be an instance of Model', () => assert.instanceOf(place, Model));
-		
-		it('street2 attribute should be updated', () => assert.equal(place.getAttribute('street2'), '#5-22'));
+			assert.instanceOf(place, Place);
+			assert.instanceOf(place, Model);
+		});
+
+		it('Should have an id', () => {
+			assert.isString(context.place.id);
+			assert.include(context.place.id, 'place', `id: ${context.place.id}`);
+		});
 	});
 
-	describe('Delete the Place resource instance', async () => {
-		await place.destroy();
+	describe('#update()', () => {
+		it('Should update the Place resource instance', async () => {
+			const { place } = context;
 
-		it('should be an instance of Place', () => assert.instanceOf(deletedPlace, Place));
-	
-		it('should be an instance of Model', () => assert.instanceOf(deletedPlace, Model));
+			await place.update({
+				street2: '#5-22'
+			});
+
+			console.log('[place.update()]', place);
+
+			assert.instanceOf(place, Place);
+			assert.instanceOf(place, Model);
+			assert.equal(place.getAttribute('street2'), '#5-22');
+		});
+	});
+
+	describe('#delete()', () => {
+		it('Should delete the Place resource instance', async () => {
+			const { place } = context;
+
+			await place.destroy();
+
+			assert.instanceOf(place, Place);
+			assert.instanceOf(place, Model);
+			assert.isTrue(place.getAttribute('deleted'));
+		});
 	});
 });

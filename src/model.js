@@ -13,7 +13,9 @@ class Model {
 		this.attributes = attributes;
 		this.version = version;
 		this.resource = resource;
-		this.store = new Store(resource, adapter);
+		this.store = new Store(resource, adapter, {
+			onAfterFetch: this.syncAttributes.bind(this)
+		});
 	}
 
 	/**
@@ -31,10 +33,10 @@ class Model {
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
 	 */
-	create(attributes = {}) {
-		this.attributes = [...this.attributes, ...attributes];
+	create(attrs = {}) {
+		const attributes = this.mergeAttributes(attrs);
 		
-		return this.store.create(this.attributes);
+		return this.store.create(attributes);
 	}
 
 	/**
@@ -43,10 +45,10 @@ class Model {
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
 	 */
-	update(attributes = {}) {
-		this.attributes = [...this.attributes, ...attributes];
+	update(attrs = {}) {
+		const attributes = this.mergeAttributes(attrs);
 		
-		return this.store.update(this.attributes.id, this.attributes);
+		return this.store.update(this.attributes.id, attributes);
 	}
 
 	/**
@@ -55,7 +57,7 @@ class Model {
 	 * @return {[type]} [description]
 	 */
 	destroy() {
-		return this.store.delete(this.this.attributes.id);
+		return this.store.destroy(this.attributes.id);
 	}
 
 	/**
@@ -89,7 +91,7 @@ class Model {
 	 * @param {Object} properties [description]
 	 */
 	setAttributes(attributes = {}) {
-		this.attributes = [...this.attributes, ...attributes];
+		this.attributes =  { ...this.attributes, ...attributes };
 	}
 	
 	/**
@@ -100,6 +102,29 @@ class Model {
 	 */
 	 getAttribute(attribute) {
 		return this.attributes[attribute];
+	}
+	
+	/**
+	 * Merge and return attributes on the model instance.
+	 * 
+	 * @param {[type]} proprty [description]
+	 * @param {[type]} value   [description]
+	 */
+	 mergeAttributes(attributes = {}) {
+		const modelAttributes = this.attributes || {};
+		this.attributes =  { ...modelAttributes, ...attributes };
+
+		return this.attributes;
+	}
+	
+	/**
+	 * Merge and return attributes on the model instance.
+	 * 
+	 * @param {[type]} proprty [description]
+	 * @param {[type]} value   [description]
+	 */
+	 syncAttributes(json = {}) {
+		this.attributes = json;
 	}
 };
 
