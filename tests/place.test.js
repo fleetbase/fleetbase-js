@@ -92,8 +92,6 @@ describe('Place', async () => {
 				street2: '#5-22'
 			});
 
-			console.log('[place.update()]', place);
-
 			assert.instanceOf(place, Place);
 			assert.instanceOf(place, Model);
 			assert.equal(place.getAttribute('street2'), '#5-22');

@@ -33,10 +33,10 @@ class Model {
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
 	 */
-	create(attrs = {}) {
-		const attributes = this.mergeAttributes(attrs);
+	create(attributes = {}) {
+		const data = this.mergeAttributes(attributes);
 		
-		return this.store.create(attributes);
+		return this.store.create(data);
 	}
 
 	/**
@@ -45,8 +45,7 @@ class Model {
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
 	 */
-	update(attrs = {}) {
-		const attributes = this.mergeAttributes(attrs);
+	update(attributes = {}) {
 		
 		return this.store.update(this.attributes.id, attributes);
 	}
