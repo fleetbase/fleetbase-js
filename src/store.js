@@ -1,4 +1,4 @@
-'use strict';
+
 
 import { lookup } from './resolver';
 import { pluralize, classify } from './utils/string';
@@ -31,7 +31,7 @@ class Store {
         }
 
         if (isArray(json)) {
-            let serialized = [];
+            const serialized = [];
 
             for (let i = 0; i < json.length; i++) {
                 serialized.push(this.afterFetch(json[i]));

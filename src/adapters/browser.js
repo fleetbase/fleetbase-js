@@ -1,4 +1,4 @@
-'use strict';
+
 
 import Adapter from '../adapter';
 import { isBlank } from '../utils';
@@ -7,13 +7,13 @@ import 'cross-fetch/polyfill';
 class BrowserAdapter extends Adapter {
     /**
      * Setup browser adapter.
-     * @param {Object} config 
+     * @param {Object} config
      */
     constructor(config) {
         super(config);
 
         this.setHeaders({
-            'Authorization': `Bearer ${config.publicKey}`,
+            Authorization: `Bearer ${config.publicKey}`,
             'Content-Type': 'application/json',
             'User-Agent': '@fleetbase/sdk;browser'
         });
@@ -25,7 +25,7 @@ class BrowserAdapter extends Adapter {
      * @param {Object} headers
      */
     setHeaders(headers = {}) {
-        this.headers = {...this.headers, ...headers};
+        this.headers = { ...this.headers, ...headers };
     }
 
     /**
@@ -37,21 +37,17 @@ class BrowserAdapter extends Adapter {
      * @return {Promise}
      */
     parseJSON(response) {
-        return new Promise((resolve, reject) =>
-            response
-                .json()
-                .then((json) =>
-                    resolve({
-                        statusText: response.statusText,
-                        status: response.status,
-                        ok: response.ok,
-                        json,
-                    })
-                )
-                .catch(() => {
-                    reject(new Error('Oops! Something went wrong when handling your request.'));
-                })
-        );
+        return new Promise((resolve, reject) => response
+            .json()
+            .then((json) => resolve({
+                statusText: response.statusText,
+                status: response.status,
+                ok: response.ok,
+                json,
+            }))
+            .catch(() => {
+                reject(new Error('Oops! Something went wrong when handling your request.'));
+            }));
     }
 
     /**
@@ -64,29 +60,27 @@ class BrowserAdapter extends Adapter {
      *
      * @return {Promise}
      */
-     request(path, method = 'GET', data = {}, options = {}) {
-        return new Promise((resolve, reject) => {
-            return fetch(`${this.host}/${this.namespace}/${path}`, {
-                method,
-                mode: options.mode || 'cors',
-                headers: {
-                    ...(this.headers || {}),
-                    ...(options.headers || {}),
-                },
-                ...data,
-            })
-                .then(this.parseJSON)
-                .then((response) => {
-                    if (response.ok) {
-                        return resolve(response.json);
-                    }
+    request(path, method = 'GET', data = {}, options = {}) {
+        return new Promise((resolve, reject) => fetch(`${this.host}/${this.namespace}/${path}`, {
+            method,
+            mode: options.mode || 'cors',
+            headers: {
+                ...(this.headers || {}),
+                ...(options.headers || {}),
+            },
+            ...data,
+        })
+            .then(this.parseJSON)
+            .then((response) => {
+                if (response.ok) {
+                    return resolve(response.json);
+                }
 
-                    return reject(new Error(response.json.errors ? response.json.errors[0] : response.statusText));
-                })
-                .catch((error) => {
-                    reject(error);
-                });
-        });
+                return reject(new Error(response.json.errors ? response.json.errors[0] : response.statusText));
+            })
+            .catch((error) => {
+                reject(error);
+            }));
     }
 
     /**
@@ -101,7 +95,7 @@ class BrowserAdapter extends Adapter {
     get(path, query = {}, options = {}) {
         const urlParams = !isBlank(query) ? new URLSearchParams(query).toString() : '';
 
-        return this.request(`${path}${urlParams ? '?' + urlParams : ''}`, 'GET', {}, options);
+        return this.request(`${path}${urlParams ? `?${urlParams}` : ''}`, 'GET', {}, options);
     }
 
     /**

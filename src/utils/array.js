@@ -1,4 +1,4 @@
-const isArray = Array.isArray;
+const { isArray } = Array;
 
 export {
     isArray

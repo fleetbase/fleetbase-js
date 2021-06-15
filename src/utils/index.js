@@ -12,4 +12,4 @@ export {
     isLatitude,
     isLongitude,
     uuid
-}
+};

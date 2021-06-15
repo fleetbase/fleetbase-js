@@ -6,7 +6,7 @@ import { Place } from '../src/resources';
 
 // create an instance of the fleetbase sdk
 describe('Create a Fleetbase SDK instance', () => {
-	const fleetbase = new Fleetbase('flb_test_lxHdcBHAHeuDCQS9udhZ');
+	const fleetbase = new Fleetbase();
 	
 	it('should be an instance of Fleetbase', () => {
         assert.instanceOf(fleetbase, Fleetbase);

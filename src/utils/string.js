@@ -119,10 +119,10 @@ export default class String {
     }
 
     /*
-        Inflector.pluralize('person')           -> 'people'
-        Inflector.pluralize('octopus')          -> 'octopi'
-        Inflector.pluralize('Hat')              -> 'Hats'
-        Inflector.pluralize('person', 'guys')   -> 'guys'    
+        String.pluralize('person')           -> 'people'
+        String.pluralize('octopus')          -> 'octopi'
+        String.pluralize('Hat')              -> 'Hats'
+        String.pluralize('person', 'guys')   -> 'guys'    
     */
     pluralize(str, plural = null) {
         str = str || this.str;
@@ -131,10 +131,10 @@ export default class String {
     }
 
     /*
-        Inflector.singularize('person')         -> 'person'
-        Inflector.singularize('octopi')         -> 'octopus'
-        Inflector.singularize('hats')           -> 'hat'
-        Inflector.singularize('guys', 'person') -> 'person'
+        String.singularize('person')         -> 'person'
+        String.singularize('octopi')         -> 'octopus'
+        String.singularize('hats')           -> 'hat'
+        String.singularize('guys', 'person') -> 'person'
     */
     singularize(str, singular) {
         str = str || this.str;
@@ -143,8 +143,8 @@ export default class String {
     }
 
     /*
-        Inflector.camelize('message_properties')        -> 'MessageProperties'
-        Inflector.camelize('message_properties', true)  -> 'messageProperties'
+        String.camelize('message_properties')        -> 'MessageProperties'
+        String.camelize('message_properties', true)  -> 'messageProperties'
     */
     camelize(str, lowFirstLetter) {
         str = str || this.str;
@@ -180,8 +180,8 @@ export default class String {
     }
 
     /*
-        Inflector.underscore('MessageProperties')       -> 'message_properties'
-        Inflector.underscore('messageProperties')       -> 'message_properties'
+        String.underscore('MessageProperties')       -> 'message_properties'
+        String.underscore('messageProperties')       -> 'message_properties'
     */
     underscore(str) {
         str = str || this.str;
@@ -205,8 +205,8 @@ export default class String {
     }
 
     /*
-        Inflector.humanize('message_properties')        -> 'Message properties'
-        Inflector.humanize('message_properties')        -> 'message properties'
+        String.humanize('message_properties')        -> 'Message properties'
+        String.humanize('message_properties')        -> 'message properties'
     */
     humanize(str, lowFirstLetter) {
         str = str || this.str;
@@ -230,8 +230,8 @@ export default class String {
     }
 
     /*
-        Inflector.capitalize('message_properties')      -> 'Message_properties'
-        Inflector.capitalize('message properties')      -> 'Message properties'
+        String.capitalize('message_properties')      -> 'Message_properties'
+        String.capitalize('message properties')      -> 'Message properties'
     */
     capitalize(str) {
         str = str || this.str;
@@ -251,8 +251,8 @@ export default class String {
     }
 
     /*
-        Inflector.dasherize('message_properties')       -> 'message-properties'
-        Inflector.dasherize('message properties')       -> 'message-properties'
+        String.dasherize('message_properties')       -> 'message-properties'
+        String.dasherize('message properties')       -> 'message-properties'
     */
     dasherize(str) {
         str = str || this.str;
@@ -272,8 +272,8 @@ export default class String {
     }
 
     /*
-        Inflector.normify('message_properties')         -> 'Message Properties'
-        Inflector.normify('message properties')         -> 'Message Properties'
+        String.normify('message_properties')         -> 'Message Properties'
+        String.normify('message properties')         -> 'Message Properties'
         Inflactor.normify('Message_propertyId', true)   -> 'Message Properties Id'
     */
     normify(str, allFirstUpper) {
@@ -313,7 +313,7 @@ export default class String {
     }
 
     /*
-        Inflector.demodulize('Message::Bus::Properties')    -> 'Properties'
+        String.demodulize('Message::Bus::Properties')    -> 'Properties'
     */
     demodulize(str) {
         str = str || this.str;
@@ -333,7 +333,7 @@ export default class String {
     }
 
     /*
-        Inflector.tableize('MessageBusProperty')    -> 'message_bus_properties'
+        String.tableize('MessageBusProperty')    -> 'message_bus_properties'
     */
     tableize(str) {
         str = str || this.str;
@@ -352,7 +352,7 @@ export default class String {
     }
 
     /*
-        Inflector.classify('message_bus_properties')    -> 'MessageBusProperty'
+        String.classify('message_bus_properties')    -> 'MessageBusProperty'
     */
     classify(str) {
         str = str || this.str;
@@ -371,8 +371,8 @@ export default class String {
     }
 
     /*
-        Inflector.foreignKey('MessageBusProperty')       -> 'message_bus_property_id'
-        Inflector.foreignKey('MessageBusProperty', true) -> 'message_bus_propertyid'
+        String.foreignKey('MessageBusProperty')       -> 'message_bus_property_id'
+        String.foreignKey('MessageBusProperty', true) -> 'message_bus_propertyid'
     */
     foreignKey(str, dropIdUbar = false) {
         str = str || this.str;
@@ -391,7 +391,7 @@ export default class String {
     }
 
     /*
-        Inflector.ordinalize('the 1 pitch')     -> 'the 1st pitch'
+        String.ordinalize('the 1 pitch')     -> 'the 1st pitch'
     */
     ordinalize(str) {
         str = str || this.str;

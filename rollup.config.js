@@ -20,6 +20,6 @@ export default {
 	      modulesOnly: true
 	    }),
 		terser(),
-		eslint()
+		// eslint()
 	]
 };

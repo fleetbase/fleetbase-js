@@ -1,59 +1,59 @@
-'use strict';
+
 
 class Collection extends Array {
-	/**
+    /**
 	 * [constructor description]
-	 * 
+	 *
 	 * @param  {...[type]} items [description]
 	 * @return {[type]}          [description]
 	 */
-	constructor(...items) {
-		super(...arguments);
-	}
+    constructor(...items) {
+        super(...arguments);
+    }
 
-	/**
+    /**
 	 * [pushObject description]
-	 * 
+	 *
 	 * @param  {[type]} object [description]
 	 * @return {[type]}        [description]
 	 */
-	pushObject(object) {
+    pushObject(object) {
 
-	}
+    }
 
-	/**
+    /**
 	 * [removeObject description]
 	 * @param  {[type]} object [description]
 	 * @return {[type]}        [description]
 	 */
-	removeObject(object) {
+    removeObject(object) {
 
-	}
+    }
 
-	/**
+    /**
 	 * [query description]
 	 * @param  {[type]} query [description]
 	 * @return {[type]}       [description]
 	 */
-	query(query) {
+    query(query) {
 
-	}
+    }
 
-	/**
+    /**
 	 * [first description]
 	 * @return {[type]} [description]
 	 */
-	get first() {
+    get first() {
 
-	}
+    }
 
-	/**
+    /**
 	 * [last description]
 	 * @return {[type]} [description]
 	 */
-	get last() {
+    get last() {
 
-	}
-};
+    }
+}
 
 export default Collection;

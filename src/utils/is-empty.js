@@ -1,5 +1,5 @@
 const isEmpty = (obj) => {
-    let none = obj === null || obj === undefined;
+    const none = obj === null || obj === undefined;
     if (none) {
         return none;
     }
@@ -8,10 +8,10 @@ const isEmpty = (obj) => {
         return !obj.size;
     }
 
-    let objectType = typeof obj;
+    const objectType = typeof obj;
 
     if (objectType === 'object') {
-        let size = obj.size;
+        const { size } = obj;
         if (typeof size === 'number') {
             return !size;
         }
@@ -22,7 +22,7 @@ const isEmpty = (obj) => {
     }
 
     if (objectType === 'object') {
-        let length = obj.length;
+        const { length } = obj;
         if (typeof length === 'number') {
             return !length;
         }

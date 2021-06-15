@@ -1,4 +1,4 @@
-'use strict';
+
 
 import { Place, Payload, Order } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
@@ -12,7 +12,7 @@ const models = {
 
 const adapters = {
     BrowserAdapter,
-    NodeAdapter, 
+    NodeAdapter,
     EmberJsAdapter
 };
 
@@ -39,11 +39,9 @@ class Resolver {
     }
 }
 
-const lookup = (type, className, options = {}) => {
-    return new Resolver(type, className, options);
-}
+const lookup = (type, className, options = {}) => new Resolver(type, className, options);
 
 export {
     Resolver,
     lookup
-}
+};

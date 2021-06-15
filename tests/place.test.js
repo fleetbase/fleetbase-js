@@ -1,10 +1,9 @@
 import { assert } from 'chai';
 import Fleetbase from '../src/fleetbase';
 import Model from '../src/model';
-import Store from '../src/store';
 import { Place } from '../src/resources';
 
-const fleetbase = new Fleetbase('flb_test_lxHdcBHAHeuDCQS9udhZ');
+const fleetbase = new Fleetbase();
 const adapter = fleetbase.getAdapter();
 
 // create an instance of the fleetbase sdk
