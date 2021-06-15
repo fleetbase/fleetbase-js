@@ -2,7 +2,7 @@
 
 import Adapter from '../adapter';
 import { isBlank } from '../utils';
-import 'cross-fetch/polyfill';
+import fetch from 'cross-fetch';
 
 class BrowserAdapter extends Adapter {
     /**
