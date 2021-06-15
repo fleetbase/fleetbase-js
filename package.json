@@ -12,7 +12,7 @@
     "test": "mocha --require @babel/polyfill --require @babel/register --require source-map-support/register tests/*.test.js"
   },
   "author": "Ronald A. Richardson <ron@fleetbase.io> (https://ron.dev)",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "devDependencies": {
     "@babel/core": "^7.14.0",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
@@ -23,7 +23,6 @@
     "@babel/preset-env": "^7.14.1",
     "@babel/register": "^7.13.16",
     "chai": "^4.3.4",
-    "cross-fetch": "^3.1.4",
     "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.16.0",
@@ -34,7 +33,35 @@
     "source-map-support": "^0.5.19"
   },
   "dependencies": {
+    "cross-fetch": "^3.1.4",
     "global": "^4.4.0",
     "rollup": "^2.50.5"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fleetbase/fleetbase-js.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "logistics",
+    "ondemand",
+    "delivery",
+    "operations",
+    "logistics",
+    "api",
+    "fleet",
+    "management",
+    "fleet",
+    "api"
+  ],
+  "bugs": {
+    "url": "https://github.com/fleetbase/fleetbase-js/issues"
+  },
+  
+  "homepage": "https://github.com/fleetbase/fleetbase-js#readme"
 }
