@@ -1,7 +1,6 @@
 
 
 import Store from './store';
-import { lookup } from './resolver';
 import { isNodeEnvironment, detectAdapter } from './utils';
 
 /**
