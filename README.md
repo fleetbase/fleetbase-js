@@ -13,6 +13,9 @@ Build custom real-time on-demand experiences, and easily manage the flow from st
   <a href="https://www.npmjs.com/package/@fleetbase/sdk">
     <img src="https://img.shields.io/npm/dw/@fleetbase/sdk" alt="Downloads/week" />
   </a>
+  <a href="https://bundlephobia.com/package/@fleetbase/sdk@1.0.0">
+    <img src="https://img.shields.io/bundlephobia/min/@fleetbase/sdk" alt="Bundle Size" />
+  </a>
   <a href="https://github.com/fleetbase/fleetbase-js/blob/master/LICENSE.md">
     <img src="https://img.shields.io/github/license/fleetbase/fleetbase-js" alt="License" />
   </a>
