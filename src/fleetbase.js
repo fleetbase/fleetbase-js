@@ -2,6 +2,8 @@
 
 import Store from './store';
 import { isNodeEnvironment, detectAdapter } from './utils';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint } from './resources';
+import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
 
 /**
  * // instance
@@ -13,7 +15,7 @@ import { isNodeEnvironment, detectAdapter } from './utils';
  * });
  *
  * // export
- * import { Contact } from '@fleetbase/sdk/resources';
+ * import { Contact } from '@fleetbase/sdk';
  *
  * const contact = new Contact({
  * 		name: 'Ron',
@@ -23,7 +25,7 @@ import { isNodeEnvironment, detectAdapter } from './utils';
  * contact.save();
  */
 
-class Fleetbase {
+export default class Fleetbase {
     /**
 	 * Builds an instance of the Fleetbase SDK
 	 *
@@ -74,4 +76,7 @@ class Fleetbase {
     }
 }
 
-export default Fleetbase;
+
+export {
+    Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter
+};
