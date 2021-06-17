@@ -2,9 +2,10 @@
 
 import Store from './store';
 import { lookup } from './resolver';
+import { isNodeEnvironment, detectAdapter } from './utils';
 
 /**
- * // instancr
+ * // instance
  * const fleetbase = new Fleetbase();
  *
  * const contact = fleetbase.contacts.create({
@@ -41,15 +42,16 @@ class Fleetbase {
             debug,
             publicKey
         };
-        this.adapter = config.adapter || lookup('adapter', 'BrowserAdapter', this.options);
 
         if (typeof publicKey !== 'string' || publicKey.length === 0) {
             throw new Error('⚠️ Invalid public key given to Fleetbase SDK');
         }
 
-        if (publicKey.toLowerCase().startsWith('$')) {
+        if (!isNodeEnvironment() && publicKey.toLowerCase().startsWith('$')) {
             throw new Error('Secret key provided. You must use a public key with Fleetbase Javascript SDK!');
-		  }
+        }
+
+        this.adapter = config.adapter || detectAdapter(this.options);
 
         this.orders = new Store('order', this.adapter);
         this.entities = new Store('entity', this.adapter);
@@ -60,8 +62,8 @@ class Fleetbase {
         this.contacts = new Store('contact', this.adapter);
     }
 
-    static newInstance(publicKey, config = {}, debug = false) {
-        return new Fleetbase(publicKey, debug, config);
+    static newInstance() {
+        return new Fleetbase(...arguments);
     }
 
     setAdapter(adapter) {

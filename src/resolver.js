@@ -4,7 +4,7 @@ import { Place, Payload, Order } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
 import { pluralize, singularize } from './utils/string';
 
-const models = {
+const resources = {
     Place,
     Payload,
     Order
@@ -18,14 +18,15 @@ const adapters = {
 
 class Resolver {
     constructor () {
-        this.models = models;
+        this.resources = resources;
         this.adapters = adapters;
 
         return this.lookup(...arguments);
     }
 
-    lookup(type, className, options = {}) {
+    lookup(type, className) {
         const key = pluralize(type);
+        const params = [ ...arguments ].slice(2);
 
         if (!this[key]) {
             throw new Error('Attempted to resolve invalid type');
@@ -35,11 +36,13 @@ class Resolver {
             throw new Error(`No ${singularize(type)} named ${className} to resolve`);
         }
 
-        return new this[key][className](options);
+        return new this[key][className](...params);
     }
 }
 
-const lookup = (type, className, options = {}) => new Resolver(type, className, options);
+const lookup = function() {
+    return new Resolver(...arguments);
+};
 
 export {
     Resolver,

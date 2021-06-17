@@ -2,7 +2,6 @@
 
 import Adapter from '../adapter';
 import { isBlank } from '../utils';
-import fetch from 'cross-fetch';
 
 class BrowserAdapter extends Adapter {
     /**
@@ -61,13 +60,13 @@ class BrowserAdapter extends Adapter {
      * @return {Promise}
      */
     request(path, method = 'GET', data = {}, options = {}) {
-        return new Promise((resolve, reject) => fetch(`${this.host}/${this.namespace}/${path}`, {
+        return new Promise((resolve, reject) => fetch(options.url || `${this.host}/${this.namespace}/${path}`, {
             method,
             mode: options.mode || 'cors',
-            headers: {
+            headers: new Headers({
                 ...(this.headers || {}),
                 ...(options.headers || {}),
-            },
+            }),
             ...data,
         })
             .then(this.parseJSON)
@@ -133,8 +132,8 @@ class BrowserAdapter extends Adapter {
      *
      * @return {Promise}
      */
-    delete(path, data = {}, options = {}) {
-        return this.request(path, 'DELETE', { body: JSON.stringify(data) }, options);
+    delete(path, options = {}) {
+        return this.request(path, 'DELETE', {}, options);
     }
 
     /**

@@ -3,10 +3,12 @@ import Fleetbase from '../src/fleetbase';
 import Store from '../src/store';
 import Model from '../src/model';
 import { Place } from '../src/resources';
+import 'cross-fetch/polyfill';
 
 // create an instance of the fleetbase sdk
 describe('Create a Fleetbase SDK instance', () => {
-	const fleetbase = new Fleetbase();
+	// const fleetbase = new Fleetbase();
+	const fleetbase = new Fleetbase('$2y$10$uHbd1Sd3TxuvZKS2i4pe7OHDmxyN3xTBU1fDVYIGqtlyYs6jaO.hy', { host: 'https://v2api.fleetbase.engineering' });
 	
 	it('should be an instance of Fleetbase', () => {
         assert.instanceOf(fleetbase, Fleetbase);

@@ -33,6 +33,7 @@
     "source-map-support": "^0.5.19"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "cross-fetch": "^3.1.4",
     "global": "^4.4.0",
     "rollup": "^2.50.5"
@@ -62,6 +63,5 @@
   "bugs": {
     "url": "https://github.com/fleetbase/fleetbase-js/issues"
   },
-  
   "homepage": "https://github.com/fleetbase/fleetbase-js#readme"
 }

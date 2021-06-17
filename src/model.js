@@ -9,10 +9,11 @@ class Model {
 
 	 * @return {[type]} [description]
 	 */
-    constructor(attributes = {}, version = 'v1', resource, adapter) {
+    constructor(attributes = {}, adapter, resource, options = {}) {
         this.attributes = attributes;
-        this.version = version;
         this.resource = resource;
+        this.options = options;
+        this.version = options.version || 'v1';
         this.store = new Store(resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this)
         });

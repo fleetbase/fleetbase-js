@@ -3,13 +3,13 @@
 import { lookup } from './resolver';
 import { pluralize, classify } from './utils/string';
 import { isArray } from './utils/array';
-import { Collection } from './utils';
+import { Collection, detectAdapter } from './utils';
 import Model from './model';
 
 class Store {
     constructor(resource, adapter, options = {}) {
         this.resource = resource;
-        this.adapter = adapter || lookup('adapter', 'BrowserAdapter');
+        this.adapter = adapter || detectAdapter();
         this.namespace = pluralize(resource);
         this.storage = new Collection();
         this.options = options;
@@ -21,8 +21,8 @@ class Store {
         return resourceInstance;
     }
 
-    serialize(options) {
-        return lookup('model', classify(this.resource), options);
+    serialize(json) {
+        return lookup('resource', classify(this.resource), json, this.adapter);
     }
 
     afterFetch(json) {
@@ -46,7 +46,7 @@ class Store {
 
     create(attributes = {}, options = {}) {
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.post(`${this.namespace}`, attributes).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.post(`${this.namespace}`, attributes, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
@@ -54,7 +54,7 @@ class Store {
 
     update(id, attributes = {}, options = {}) {
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.put(`${this.namespace}/${id}`, attributes).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.put(`${this.namespace}/${id}`, attributes, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
@@ -62,15 +62,15 @@ class Store {
 
     findRecord(id, options = {}) {
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}/${id}`).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.get(`${this.namespace}/${id}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
     }
 
-    findAll() {
+    findAll(options = {}) {
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}`).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.get(`${this.namespace}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
@@ -78,7 +78,7 @@ class Store {
 
     query(query = {}, options = {}) {
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}`, query).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.get(`${this.namespace}`, query, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
@@ -88,7 +88,7 @@ class Store {
         query.single = true;
 
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}`, query).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.get(`${this.namespace}`, query, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
@@ -98,7 +98,7 @@ class Store {
         const id = record instanceof Model ? record.getAttribute('id') : record;
 
         return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.delete(`${this.namespace}/${id}`).then(this.afterFetch.bind(this)).catch(reject);
+            const response = await this.adapter.delete(`${this.namespace}/${id}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);
 
             resolve(response);
         });
