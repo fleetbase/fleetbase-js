@@ -69,3 +69,25 @@ const speceNeedle = await fleetbase.places.create({
   country: 'US'
 });
 ```
+
+## Create a custom adapter
+
+You're able to create a custom adapter to handle network request in the Fleetbase SDK. 
+The Fleetbase SDK ships with two standard adapters. The BrowserAdapter which is based on `fetch()` and
+the NodeAdapter based on axios.
+
+```
+import { Adapter } from '@fleetbase/sdk';
+
+class CustomAdapter extends Adapter {
+  constructor(config) {
+    super(config);
+  }
+
+  get() {}
+  post() {}
+  put() {}
+  patch() {}
+  delete() {}
+}
+```

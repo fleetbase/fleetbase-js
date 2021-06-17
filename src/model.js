@@ -14,9 +14,21 @@ class Model {
         this.resource = resource;
         this.options = options;
         this.version = options.version || 'v1';
-        this.store = new Store(resource, adapter, {
+        this.setAdapter(adapter);
+    }
+
+    /**
+     * Set a new adapter to the model instance, this will update the Store instance
+     * 
+     * @param {Adapter} adapter
+     * @return {Model} this
+     */
+    setAdapter(adapter) {
+        this.store = new Store(this.resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this)
         });
+
+        return this;
     }
 
     /**
