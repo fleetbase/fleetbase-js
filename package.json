@@ -1,9 +1,12 @@
 {
   "name": "@fleetbase/sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fleetbase JS & Node SDK",
   "main": "src/fleetbase.js",
-  "files": ["src/resources.js", "src/adapters.js"],
+  "files": [
+    "src/resources.js",
+    "src/adapters.js"
+  ],
   "scripts": {
     "prebuild": "npm run lint",
     "lint": "eslint src",
