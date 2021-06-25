@@ -1,11 +1,9 @@
-
-
 import Store from './Store';
 import { isEmpty } from './utils';
 
-class Model {
+class Resource {
     /**
-	 * The base model for all resources
+	 * The base resource for all resources
 
 	 * @return {[type]} [description]
 	 */
@@ -18,10 +16,10 @@ class Model {
     }
 
     /**
-     * Set a new adapter to the model instance, this will update the Store instance
+     * Set a new adapter to the resource instance, this will update the Store instance
      * 
      * @param {Adapter} adapter
-     * @return {Model} this
+     * @return {Resource} this
      */
     setAdapter(adapter) {
         this.store = new Store(this.resource, adapter, {
@@ -41,7 +39,7 @@ class Model {
     }
 
     /**
-	 * Creates a new model on the server
+	 * Creates a new resource on the server
 	 *
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
@@ -53,7 +51,7 @@ class Model {
     }
 
     /**
-	 * Creates a new model on the server
+	 * Creates a new resource on the server
 	 *
 	 * @param  {Object} payload [description]
 	 * @return {[type]}         [description]
@@ -64,7 +62,7 @@ class Model {
     }
 
     /**
-	 * Deletes the model instance on the server
+	 * Deletes the resource instance on the server
 	 *
 	 * @return {[type]} [description]
 	 */
@@ -73,7 +71,7 @@ class Model {
     }
 
     /**
-	 * Saves the model instance on the server
+	 * Saves the resource instance on the server
 	 *
 	 * @return {[type]} [description]
 	 */
@@ -117,7 +115,7 @@ class Model {
     }
 
     /**
-	 * Merge and return attributes on the model instance.
+	 * Merge and return attributes on the resource instance.
 	 *
 	 * @param {[type]} proprty [description]
 	 * @param {[type]} value   [description]
@@ -130,7 +128,7 @@ class Model {
     }
 
     /**
-	 * Merge and return attributes on the model instance.
+	 * Merge and return attributes on the resource instance.
 	 *
 	 * @param {[type]} proprty [description]
 	 * @param {[type]} value   [description]
@@ -140,4 +138,4 @@ class Model {
     }
 }
 
-export default Model;
+export default Resource;

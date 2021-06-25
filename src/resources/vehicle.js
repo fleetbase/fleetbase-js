@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Vehicle extends Model {
+class Vehicle extends Resource {
 }
 
 export default Vehicle;

@@ -1,4 +1,5 @@
 import Store from './store';
+import Resource from './resource';
 import { isNodeEnvironment, detectAdapter } from './utils';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
@@ -79,5 +80,5 @@ export default class Fleetbase {
 
 
 export {
-    Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter, isLatitude, isLongitude
+    Store, Resource, Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter, isLatitude, isLongitude
 };

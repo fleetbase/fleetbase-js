@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Contact extends Model {
+class Contact extends Resource {
 }
 
 export default Contact;

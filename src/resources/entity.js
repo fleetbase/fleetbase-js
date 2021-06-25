@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Entity extends Model {
+class Entity extends Resource {
 }
 
 export default Entity;

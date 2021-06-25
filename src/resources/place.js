@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Place extends Model {
+class Place extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'place', options);
     }

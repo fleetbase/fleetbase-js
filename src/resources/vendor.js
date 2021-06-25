@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Vendor extends Model {
+class Vendor extends Resource {
 }
 
 export default Vendor;

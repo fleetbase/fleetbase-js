@@ -1,9 +1,9 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 import Collection from '../utils/collection';
 
-class Payload extends Model {
+class Payload extends Resource {
     /**
 	 * Attaches an entity to an existing payload and returns
 	 * the payload with the entity attached

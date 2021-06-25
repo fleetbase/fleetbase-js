@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Driver extends Model {
+class Driver extends Resource {
 }
 
 export default Driver;

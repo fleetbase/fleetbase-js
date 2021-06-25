@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class Order extends Model {
+class Order extends Resource {
 }
 
 export default Order;

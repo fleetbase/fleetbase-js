@@ -1,8 +1,8 @@
 
 
-import Model from '../model';
+import Resource from '../resource';
 
-class TrackingStatus extends Model {
+class TrackingStatus extends Resource {
 }
 
 export default TrackingStatus;
