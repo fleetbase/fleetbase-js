@@ -1,5 +1,3 @@
-
-
 import Store from './store';
 import { isNodeEnvironment, detectAdapter } from './utils';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint } from './resources';
@@ -14,6 +12,8 @@ import { isLatitude, isLongitude } from './utils';
  * 		name: 'Ron',
  * 		phone: '+65 9999 8888'
  * });
+ * 
+ * constact.update({ name: 'Hollywood Ron' });
  *
  * // export
  * import { Contact } from '@fleetbase/sdk';
@@ -30,10 +30,10 @@ export default class Fleetbase {
     /**
 	 * Builds an instance of the Fleetbase SDK
 	 *
-	 * @param  {String} publicKey The public key issued
-	 * @param  {String} version   The version of resource to access
-	 * @param  {Object} config    Config to overwrite
-	 * @return {Fletbase}        Instance
+	 * @param  {String}  publicKey  The public key issued
+	 * @param  {Object}  config     The version of resource to access
+	 * @param  {Boolean} debug      Debug mode for SDK
+	 * @return {Fleetbase}          Instance
 	 */
     constructor(publicKey, config = {}, debug = false) {
         this.version = config.version || 'v1';
