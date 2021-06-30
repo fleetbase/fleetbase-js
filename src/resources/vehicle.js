@@ -1,5 +1,3 @@
-
-
 import Resource from '../resource';
 
 class Vehicle extends Resource {

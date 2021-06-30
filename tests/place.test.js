@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import Fleetbase from '../src/fleetbase';
-import Model from '../src/model';
+import Resource from '../src/resource';
 import { Place } from '../src/resources';
 import 'cross-fetch/polyfill';
 
@@ -24,7 +24,7 @@ describe('fleetbase.places', () => {
 			context.id = place.id;
 	
 			assert.instanceOf(place, Place);
-			assert.instanceOf(place, Model);
+			assert.instanceOf(place, Resource);
 		});
 	
 		it('Should have an id', () => {
@@ -41,7 +41,7 @@ describe('fleetbase.places', () => {
 			});
 	
 			assert.instanceOf(place, Place);
-			assert.instanceOf(place, Model);
+			assert.instanceOf(place, Resource);
 			assert.equal(place.getAttribute('street2'), '#5-22');
 		});
 	});
@@ -52,7 +52,7 @@ describe('fleetbase.places', () => {
 			const place = await fleetbase.places.destroy(id);
 	
 			assert.instanceOf(place, Place);
-			assert.instanceOf(place, Model);
+			assert.instanceOf(place, Resource);
 			assert.isTrue(place.getAttribute('deleted'));
 		});
 	});
@@ -76,7 +76,7 @@ describe('Place', async () => {
 			await place.save();
 
 			assert.instanceOf(place, Place);
-			assert.instanceOf(place, Model);
+			assert.instanceOf(place, Resource);
 		});
 
 		it('Should have an id', () => {
@@ -94,7 +94,7 @@ describe('Place', async () => {
 			});
 
 			assert.instanceOf(place, Place);
-			assert.instanceOf(place, Model);
+			assert.instanceOf(place, Resource);
 			assert.equal(place.getAttribute('street2'), '#5-22');
 		});
 	});
@@ -106,7 +106,7 @@ describe('Place', async () => {
 			await place.destroy();
 
 			assert.instanceOf(place, Place);
-			assert.instanceOf(place, Model);
+			assert.instanceOf(place, Resource);
 			assert.isTrue(place.getAttribute('deleted'));
 		});
 	});

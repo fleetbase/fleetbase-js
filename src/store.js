@@ -1,10 +1,7 @@
-
-
 import { lookup } from './resolver';
 import { pluralize, classify } from './utils/string';
 import { isArray } from './utils/array';
-import { Collection, detectAdapter } from './utils';
-import Resource from './resource';
+import { Collection, detectAdapter, isResource } from './utils';
 
 class Store {
     constructor(resource, adapter, options = {}) {
@@ -95,7 +92,7 @@ class Store {
     }
 
     destroy(record, options = {}) {
-        const id = record instanceof Resource ? record.getAttribute('id') : record;
+        const id = isResource(record) ? record.getAttribute('id') : record;
 
         return new Promise(async (resolve, reject) => {
             const response = await this.adapter.delete(`${this.namespace}/${id}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);

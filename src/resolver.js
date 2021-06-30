@@ -1,5 +1,3 @@
-
-
 import { Place, Payload, Order } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
 import { pluralize, singularize } from './utils/string';

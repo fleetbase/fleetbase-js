@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import Fleetbase from '../src/fleetbase';
 import Store from '../src/store';
-import Model from '../src/model';
+import Resource from '../src/resource';
 import { Place } from '../src/resources';
 import 'cross-fetch/polyfill';
 
@@ -42,8 +42,8 @@ describe('Create a Place instance without SDK', () => {
         assert.instanceOf(place, Place);
     });
 	
-	it('should be an instance of Model', () => {
-        assert.instanceOf(place, Model);
+	it('should be an instance of Resource', () => {
+        assert.instanceOf(place, Resource);
     });
 	
 	it('should be able to get street1 attribute', () => {

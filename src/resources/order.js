@@ -1,5 +1,3 @@
-
-
 import Resource from '../resource';
 
 class Order extends Resource {

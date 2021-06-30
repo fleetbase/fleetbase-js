@@ -3,6 +3,7 @@ import isBlank from './is-blank';
 import isEmpty from './is-empty';
 import isLatitude from './is-latitude';
 import isLongitude from './is-longitude';
+import isResource from './is-resource';
 import isNodeEnvironment from './is-node-environment';
 import detectAdapter from './detect-adapter';
 import uuid from './uuid';
@@ -15,5 +16,6 @@ export {
     isEmpty,
     isLatitude,
     isLongitude,
+    isResource,
     uuid
 };

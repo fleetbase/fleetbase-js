@@ -1,5 +1,6 @@
-import Store from './Store';
+import Store from './store';
 import { isEmpty } from './utils';
+import { isArray } from './utils/array';
 
 class Resource {
     /**
@@ -22,6 +23,7 @@ class Resource {
      * @return {Resource} this
      */
     setAdapter(adapter) {
+        this.adapter = adapter;
         this.store = new Store(this.resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this)
         });
@@ -57,7 +59,6 @@ class Resource {
 	 * @return {[type]}         [description]
 	 */
     update(attributes = {}) {
-
         return this.store.update(this.attributes.id, attributes);
     }
 
@@ -88,10 +89,10 @@ class Resource {
     /**
 	 * Set an instance property locally
 	 *
-	 * @param {[type]} proprty [description]
+	 * @param {[type]} property [description]
 	 * @param {[type]} value   [description]
 	 */
-    set(proprty, value = null) {
+    set(property, value = null) {
         this.attributes[property] = value;
     }
 
@@ -107,7 +108,7 @@ class Resource {
     /**
 	 * Get an attribute
 	 *
-	 * @param {[type]} proprty [description]
+	 * @param {[type]} property [description]
 	 * @param {[type]} value   [description]
 	 */
 	 getAttribute(attribute) {
@@ -115,9 +116,52 @@ class Resource {
     }
 
     /**
+	 * Get multiple attributes.
+	 *
+	 * @param {Array} properties [description]
+	 * @param {[type]} value   [description]
+	 */
+	 getAttributes(properties) {
+        const attributes = {};
+
+        if (properties === null || properties === undefined) {
+            return this.attributes;
+        }
+
+        if (typeof properties === 'string') {
+            return this.getAttribute([ ...arguments ]);
+        }
+
+        if (!isArray(properties)) {
+            throw new Error('No attribute properties provided!')
+        }
+
+        for (let i = 0; i < properties.length; i++) {
+            const property = properties[i];
+
+            if (typeof property !== 'string') {
+                continue;
+            }
+
+            attributes[property] = this.getAttribute(property);
+        }
+
+        return attributes;
+    }
+
+    /**
+	 * Serialize resource to a POJO
+	 *
+     * @returns {Object}
+	 */
+	 serialize() {
+        return this.getAttributes();
+    }
+
+    /**
 	 * Merge and return attributes on the resource instance.
 	 *
-	 * @param {[type]} proprty [description]
+	 * @param {[type]} property [description]
 	 * @param {[type]} value   [description]
 	 */
 	 mergeAttributes(attributes = {}) {
@@ -130,7 +174,7 @@ class Resource {
     /**
 	 * Merge and return attributes on the resource instance.
 	 *
-	 * @param {[type]} proprty [description]
+	 * @param {[type]} property [description]
 	 * @param {[type]} value   [description]
 	 */
 	 syncAttributes(json = {}) {

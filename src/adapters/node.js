@@ -1,4 +1,5 @@
 import Adapter from '../adapter';
+import { isBlank } from '../utils';
 import axios from 'axios';
 
 class NodeAdapter extends Adapter {

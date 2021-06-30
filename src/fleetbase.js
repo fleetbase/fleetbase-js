@@ -4,6 +4,7 @@ import { isNodeEnvironment, detectAdapter } from './utils';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
 import { isLatitude, isLongitude } from './utils';
+import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
 
 /**
  * // instance
@@ -13,7 +14,7 @@ import { isLatitude, isLongitude } from './utils';
  * 		name: 'Ron',
  * 		phone: '+65 9999 8888'
  * });
- * 
+ *
  * constact.update({ name: 'Hollywood Ron' });
  *
  * // export
@@ -29,13 +30,13 @@ import { isLatitude, isLongitude } from './utils';
 
 export default class Fleetbase {
     /**
-	 * Builds an instance of the Fleetbase SDK
-	 *
-	 * @param  {String}  publicKey  The public key issued
-	 * @param  {Object}  config     The version of resource to access
-	 * @param  {Boolean} debug      Debug mode for SDK
-	 * @return {Fleetbase}          Instance
-	 */
+     * Builds an instance of the Fleetbase SDK
+     *
+     * @param  {String}  publicKey  The public key issued
+     * @param  {Object}  config     The version of resource to access
+     * @param  {Boolean} debug      Debug mode for SDK
+     * @return {Fleetbase}          Instance
+     */
     constructor(publicKey, config = {}, debug = false) {
         this.version = config.version || 'v1';
         this.options = {
@@ -43,7 +44,7 @@ export default class Fleetbase {
             host: config.host || 'https://api.fleetbase.io',
             namespace: this.version || config.namespace,
             debug,
-            publicKey
+            publicKey,
         };
 
         if (typeof publicKey !== 'string' || publicKey.length === 0) {
@@ -78,7 +79,29 @@ export default class Fleetbase {
     }
 }
 
-
 export {
-    Store, Resource, Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter, isLatitude, isLongitude
+    Store,
+    Resource,
+    Contact,
+    Driver,
+    Entity,
+    Order,
+    Payload,
+    Place,
+    TrackingStatus,
+    Vehicle,
+    Vendor,
+    Waypoint,
+    BrowserAdapter,
+    NodeAdapter,
+    EmberJsAdapter,
+    Adapter,
+    isNodeEnvironment,
+    isLatitude,
+    isLongitude,
+    pluralize,
+    singularize,
+    classify,
+    dasherize,
+    camelize,
 };

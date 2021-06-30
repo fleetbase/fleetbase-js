@@ -1,5 +1,3 @@
-
-
 import Resource from '../resource';
 import Collection from '../utils/collection';
 

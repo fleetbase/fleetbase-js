@@ -1,5 +1,3 @@
-
-
 import Adapter from '../adapter';
 import { isBlank } from '../utils';
 
