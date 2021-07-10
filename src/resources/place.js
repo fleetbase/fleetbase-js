@@ -1,4 +1,5 @@
 import Resource from '../resource';
+import { isResource } from '../utils';
 
 class Place extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
@@ -53,6 +54,24 @@ class Place extends Resource {
         const { latitude, longitude } = this;
 
         return  [ latitude, longitude ];
+    }
+
+    /**
+     * Set the owner of the place.
+     * 
+     * @param {Object|String} owner
+     * @return {Place}
+     */
+    setOwner(owner) {
+        if (isResource(owner)) {
+            this.setAttribute('owner', owner.id);
+        }
+
+        if (typeof owner === 'string') {
+            this.setAttribute('owner', owner);
+        }
+
+        return this;
     }
 }
 
