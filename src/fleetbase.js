@@ -3,7 +3,7 @@ import Resource from './resource';
 import { isNodeEnvironment, detectAdapter } from './utils';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
-import { isLatitude, isLongitude } from './utils';
+import { isLatitude, isLongitude, GoogleAddress } from './utils';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
 
 /**
@@ -99,6 +99,7 @@ export {
     isNodeEnvironment,
     isLatitude,
     isLongitude,
+    GoogleAddress,
     pluralize,
     singularize,
     classify,

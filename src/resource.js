@@ -10,6 +10,12 @@ class Resource {
 	 */
     constructor(attributes = {}, adapter, resource, options = {}) {
         this.attributes = attributes;
+        this.dirtyAttributes = {};
+        this.changes = {};
+        this.isLoading = false;
+        this.isSaving = false;
+        this.isDestroying = false;
+        this.isReloading = false;
         this.resource = resource;
         this.options = options;
         this.version = options.version || 'v1';
@@ -18,110 +24,344 @@ class Resource {
 
     /**
      * Set a new adapter to the resource instance, this will update the Store instance
-     * 
+     *
      * @param {Adapter} adapter
      * @return {Resource} this
      */
     setAdapter(adapter) {
         this.adapter = adapter;
         this.store = new Store(this.resource, adapter, {
-            onAfterFetch: this.syncAttributes.bind(this)
+            onAfterFetch: this.syncAttributes.bind(this),
         });
 
         return this;
     }
 
     /**
-	 * Getter for id attribute
-	 *
-	 * @var {String}
-	 */
+     * Getter for id attribute
+     *
+     * @var {String}
+     */
     get id() {
         return this.getAttribute('id');
     }
 
     /**
-	 * Creates a new resource on the server
-	 *
-	 * @param  {Object} payload [description]
-	 * @return {[type]}         [description]
-	 */
+     * Creates a new resource on the server
+     *
+     * @param  {Object} payload [description]
+     * @return {[type]}         [description]
+     */
     create(attributes = {}) {
         const data = this.mergeAttributes(attributes);
+        this.setFlags(['isLoading', 'isSaving']);
 
-        return this.store.create(data);
+        return this.store.create(data).then((response) => {
+           this.setFlags(['isLoading', 'isSaving'], false);
+
+           return response;
+        });
     }
 
     /**
-	 * Creates a new resource on the server
-	 *
-	 * @param  {Object} payload [description]
-	 * @return {[type]}         [description]
-	 */
+     * Creates a new resource on the server
+     *
+     * @param  {Object} payload [description]
+     * @return {[type]}         [description]
+     */
     update(attributes = {}) {
-        return this.store.update(this.attributes.id, attributes);
+        this.setFlags(['isLoading', 'isSaving']);
+
+        return this.store.update(this.attributes.id, attributes).then((response) => {
+           this.setFlags(['isLoading', 'isSaving'], false);
+
+           return response;
+        });
     }
 
     /**
-	 * Deletes the resource instance on the server
-	 *
-	 * @return {[type]} [description]
-	 */
+     * Deletes the resource instance on the server
+     *
+     * @return {[type]} [description]
+     */
     destroy() {
-        return this.store.destroy(this.attributes.id);
+        this.setFlags(['isLoading', 'isDestroying']);
+
+        return this.store.destroy(this.attributes.id).then((response) => {
+           this.setFlags(['isLoading', 'isDestroying'], false);
+
+           return response;
+        });
     }
 
     /**
-	 * Saves the resource instance on the server
-	 *
-	 * @return {[type]} [description]
-	 */
-    save() {
-        const { attributes } = this;
+     * Reloads the resource from the server.
+     *
+     * @return {[type]} [description]
+     */
+    reload() {
+        this.setFlags(['isLoading', 'isReloading']);
 
-        if (isEmpty(this.attributes.id)) {
+        return this.store.findRecord(this.attributes.id).then((response) => {
+           this.reset();
+
+           return response;
+        });
+    }
+
+    /**
+     * Sets flag properties.
+     *
+     * @return this
+     */
+    setFlags(flags = [], state = true) {
+        const validFlags = ['isLoading', 'isSaving', 'isReloading', 'isDestroying'];
+
+        for(let i = 0; i < flags.length; i++) {
+            const flag = flags[i];
+
+            if (typeof flag !== 'string' || !validFlags.includes(flag)) {
+                throw new Error(`${flag} is not a valid flag!`);
+            }
+
+            this[flag] = state;
+        }
+
+        return this;
+    }
+
+    /**
+     * Resets tracked properties
+     *
+     * @return this
+     */
+    reset() {
+        this.dirtyAttributes = {};
+        this.changes = {};
+        this.isLoading = false;
+        this.isSaving = false;
+        this.isReloading = false;
+
+        return this;
+    }
+
+    /**
+     * Emptys resource.
+     *
+     * @return this
+     */
+    empty() {
+        this.reset();
+        this.attribues = {};
+
+        return this;
+    }
+
+    /**
+     * Saves the resource instance on the server
+     *
+     * @return {[type]} [description]
+     */
+    save(options = {}) {
+        const attributes = this.getAttributes();
+
+        if (isEmpty(this.id)) {
             return this.create(attributes);
+        }
+
+        if (options.onlyDirty === true) {
+            return this.savedirty();
         }
 
         return this.update(attributes);
     }
 
     /**
-	 * Set an instance property locally
-	 *
-	 * @param {[type]} property [description]
-	 * @param {[type]} value   [description]
-	 */
-    set(property, value = null) {
+     * Saves only dirtied attributes.
+     *
+     * @return {[type]} [description]
+     */
+    saveDirty() {
+        const dirtyAttributeKeys = Object.keys(this.dirtyAttributes);
+        const dirtyAttributes = {};
+
+        for (let i = 0; i < dirtyAttributeKeys.length; i++) {
+            const key = dirtyAttributeKeys[i];
+            dirtyAttributes[key] = this.getAttribute(key);
+        }
+
+        return this.update(dirtyAttributes);
+    }
+
+    /**
+     * Checks if resource is not saved to server.
+     *
+     * @return {Boolean}
+     */
+    isNew() {
+        return !this.id;
+    }
+
+    /**
+     * Checks if resource is deleted on server.
+     *
+     * @return {Boolean}
+     */
+    isDeleted() {
+        return this.hasAttributes(['deleted', 'time']);
+    }
+
+    /**
+     * Iterates over each attribute value and property executing a user supplied callback.
+     *
+     * @return {Object}
+     */
+    eachAttribute(callback) {
+        if (typeof callback !== 'function') {
+            return this;
+        }
+
+        Object.keys(this.attributes).forEach((property) => {
+            const value = this.getAttribute(property);
+            callback.call(this, value, property);
+        });
+
+        return this;
+    }
+
+    /**
+     * Gets all changes
+     *
+     * @return {Object}
+     */
+    changes() {
+        return this.changes;
+    }
+
+    /**
+     * Gets all dirty attributes.
+     *
+     * @return {Object}
+     */
+    getDirtyAttributes() {
+        return this.dirtyAttributes;
+    }
+
+    /**
+     * Checks if property is dirty.
+     *
+     * @param {String} property [description]
+     * @return {Boolean}
+     */
+    isDirty(property) {
+        return property in this.dirtyAttributes;
+    }
+
+    /**
+     * Checks if any properties is dirty.
+     *
+     * @return {Boolean}
+     */
+    hasDirtyAttributes() {
+        return Object.keys(this.dirtyAttributes).length > 0;
+    }
+
+    /**
+     * Updates a instance property without tracking changes or dirtying attribute.
+     *
+     * @param {String} property [description]
+     * @param {mixed} value   [description]
+     */
+    mutate(property, value) {
         this.attributes[property] = value;
     }
 
     /**
-	 * Set multiple instance properties locally
-	 *
-	 * @param {Object} properties [description]
-	 */
-    setAttributes(attributes = {}) {
-        this.attributes =  { ...this.attributes, ...attributes };
+     * Set an instance property locally
+     *
+     * @param {String} property [description]
+     * @param {mixed} value   [description]
+     */
+    setAttribute(property, value = null) {
+        if (value === null && typeof property === 'object') {
+            return this.setAttributes(property);
+        }
+
+        const previousValue = this.attributes[property] || null;
+
+        this.attributes[property] = value;
+        this.dirtyAttributes[property] = previousValue;
+
+        // track changes
+        if (!isArray(this.changes[property])) {
+            this.changes[property] = [];
+        }
+
+        this.changes[property].push({
+            property,
+            previousValue,
+            value,
+            changedAt: new Date(),
+        });
+
+        return this;
     }
 
     /**
-	 * Get an attribute
-	 *
-	 * @param {[type]} property [description]
-	 * @param {[type]} value   [description]
-	 */
-	 getAttribute(attribute) {
+     * Set multiple instance properties locally
+     *
+     * @param {Object} properties [description]
+     */
+    setAttributes(attributes = {}) {
+        for (let property in attributes) {
+            this.setAttribute(property, attributes[property]);
+        }
+
+        return this;
+    }
+
+    /**
+     * Get an attribute
+     *
+     * @param {[type]} property [description]
+     * @param {[type]} value   [description]
+     */
+    getAttribute(attribute) {
         return this.attributes[attribute];
     }
 
     /**
-	 * Get multiple attributes.
-	 *
-	 * @param {Array} properties [description]
-	 * @param {[type]} value   [description]
-	 */
-	 getAttributes(properties) {
+     * Checks if attribute exists.
+     *
+     * @param {String} property [description]
+     * @return {Boolean}
+     */
+    hasAttribute(property) {
+        if (isArray(property)) {
+            const attributeKeys = Object.keys(this.attributes);
+            return property.every((prop) => attributeKeys.includes(prop));
+        }
+
+        return property in this.attributes;
+    }
+
+    /**
+     * Alias for checking if has multiple attributes.
+     *
+     * @param {Array} properties 
+     * @return {Boolean}
+     */
+    hasAttributes(properties = []) {
+        return this.hasAttribute(properties);
+    }
+
+    /**
+     * Get multiple attributes.
+     *
+     * @param {Array} properties [description]
+     * @param {[type]} value   [description]
+     */
+    getAttributes(properties) {
         const attributes = {};
 
         if (properties === null || properties === undefined) {
@@ -129,11 +369,11 @@ class Resource {
         }
 
         if (typeof properties === 'string') {
-            return this.getAttribute([ ...arguments ]);
+            return this.getAttribute([...arguments]);
         }
 
         if (!isArray(properties)) {
-            throw new Error('No attribute properties provided!')
+            throw new Error('No attribute properties provided!');
         }
 
         for (let i = 0; i < properties.length; i++) {
@@ -150,34 +390,34 @@ class Resource {
     }
 
     /**
-	 * Serialize resource to a POJO
-	 *
+     * Serialize resource to a POJO
+     *
      * @returns {Object}
-	 */
-	 serialize() {
+     */
+    serialize() {
         return this.getAttributes();
     }
 
     /**
-	 * Merge and return attributes on the resource instance.
-	 *
-	 * @param {[type]} property [description]
-	 * @param {[type]} value   [description]
-	 */
-	 mergeAttributes(attributes = {}) {
+     * Merge and return attributes on the resource instance.
+     *
+     * @param {[type]} property [description]
+     * @param {[type]} value   [description]
+     */
+    mergeAttributes(attributes = {}) {
         const modelAttributes = this.attributes || {};
-        this.attributes =  { ...modelAttributes, ...attributes };
+        this.attributes = { ...modelAttributes, ...attributes };
 
         return this.attributes;
     }
 
     /**
-	 * Merge and return attributes on the resource instance.
-	 *
-	 * @param {[type]} property [description]
-	 * @param {[type]} value   [description]
-	 */
-	 syncAttributes(json = {}) {
+     * Merge and return attributes on the resource instance.
+     *
+     * @param {[type]} property [description]
+     * @param {[type]} value   [description]
+     */
+    syncAttributes(json = {}) {
         this.attributes = json;
     }
 }

@@ -5,6 +5,27 @@ class Place extends Resource {
         super(attributes, adapter, 'place', options);
     }
 
+    static fromGoogleAddress(googleAddress, adapter, options = {}) {
+        const attributes = {
+            name: null,
+            address: googleAddress.getAttribute('address'),
+            location: googleAddress.getAttribute('coordinates'),
+            street1: googleAddress.getAttribute('streetName'),
+            street2: null,
+            city: googleAddress.getAttribute('city'),
+            province: googleAddress.getAttribute('stateLong'),
+            postal_code: googleAddress.getAttribute('postalCode'),
+            neighborhood: googleAddress.get('neighborhood'),
+            district: googleAddress.getAttribute('county'),
+            building: googleAddress.get('building'),
+            country: googleAddress.getAttribute('countryShort'),
+            phone: null,
+            security_access_code: null
+        };
+
+        return new Place(attributes, adapter, options);
+    }
+
     /**
      * The latitude coordinate for the 'Place' location.
      * 

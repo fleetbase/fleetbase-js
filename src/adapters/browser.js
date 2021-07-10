@@ -23,6 +23,8 @@ class BrowserAdapter extends Adapter {
      */
     setHeaders(headers = {}) {
         this.headers = { ...this.headers, ...headers };
+
+        return this;
     }
 
     /**

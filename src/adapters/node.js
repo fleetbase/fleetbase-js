@@ -17,6 +17,18 @@ class NodeAdapter extends Adapter {
     }
 
     /**
+     * Updates the adapter headers.
+     *
+     * @param {Object} headers
+     */
+    setHeaders(headers = {}) {
+        const commonHeaders = this.axios.defaults.headers.common;
+        this.axios.defaults.headers.common = { ...commonHeaders, ...headers };
+
+        return this;
+    }
+
+    /**
      * Tranform the response, and return the response data from axios.
      *
      * @param {AxiosResponse} response

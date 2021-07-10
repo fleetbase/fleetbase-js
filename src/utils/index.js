@@ -7,6 +7,7 @@ import isResource from './is-resource';
 import isNodeEnvironment from './is-node-environment';
 import detectAdapter from './detect-adapter';
 import uuid from './uuid';
+import GoogleAddress from './google-address';
 
 export {
     Collection,
@@ -17,5 +18,6 @@ export {
     isLatitude,
     isLongitude,
     isResource,
-    uuid
+    uuid,
+    GoogleAddress
 };
