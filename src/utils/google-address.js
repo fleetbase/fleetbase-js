@@ -14,7 +14,7 @@ class GoogleAddress {
     }
 
     parseComponents() {
-        const components = (this?.place?.address_components || []).reduce(function (acc, data) {
+        const components = (this.place?.address_components || []).reduce(function (acc, data) {
             data.types.forEach(function (type) {
                 acc[type] = data;
             });
@@ -28,7 +28,7 @@ class GoogleAddress {
         const attributes = {
             streetNumber: this.get('street_number'),
             streetName: this.get('route'),
-            coordinates: this.geometry.location ? Object.values(this.geometry.location) : [0, 0],
+            coordinates: this.geometry?.location ? Object.values(this.geometry.location) : [0, 0],
             city: this.or(['locality', 'sublocality', 'sublocality_level_1', 'neighborhood', 'administrative_area_level_3', 'administrative_area_level_2']),
             county: this.get('administrative_area_level_2'),
             stateShort: this.get('administrative_area_level_1', true),

@@ -194,12 +194,39 @@ class Resource {
     }
 
     /**
+     * Checks if resource is loaded from the server.
+     *
+     * @return {Boolean}
+     */
+    get isLoaded() {
+        return this.hasAttributes(['created_at', 'id']);
+    }
+
+    /**
+     * Checks if resource ihas no attributes
+     *
+     * @return {Boolean}
+     */
+    get isEmpty() {
+        return Object.values(this.attributes).length === 0;
+    }
+
+    /**
      * Checks if resource is not saved to server.
      *
      * @return {Boolean}
      */
-    isNew() {
+    get isNew() {
         return !this.id;
+    }
+
+    /**
+     * Checks if resource is not saved to server.
+     *
+     * @return {Boolean}
+     */
+    get isSaved() {
+        return !this.isNew && this.isLoaded;
     }
 
     /**
@@ -207,7 +234,7 @@ class Resource {
      *
      * @return {Boolean}
      */
-    isDeleted() {
+    get isDeleted() {
         return this.hasAttributes(['deleted', 'time']);
     }
 

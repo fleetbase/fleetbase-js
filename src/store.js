@@ -34,7 +34,7 @@ class Store {
                 serialized.push(this.afterFetch(json[i]));
             }
 
-            return serialized;
+            return new Collection(...serialized);
         }
 
         const resourceInstance = this.serialize(json);
