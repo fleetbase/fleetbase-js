@@ -250,6 +250,10 @@ class Collection extends Array {
         return this;
     }
 
+    replaceAt(idx, object) {
+        return this.replace(idx, 1, [object]);
+    }
+
     removeAt(start, len) {
         return removeAt(this, start, len);
     }
@@ -327,11 +331,10 @@ class Collection extends Array {
     }
 
     removeObjects(objects) {
-        beginPropertyChanges();
         for (let i = objects.length - 1; i >= 0; i--) {
             this.removeObject(objects[i]);
         }
-        endPropertyChanges();
+        
         return this;
     }
 
