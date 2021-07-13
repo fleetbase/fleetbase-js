@@ -8,6 +8,10 @@ import Vehicle from './resources/vehicle';
 import Driver from './resources/driver';
 import Vendor from './resources/vendor';
 import Contact from './resources/contact';
+import Zone from './resources/zone';
+import ServiceArea from './resources/service-area';
+import ServiceRate from './resources/service-rate';
+import ServiceQuote from './resources/service-quote';
 
 export {
     Order,
@@ -19,5 +23,9 @@ export {
     Vehicle,
     Driver,
     Vendor,
-    Contact
+    Contact,
+    Zone,
+    ServiceArea,
+    ServiceRate,
+    ServiceQuote
 };

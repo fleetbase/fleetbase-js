@@ -2,6 +2,10 @@ import Resource from '../resource';
 import Collection from '../utils/collection';
 
 class Payload extends Resource {
+	constructor(attributes = {}, adapter, options = {}) {
+        super(attributes, adapter, 'payload', options);
+    }
+	
     /**
 	 * Attaches an entity to an existing payload and returns
 	 * the payload with the entity attached

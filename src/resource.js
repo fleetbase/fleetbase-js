@@ -1,6 +1,7 @@
 import Store from './store';
 import { isEmpty } from './utils';
 import { isArray } from './utils/array';
+import { set, get } from './utils/object';
 
 class Resource {
     /**
@@ -316,8 +317,12 @@ class Resource {
 
         const previousValue = this.attributes[property] || null;
 
-        this.attributes[property] = value;
-        this.dirtyAttributes[property] = previousValue;
+        // use object setter
+        set(this.attributes, property, value);
+        set(this.dirtyAttributes, property, previousValue);
+        
+        // this.attributes[property] = value;
+        // this.dirtyAttributes[property] = previousValue;
 
         // track changes
         if (!isArray(this.changes[property])) {
@@ -354,7 +359,7 @@ class Resource {
      * @param {[type]} value   [description]
      */
     getAttribute(attribute) {
-        return this.attributes[attribute];
+        return get(this.attributes, attribute);
     }
 
     /**

@@ -1,9 +1,9 @@
+import { isArray } from './array';
+
 /**
  * Collection
  * Extended array inspired by Ember's NativeArray
  **/
-
-const { isArray } = Array;
 
 const CHUNK_SIZE = 60000;
 
@@ -208,8 +208,8 @@ class Collection extends Array {
         return this.sort((a, b) => {
             for (let i = 0; i < sortKeys.length; i++) {
                 let key = sortKeys[i];
-                let propA = a[key]
-                let propB = b[key]
+                let propA = a[key];
+                let propB = b[key];
                 // return 1 or -1 else continue to the next sortKey
                 let compareValue = compare(propA, propB);
 
@@ -334,7 +334,7 @@ class Collection extends Array {
         for (let i = objects.length - 1; i >= 0; i--) {
             this.removeObject(objects[i]);
         }
-        
+
         return this;
     }
 

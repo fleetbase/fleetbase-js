@@ -1,7 +1,7 @@
 import Store from './store';
 import Resource from './resource';
 import { isNodeEnvironment, detectAdapter } from './utils';
-import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint } from './resources';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
 import { isLatitude, isLongitude, isResource, GoogleAddress, Collection } from './utils';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
@@ -92,6 +92,10 @@ export {
     Vehicle,
     Vendor,
     Waypoint,
+    Zone,
+    ServiceArea,
+    ServiceRate,
+    ServiceQuote,
     BrowserAdapter,
     NodeAdapter,
     EmberJsAdapter,
