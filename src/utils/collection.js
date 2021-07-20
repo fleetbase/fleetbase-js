@@ -120,6 +120,14 @@ class Collection extends Array {
         }
     }
 
+    get notEmpty() {
+        return this.length > 0;
+    }
+
+    get empty() {
+        return this.length === 0;
+    }
+
     get first() {
         return objectAt(this, 0);
     }

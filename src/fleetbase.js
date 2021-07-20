@@ -1,10 +1,10 @@
 import Store from './store';
 import Resource from './resource';
-import { isNodeEnvironment, detectAdapter } from './utils';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
-import { isLatitude, isLongitude, isResource, GoogleAddress, Collection } from './utils';
+import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, isResource, GoogleAddress, Collection, StoreActions } from './utils';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
+import { extendStoreActions } from './store';
 
 /**
  * // instance
@@ -106,6 +106,8 @@ export {
     isResource,
     GoogleAddress,
     Collection,
+    StoreActions,
+    extendStoreActions,
     pluralize,
     singularize,
     classify,

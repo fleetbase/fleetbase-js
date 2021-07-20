@@ -1,7 +1,46 @@
 import { lookup } from './resolver';
 import { pluralize, classify } from './utils/string';
 import { isArray } from './utils/array';
-import { Collection, detectAdapter, isResource } from './utils';
+import { Collection, detectAdapter, isResource, StoreActions } from './utils';
+import { set, isCallable, invoke } from './utils/object';
+
+const extendStoreActions = (store, actions = []) => {
+    store.actions = isArray(actions) ? actions : [actions];
+
+    if (isArray(actions)) {
+        for (let i = 0; i < actions.length; i++) {
+            const action = actions[i];
+
+            this.extendActions(action);
+        }
+        return;
+    }
+
+    if (actions instanceof StoreActions) {
+        actions.extend(store);
+    }
+
+    return store;
+};
+
+const afterFetch = (store, json) => {
+    if (typeof store.options.onAfterFetch === 'function') {
+        store.options.onAfterFetch(json);
+    }
+
+    if (isArray(json)) {
+        const serialized = [];
+
+        for (let i = 0; i < json.length; i++) {
+            serialized.push(store.afterFetch(json[i]));
+        }
+
+        return new Collection(...serialized);
+    }
+
+    const resourceInstance = store.serialize(json);
+    return store.deposit(resourceInstance);
+};
 
 class Store {
     constructor(resource, adapter, options = {}) {
@@ -10,6 +49,11 @@ class Store {
         this.namespace = pluralize(resource);
         this.storage = new Collection();
         this.options = options;
+        this.extendActions(options.actions);
+    }
+
+    extendActions(actions = []) {
+        return extendStoreActions(this, actions);
     }
 
     deposit(resourceInstance) {
@@ -23,22 +67,7 @@ class Store {
     }
 
     afterFetch(json) {
-        if (typeof this.options.onAfterFetch === 'function') {
-            this.options.onAfterFetch(json);
-        }
-
-        if (isArray(json)) {
-            const serialized = [];
-
-            for (let i = 0; i < json.length; i++) {
-                serialized.push(this.afterFetch(json[i]));
-            }
-
-            return new Collection(...serialized);
-        }
-
-        const resourceInstance = this.serialize(json);
-        return this.deposit(resourceInstance);
+        return afterFetch(this, json);
     }
 
     create(attributes = {}, options = {}) {
@@ -103,3 +132,5 @@ class Store {
 }
 
 export default Store;
+
+export { extendStoreActions, afterFetch };

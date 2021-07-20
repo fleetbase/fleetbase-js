@@ -1,5 +1,5 @@
 import Resource from '../resource';
-import { isResource } from '../utils';
+import { isResource, Point } from '../utils';
 
 class Place extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
@@ -7,10 +7,11 @@ class Place extends Resource {
     }
 
     static fromGoogleAddress(googleAddress, adapter, options = {}) {
+        const [ latitude, longitude ] = googleAddress.getAttribute('coordinates');
         const attributes = {
             name: null,
             address: googleAddress.getAttribute('address'),
-            location: googleAddress.getAttribute('coordinates'),
+            location: new Point(latitude, longitude),
             street1: googleAddress.getAttribute('streetName'),
             street2: null,
             city: googleAddress.getAttribute('city'),
@@ -33,7 +34,7 @@ class Place extends Resource {
      * @var {Integer}
      */
     get latitude() {
-        return this.getAttribute('location').coordinates[1];
+        return this.getAttribute('location', new Point()).coordinates[1];
     }
 
     /**
@@ -42,7 +43,7 @@ class Place extends Resource {
      * @var {Integer}
      */
     get longitude() {
-        return this.getAttribute('location').coordinates[0];
+        return this.getAttribute('location', new Point()).coordinates[0];
     }
 
     /**

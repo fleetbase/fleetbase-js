@@ -8,6 +8,8 @@ import isNodeEnvironment from './is-node-environment';
 import detectAdapter from './detect-adapter';
 import uuid from './uuid';
 import GoogleAddress from './google-address';
+import Point from './point';
+import StoreActions from './store-actions';
 
 export {
     Collection,
@@ -19,5 +21,7 @@ export {
     isLongitude,
     isResource,
     uuid,
-    GoogleAddress
+    GoogleAddress,
+    StoreActions,
+    Point
 };

@@ -2,9 +2,17 @@ import isEmpty from './is-empty';
 
 const isResource = (mixed) => typeof mixed === 'object' && !isEmpty(mixed?.attributes) && typeof mixed?.attributes === 'object';
 
+const isCallable = (object, property) => typeof object[property] === 'function';
+
 const getResolved = (func, path) => {
     const resolved = func();
     return Array.isArray(resolved) || typeof resolved === 'object' ? get(resolved, path) : null;
+};
+
+const invoke = (object, method) => {
+    if (typeof object[method] === 'function') {
+        return object[method].bind(object);
+    }
 };
 
 const get = (object, path) => {
@@ -120,4 +128,4 @@ const extend = (classes = []) => {
     return this;
 };
 
-export { set, get, getProperties, setProperties, extend };
+export { set, get, getProperties, setProperties, extend, isCallable, invoke };

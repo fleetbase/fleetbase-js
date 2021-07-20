@@ -33,6 +33,7 @@ class Resource {
         this.adapter = adapter;
         this.store = new Store(this.resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this),
+            actions: this.options?.actions
         });
 
         return this;
@@ -355,11 +356,11 @@ class Resource {
     /**
      * Get an attribute
      *
-     * @param {[type]} property [description]
-     * @param {[type]} value   [description]
+     * @param {String} attribute     The attribute key to get
+     * @param {mixed}  defaultValue  The default value if no attribute value
      */
-    getAttribute(attribute) {
-        return get(this.attributes, attribute);
+    getAttribute(attribute, defaultValue = null) {
+        return get(this.attributes, attribute) || defaultValue;
     }
 
     /**
@@ -385,6 +386,21 @@ class Resource {
      */
     hasAttributes(properties = []) {
         return this.hasAttribute(properties);
+    }
+
+
+    /**
+     * Returns true if attribute has value.
+     *
+     * @param {Array} properties 
+     * @return {Boolean}
+     */
+    isAttributeFilled(property) {
+        if (isArray(property)) {
+            return this.hasAttribute(property) && property.every((prop) => !isEmpty(this.getAttribute(prop)));
+        }
+
+        return this.hasAttribute(property) && !isEmpty(this.getAttribute(property));
     }
 
     /**
