@@ -196,6 +196,24 @@ class Resource {
     }
 
     /**
+     * Returns the date instance resource was created.
+     *
+     * @return {Date}
+     */
+    get createdAt() {
+        return this.hasAttribute('created_at') ? new Date(this.getAttribute('created_at')) : null;
+    }
+
+    /**
+     * Returns the date instance resource was created.
+     *
+     * @return {Date}
+     */
+    get updatedAt() {
+        return this.hasAttribute('updated_at') ? new Date(this.getAttribute('updated_at')) : null;
+    }
+
+    /**
      * Checks if resource is loaded from the server.
      *
      * @return {Boolean}
@@ -371,8 +389,12 @@ class Resource {
      */
     hasAttribute(property) {
         if (isArray(property)) {
-            const attributeKeys = Object.keys(this.attributes);
+            const attributeKeys = Object.keys(this.attributes || {});
             return property.every((prop) => attributeKeys.includes(prop));
+        }
+
+        if (!this.attributes) {
+            return false;
         }
 
         return property in this.attributes;

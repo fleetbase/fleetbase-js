@@ -5,6 +5,7 @@ import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters
 import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, isResource, GoogleAddress, Collection, StoreActions } from './utils';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
 import { extendStoreActions } from './store';
+import { orderActions } from './resources/order';
 
 /**
  * // instance
@@ -57,7 +58,7 @@ export default class Fleetbase {
 
         this.adapter = config.adapter || detectAdapter(this.options);
 
-        this.orders = new Store('order', this.adapter);
+        this.orders = new Store('order', this.adapter).extendActions(orderActions);
         this.entities = new Store('entity', this.adapter);
         this.places = new Store('place', this.adapter);
         this.drivers = new Store('driver', this.adapter);
