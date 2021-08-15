@@ -1,5 +1,6 @@
 import Adapter from '../adapter';
 import { isBlank } from '../utils';
+import { isArray } from '../utils/array';
 import axios from 'axios';
 
 class NodeAdapter extends Adapter {
@@ -39,6 +40,28 @@ class NodeAdapter extends Adapter {
     }
 
     /**
+     * Handles an erroneous request.
+     *
+     * @param {AxiosResponse} response
+     * @returns {Object}
+     */
+    handleError(error) {
+        if (error.response) {
+            const { data } = error.response;
+
+            if (isArray(data.errors)) {
+                throw new Error(data.errors[0]);
+            }
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+        }
+
+        throw error;
+    }
+
+    /**
      * Makes a GET request with axios
      *
      * @param {String} path
@@ -50,7 +73,10 @@ class NodeAdapter extends Adapter {
     get(path, query = {}, options = {}) {
         const urlParams = !isBlank(query) ? new URLSearchParams(query).toString() : '';
 
-        return this.axios.get(`${path}${urlParams ? `?${urlParams}` : ''}`, options).then(this.transform.bind(this));
+        return this.axios
+            .get(`${path}${urlParams ? `?${urlParams}` : ''}`, options)
+            .then(this.transform.bind(this))
+            .catch(this.handleError.bind(this));
     }
 
     /**
@@ -63,7 +89,7 @@ class NodeAdapter extends Adapter {
      * @return {Promise}
      */
     post(path, data = {}, options = {}) {
-        return this.axios.post(path, data, options).then(this.transform.bind(this));
+        return this.axios.post(path, data, options).then(this.transform.bind(this)).catch(this.handleError.bind(this));
     }
 
     /**
@@ -76,7 +102,7 @@ class NodeAdapter extends Adapter {
      * @return {Promise}
      */
     put(path, data = {}, options = {}) {
-        return this.axios.put(path, data, options).then(this.transform.bind(this));
+        return this.axios.put(path, data, options).then(this.transform.bind(this)).catch(this.handleError.bind(this));
     }
 
     /**
@@ -89,7 +115,7 @@ class NodeAdapter extends Adapter {
      * @return {Promise}
      */
     delete(path, options = {}) {
-        return this.axios.delete(path, options).then(this.transform.bind(this));
+        return this.axios.delete(path, options).then(this.transform.bind(this)).catch(this.handleError.bind(this));
     }
 
     /**
@@ -101,7 +127,7 @@ class NodeAdapter extends Adapter {
      * @return {Promise}
      */
     patch(path, data = {}, options = {}) {
-        return this.axios.patch(path, data, options).then(this.transform.bind(this));
+        return this.axios.patch(path, data, options).then(this.transform.bind(this)).catch(this.handleError.bind(this));
     }
 }
 
