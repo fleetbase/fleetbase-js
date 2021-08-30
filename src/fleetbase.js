@@ -2,7 +2,7 @@ import Store from './store';
 import Resource from './resource';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
-import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, isResource, GoogleAddress, Collection, StoreActions } from './utils';
+import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, isResource, GoogleAddress, Collection, StoreActions } from './utils';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
 import { extendStoreActions } from './store';
 import { orderActions } from './resources/order';
@@ -104,6 +104,7 @@ export {
     isNodeEnvironment,
     isLatitude,
     isLongitude,
+    Point,
     isResource,
     GoogleAddress,
     Collection,
