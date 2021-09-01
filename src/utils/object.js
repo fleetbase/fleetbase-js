@@ -30,9 +30,9 @@ const get = (object, path) => {
 
     if (isArray || isObject) {
         for (let i = 0; i < pathArray.length; i++) {
-            if (current[pathArray[i]] === undefined) {
+            if (current && current[pathArray[i]] === undefined) {
                 return null;
-            } else {
+            } else if (current) {
                 current = current[pathArray[i]];
 
                 // if is resource then return get on it's attributes
