@@ -378,7 +378,13 @@ class Resource {
      * @param {mixed}  defaultValue  The default value if no attribute value
      */
     getAttribute(attribute, defaultValue = null) {
-        return get(this.attributes, attribute) || defaultValue;
+        const value = get(this.attributes, attribute);
+
+        if (value === undefined) {
+            return defaultValue;
+        }
+
+        return value;
     }
 
     /**
