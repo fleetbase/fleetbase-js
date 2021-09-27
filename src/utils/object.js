@@ -114,18 +114,18 @@ const setProperties = (object, properties = {}) => {
     return object;
 };
 
-const extend = (classes = []) => {
+const extend = (target, classes = []) => {
     if (arguments.length > 1) {
         classes = arguments;
     }
     for (let index = 0; index < classes.length; index++) {
         for (const property in classes[index]) {
             if (Object.prototype.hasOwnProperty.call(classes[index], property)) {
-                this[property] = classes[index][property];
+                target[property] = classes[index][property];
             }
         }
     }
-    return this;
+    return target;
 };
 
 export { set, get, getProperties, setProperties, extend, isCallable, invoke };

@@ -1,7 +1,6 @@
 {
     "presets": ["@babel/preset-env"],
     "plugins": [
-        // "@babel/plugin-transform-runtime",
         "@babel/plugin-transform-spread",
         [
             "@babel/plugin-proposal-decorators",
@@ -9,11 +8,5 @@
                 "legacy": true
             }
         ]
-        // [
-        //     "@babel/plugin-proposal-class-properties",
-        //     {
-        //         "loose": true
-        //     }
-        // ]
     ]
 }

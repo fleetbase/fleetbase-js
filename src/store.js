@@ -11,7 +11,7 @@ const extendStoreActions = (store, actions = []) => {
         for (let i = 0; i < actions.length; i++) {
             const action = actions[i];
 
-            this.extendActions(action);
+            store.extendActions(action);
         }
         return;
     }

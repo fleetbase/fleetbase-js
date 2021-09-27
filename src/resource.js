@@ -395,8 +395,10 @@ class Resource {
      */
     hasAttribute(property) {
         if (isArray(property)) {
-            const attributeKeys = Object.keys(this.attributes || {});
-            return property.every((prop) => attributeKeys.includes(prop));
+            const properties = property;
+            const attributeKeys = Object.keys(this.attributes ?? {});
+            
+            return properties.every((prop) => attributeKeys.includes(prop));
         }
 
         if (!this.attributes) {
