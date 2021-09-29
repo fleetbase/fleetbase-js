@@ -35,6 +35,7 @@ export default [
             exclude: ['node_modules/**'],
             include: ['lib/**'],
         },
+        external: ['axios']
     },
     {
         // esm and cjs
@@ -63,6 +64,6 @@ export default [
                 sourcemap: true,
             },
         ],
-		external: ['axios']
+        external: ['axios']
     },
 ];
