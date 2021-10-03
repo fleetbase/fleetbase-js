@@ -228,7 +228,7 @@ class Resource {
      * @return {Boolean}
      */
     get isEmpty() {
-        return Object.values(this.attributes).length === 0;
+        return Object.values(this?.attributes).length === 0;
     }
 
     /**
@@ -268,7 +268,7 @@ class Resource {
             return this;
         }
 
-        Object.keys(this.attributes).forEach((property) => {
+        Object.keys(this?.attributes ?? {}).forEach((property) => {
             const value = this.getAttribute(property);
             callback.call(this, value, property);
         });
@@ -310,7 +310,7 @@ class Resource {
      * @return {Boolean}
      */
     hasDirtyAttributes() {
-        return Object.keys(this.dirtyAttributes).length > 0;
+        return Object.keys(this?.dirtyAttributes ?? {}).length > 0;
     }
 
     /**
@@ -334,7 +334,7 @@ class Resource {
             return this.setAttributes(property);
         }
 
-        const previousValue = this.attributes[property] || null;
+        const previousValue = this?.attributes[property] ?? null;
 
         // use object setter
         set(this.attributes, property, value);
@@ -344,7 +344,7 @@ class Resource {
         // this.dirtyAttributes[property] = previousValue;
 
         // track changes
-        if (!isArray(this.changes[property])) {
+        if (!isArray(this?.changes[property])) {
             this.changes[property] = [];
         }
 
@@ -378,7 +378,7 @@ class Resource {
      * @param {mixed}  defaultValue  The default value if no attribute value
      */
     getAttribute(attribute, defaultValue = null) {
-        const value = get(this.attributes, attribute);
+        const value = get(this?.attributes ?? {}, attribute);
 
         if (value === undefined) {
             return defaultValue;
@@ -401,7 +401,7 @@ class Resource {
             return properties.every((prop) => attributeKeys.includes(prop));
         }
 
-        if (!this.attributes) {
+        if (!this?.attributes) {
             return false;
         }
 
@@ -417,7 +417,6 @@ class Resource {
     hasAttributes(properties = []) {
         return this.hasAttribute(properties);
     }
-
 
     /**
      * Returns true if attribute has value.
@@ -443,7 +442,7 @@ class Resource {
         const attributes = {};
 
         if (properties === null || properties === undefined) {
-            return this.attributes;
+            return this?.attributes;
         }
 
         if (typeof properties === 'string') {
@@ -483,7 +482,7 @@ class Resource {
      * @param {[type]} value   [description]
      */
     mergeAttributes(attributes = {}) {
-        const modelAttributes = this.attributes || {};
+        const modelAttributes = this?.attributes ?? {};
         this.attributes = { ...modelAttributes, ...attributes };
 
         return this.attributes;
