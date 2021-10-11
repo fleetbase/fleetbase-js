@@ -49,7 +49,7 @@ const fleetbase = new Fleetbase('Your Public Key');
 // create a place
 const speceNeedle = await fleetbase.places.create({
   name: 'Space Needle',
-  street1: '400 Broad Street,
+  street1: '400 Broad Street',
   city: 'Seattle',
   state: 'WA',
   country: 'US'
@@ -66,7 +66,7 @@ const fleetbase = new Fleetbase('Your Secret Key');
 // create a place
 const speceNeedle = await fleetbase.places.create({
   name: 'Space Needle',
-  street1: '400 Broad Street,
+  street1: '400 Broad Street',
   city: 'Seattle',
   state: 'WA',
   country: 'US'
