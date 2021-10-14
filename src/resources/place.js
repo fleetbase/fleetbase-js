@@ -34,7 +34,7 @@ class Place extends Resource {
      * @var {Integer}
      */
     get latitude() {
-        return this.getAttribute('location', new Point()).coordinates[1];
+        return this.getAttribute('location', new Point())?.coordinates[1];
     }
 
     /**
@@ -43,7 +43,7 @@ class Place extends Resource {
      * @var {Integer}
      */
     get longitude() {
-        return this.getAttribute('location', new Point()).coordinates[0];
+        return this.getAttribute('location', new Point())?.coordinates[0];
     }
 
     /**
