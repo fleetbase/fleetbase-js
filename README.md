@@ -41,7 +41,7 @@ If you would like to make contributions to the Fleetbase Javascript SDK document
 
 ## Quick Start for Browser
 
-```
+```js
 import Fleetbase from '@fleetbase/sdk';
 
 const fleetbase = new Fleetbase('Your Public Key');
@@ -49,7 +49,7 @@ const fleetbase = new Fleetbase('Your Public Key');
 // create a place
 const speceNeedle = await fleetbase.places.create({
   name: 'Space Needle',
-  street1: '400 Broad Street,
+  street1: '400 Broad Street',
   city: 'Seattle',
   state: 'WA',
   country: 'US'
@@ -58,7 +58,7 @@ const speceNeedle = await fleetbase.places.create({
 
 ## Quick Start for Node
 
-```
+```js
 import Fleetbase from '@fleetbase/sdk';
 
 const fleetbase = new Fleetbase('Your Secret Key');
@@ -66,7 +66,7 @@ const fleetbase = new Fleetbase('Your Secret Key');
 // create a place
 const speceNeedle = await fleetbase.places.create({
   name: 'Space Needle',
-  street1: '400 Broad Street,
+  street1: '400 Broad Street',
   city: 'Seattle',
   state: 'WA',
   country: 'US'
@@ -79,7 +79,7 @@ You're able to create a custom adapter to handle network request in the Fleetbas
 The Fleetbase SDK ships with two standard adapters. The BrowserAdapter which is based on `fetch()` and
 the NodeAdapter based on axios.
 
-```
+```js
 import { Adapter } from '@fleetbase/sdk';
 
 class CustomAdapter extends Adapter {
