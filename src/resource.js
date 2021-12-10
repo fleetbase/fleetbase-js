@@ -442,7 +442,7 @@ class Resource {
         const attributes = {};
 
         if (properties === null || properties === undefined) {
-            return this?.attributes;
+            return this.getAttributes(Object.keys(this.attributes));
         }
 
         if (typeof properties === 'string') {
@@ -460,7 +460,13 @@ class Resource {
                 continue;
             }
 
-            attributes[property] = this.getAttribute(property);
+            let value = this.getAttribute(property);
+
+            if (typeof value?.attributes === 'object' && !isArray(value?.attributes)) {
+                value = value.attributes;
+            }
+
+            attributes[property] = value;
         }
 
         return attributes;
