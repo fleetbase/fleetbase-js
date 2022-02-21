@@ -6,6 +6,7 @@ import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, isRes
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
 import { extendStoreActions } from './store';
 import { orderActions } from './resources/order';
+import { driverActions } from './resources/driver';
 
 /**
  * // instance
@@ -61,7 +62,7 @@ export default class Fleetbase {
         this.orders = new Store('order', this.adapter).extendActions(orderActions);
         this.entities = new Store('entity', this.adapter);
         this.places = new Store('place', this.adapter);
-        this.drivers = new Store('driver', this.adapter);
+        this.drivers = new Store('driver', this.adapter).extendActions(driverActions);
         this.vehicles = new Store('vehicle', this.adapter);
         this.vendors = new Store('vendor', this.adapter);
         this.contacts = new Store('contact', this.adapter);

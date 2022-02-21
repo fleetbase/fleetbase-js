@@ -1,21 +1,32 @@
-import { Place, Payload, Order } from './resources';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
 import { pluralize, singularize } from './utils/string';
 
 const resources = {
-    Place,
+    Contact,
+    Driver,
+    Entity,
+    Order,
     Payload,
-    Order
+    Place,
+    TrackingStatus,
+    Vehicle,
+    Vendor,
+    Waypoint,
+    Zone,
+    ServiceArea,
+    ServiceRate,
+    ServiceQuote,
 };
 
 const adapters = {
     BrowserAdapter,
     NodeAdapter,
-    EmberJsAdapter
+    EmberJsAdapter,
 };
 
 class Resolver {
-    constructor () {
+    constructor() {
         this.resources = resources;
         this.adapters = adapters;
 
@@ -24,7 +35,7 @@ class Resolver {
 
     lookup(type, className) {
         const key = pluralize(type);
-        const params = [ ...arguments ].slice(2);
+        const params = [...arguments].slice(2);
 
         if (!this[key]) {
             throw new Error('Attempted to resolve invalid type');
@@ -38,11 +49,8 @@ class Resolver {
     }
 }
 
-const lookup = function() {
+const lookup = function () {
     return new Resolver(...arguments);
 };
 
-export {
-    Resolver,
-    lookup
-};
+export { Resolver, lookup };

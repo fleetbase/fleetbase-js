@@ -196,12 +196,21 @@ class Resource {
     }
 
     /**
+     * Returns the resource meta if exists.
+     *
+     * @return {Object}
+     */
+    get meta() {
+        return this.getAttribute('meta', {});
+    }
+
+    /**
      * Returns the date instance resource was created.
      *
      * @return {Date}
      */
     get createdAt() {
-        return this.hasAttribute('created_at') ? new Date(this.getAttribute('created_at')) : null;
+        return this.isAttributeFilled('created_at') ? new Date(this.getAttribute('created_at')) : null;
     }
 
     /**
@@ -210,7 +219,7 @@ class Resource {
      * @return {Date}
      */
     get updatedAt() {
-        return this.hasAttribute('updated_at') ? new Date(this.getAttribute('updated_at')) : null;
+        return this.isAttributeFilled('updated_at') ? new Date(this.getAttribute('updated_at')) : null;
     }
 
     /**
