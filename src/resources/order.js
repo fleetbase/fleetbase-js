@@ -1,5 +1,5 @@
 import Resource from '../resource';
-import { StoreActions } from '../utils';
+import { StoreActions, isResource } from '../utils';
 import { isValid as isValidDate } from 'date-fns';
 
 const orderActions = new StoreActions({
@@ -15,12 +15,36 @@ const orderActions = new StoreActions({
         return this.adapter.post(`${this.namespace}/${id}/dispatch`, params, options).then(this.afterFetch.bind(this));
     },
 
-    start: function (id,params = {},  options = {}) {
+    start: function (id, params = {}, options = {}) {
         return this.adapter.post(`${this.namespace}/${id}/start`, params, options).then(this.afterFetch.bind(this));
     },
 
     updateActivity: function (id, params = {}, options = {}) {
         return this.adapter.post(`${this.namespace}/${id}/update-activity`, params, options).then(this.afterFetch.bind(this));
+    },
+
+    setDestination: function (id, destinationId, params = {}, options = {}) {
+        if (isResource(destinationId)) {
+            destinationId = destinationId.id;
+        }
+
+        return this.adapter.post(`${this.namespace}/${id}/set-destination/${destinationId}`, params, options).then(this.afterFetch.bind(this));
+    },
+
+    captureQrCode: function (id, subjectId = null, params = {}, options = {}) {
+        if (isResource(subjectId)) {
+            subjectId = subjectId.id;
+        }
+
+        return this.adapter.post(`${this.namespace}/${id}/capture-qr${!subjectId ? '' : '/' + subjectId}`, params, options);
+    },
+
+    captureSignature: function (id, subjectId = null, params = {}, options = {}) {
+        if (isResource(subjectId)) {
+            subjectId = subjectId.id;
+        }
+
+        return this.adapter.post(`${this.namespace}/${id}/capture-signature${!subjectId ? '' : '/' + subjectId}`, params, options);
     },
 
     complete: function (id, params = {}, options = {}) {
@@ -29,7 +53,7 @@ const orderActions = new StoreActions({
 
     cancel: function (id, params = {}, options = {}) {
         return this.adapter.delete(`${this.namespace}/${id}/cancel`, params, options).then(this.afterFetch.bind(this));
-    }
+    },
 });
 
 class Order extends Resource {
@@ -47,6 +71,18 @@ class Order extends Resource {
 
     start(params = {}, options = {}) {
         return this.store.start(this.id, params, options);
+    }
+
+    setDestination(destinationId, params = {}, options = {}) {
+        return this.store.setDestination(this.id, destinationId, params, options);
+    }
+
+    captureQrCode(subjectId = null, params = {}, options = {}) {
+        return this.store.captureQrCode(this.id, subjectId, params, options);
+    }
+
+    captureSignature(subjectId = null, params = {}, options = {}) {
+        return this.store.captureSignature(this.id, subjectId, params, options);
     }
 
     getNextActivity(params = {}, options = {}) {

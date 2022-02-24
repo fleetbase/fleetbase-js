@@ -20,14 +20,51 @@ const driverActions = new StoreActions({
         return this.adapter.post('drivers/verify-code', { identity, code, ...attributes }).then(this.afterFetch.bind(this));
     },
 
+    track: function (id, params = {}, options = {}) {
+        return this.adapter.post(`drivers/${id}/track`, params, options).then(this.afterFetch.bind(this));
+    },
+
     retrieve: function (id) {
         return this.findRecord(id);
+    },
+
+    syncDevice(token) {
+        return this.adapter.setHeaders({ 'Driver-Token': this.token }).post('drivers/register-device', token);
     },
 });
 
 class Driver extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
-        super(attributes, adapter, 'driver', options);
+        super(attributes, adapter, 'driver', { actions: driverActions, ...options });
+    }
+
+    /**
+     * The latitude coordinate for the 'Place' location.
+     *
+     * @var {Integer}
+     */
+    get latitude() {
+        return this.getAttribute('location', new Point())?.coordinates[1];
+    }
+
+    /**
+     * The longitude coordinate for the 'Place' location.
+     *
+     * @var {Integer}
+     */
+    get longitude() {
+        return this.getAttribute('location', new Point())?.coordinates[0];
+    }
+
+    /**
+     * Array coordinate pair for Place location.
+     *
+     * @var {Array}
+     */
+    get coordinates() {
+        const { latitude, longitude } = this;
+
+        return [latitude, longitude];
     }
 
     get token() {
@@ -38,13 +75,12 @@ class Driver extends Resource {
         return this.getAttribute('online') === true;
     }
 
+    track(params = {}, options = {}) {
+        return this.store.track(this.id, params, options);
+    }
+
     syncDevice(token) {
-        return this.adapter
-            .setHeaders({ 'Driver-Token': this.token })
-            .post('drivers/register-device', token)
-            .then(() => {
-                return this;
-            });
+        return this.store.syncDevice(token);
     }
 }
 
