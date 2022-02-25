@@ -40,11 +40,11 @@ export default class Fleetbase {
      * @return {Fleetbase}          Instance
      */
     constructor(publicKey, config = {}, debug = false) {
-        this.version = config.version || 'v1';
+        this.version = config.version ?? 'v1';
         this.options = {
             version: this.version,
-            host: config.host || 'https://api.fleetbase.io',
-            namespace: this.version || config.namespace,
+            host: config.host ?? 'https://api.fleetbase.io',
+            namespace: config.namespace ?? this.version,
             debug,
             publicKey,
         };
