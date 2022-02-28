@@ -28,14 +28,22 @@ const driverActions = new StoreActions({
         return this.findRecord(id);
     },
 
-    syncDevice(token) {
-        return this.adapter.setHeaders({ 'Driver-Token': this.token }).post('drivers/register-device', token);
+    syncDevice(id, params = {}, options = {}) {
+        return this.adapter.post(`drivers/${id}/register-device`, params, options);
     },
 });
 
 class Driver extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'driver', { actions: driverActions, ...options });
+    }
+
+    get token() {
+        return this.getAttribute('token');
+    }
+
+    get isOnline() {
+        return this.getAttribute('online') === true;
     }
 
     /**
@@ -79,8 +87,8 @@ class Driver extends Resource {
         return this.store.track(this.id, params, options);
     }
 
-    syncDevice(token) {
-        return this.store.syncDevice(token);
+    syncDevice(params = {}, options = {}) {
+        return this.store.syncDevice(this.id, params, options);
     }
 }
 
