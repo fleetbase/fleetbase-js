@@ -7,7 +7,7 @@ class Place extends Resource {
     }
 
     static fromGoogleAddress(googleAddress, adapter, options = {}) {
-        const [ latitude, longitude ] = googleAddress.getAttribute('coordinates');
+        const [latitude, longitude] = googleAddress.getAttribute('coordinates');
         const attributes = {
             name: null,
             address: googleAddress.getAttribute('address'),
@@ -22,7 +22,7 @@ class Place extends Resource {
             building: googleAddress.get('building'),
             country: googleAddress.getAttribute('countryShort'),
             phone: null,
-            security_access_code: null
+            security_access_code: null,
         };
 
         return new Place(attributes, adapter, options);
@@ -30,7 +30,7 @@ class Place extends Resource {
 
     /**
      * The latitude coordinate for the 'Place' location.
-     * 
+     *
      * @var {Integer}
      */
     get latitude() {
@@ -39,7 +39,7 @@ class Place extends Resource {
 
     /**
      * The longitude coordinate for the 'Place' location.
-     * 
+     *
      * @var {Integer}
      */
     get longitude() {
@@ -48,18 +48,18 @@ class Place extends Resource {
 
     /**
      * Array coordinate pair for Place location.
-     * 
+     *
      * @var {Array}
      */
     get coordinates() {
         const { latitude, longitude } = this;
 
-        return  [ latitude, longitude ];
+        return [latitude, longitude];
     }
 
     /**
      * Set the owner of the place.
-     * 
+     *
      * @param {Object|String} owner
      * @return {Place}
      */

@@ -13,19 +13,4 @@ import ServiceArea from './resources/service-area';
 import ServiceRate from './resources/service-rate';
 import ServiceQuote from './resources/service-quote';
 
-export {
-    Order,
-    Payload,
-    Entity,
-    Place,
-    Waypoint,
-    TrackingStatus,
-    Vehicle,
-    Driver,
-    Vendor,
-    Contact,
-    Zone,
-    ServiceArea,
-    ServiceRate,
-    ServiceQuote
-};
+export { Order, Payload, Entity, Place, Waypoint, TrackingStatus, Vehicle, Driver, Vendor, Contact, Zone, ServiceArea, ServiceRate, ServiceQuote };

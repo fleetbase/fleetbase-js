@@ -75,14 +75,6 @@ class Driver extends Resource {
         return [latitude, longitude];
     }
 
-    get token() {
-        return this.getAttribute('token');
-    }
-
-    get isOnline() {
-        return this.getAttribute('online') === true;
-    }
-
     track(params = {}, options = {}) {
         return this.store.track(this.id, params, options);
     }

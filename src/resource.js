@@ -33,7 +33,7 @@ class Resource {
         this.adapter = adapter;
         this.store = new Store(this.resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this),
-            actions: this.options?.actions
+            actions: this.options?.actions,
         });
 
         return this;
@@ -59,9 +59,9 @@ class Resource {
         this.setFlags(['isLoading', 'isSaving']);
 
         return this.store.create(data).then((response) => {
-           this.setFlags(['isLoading', 'isSaving'], false);
+            this.setFlags(['isLoading', 'isSaving'], false);
 
-           return response;
+            return response;
         });
     }
 
@@ -75,9 +75,9 @@ class Resource {
         this.setFlags(['isLoading', 'isSaving']);
 
         return this.store.update(this.attributes.id, attributes).then((response) => {
-           this.setFlags(['isLoading', 'isSaving'], false);
+            this.setFlags(['isLoading', 'isSaving'], false);
 
-           return response;
+            return response;
         });
     }
 
@@ -90,9 +90,9 @@ class Resource {
         this.setFlags(['isLoading', 'isDestroying']);
 
         return this.store.destroy(this.attributes.id).then((response) => {
-           this.setFlags(['isLoading', 'isDestroying'], false);
+            this.setFlags(['isLoading', 'isDestroying'], false);
 
-           return response;
+            return response;
         });
     }
 
@@ -105,9 +105,9 @@ class Resource {
         this.setFlags(['isLoading', 'isReloading']);
 
         return this.store.findRecord(this.attributes.id).then((response) => {
-           this.reset();
+            this.reset();
 
-           return response;
+            return response;
         });
     }
 
@@ -119,7 +119,7 @@ class Resource {
     setFlags(flags = [], state = true) {
         const validFlags = ['isLoading', 'isSaving', 'isReloading', 'isDestroying'];
 
-        for(let i = 0; i < flags.length; i++) {
+        for (let i = 0; i < flags.length; i++) {
             const flag = flags[i];
 
             if (typeof flag !== 'string' || !validFlags.includes(flag)) {
@@ -348,9 +348,6 @@ class Resource {
         // use object setter
         set(this.attributes, property, value);
         set(this.dirtyAttributes, property, previousValue);
-        
-        // this.attributes[property] = value;
-        // this.dirtyAttributes[property] = previousValue;
 
         // track changes
         if (!isArray(this?.changes[property])) {
@@ -406,7 +403,7 @@ class Resource {
         if (isArray(property)) {
             const properties = property;
             const attributeKeys = Object.keys(this.attributes ?? {});
-            
+
             return properties.every((prop) => attributeKeys.includes(prop));
         }
 
@@ -420,7 +417,7 @@ class Resource {
     /**
      * Alias for checking if has multiple attributes.
      *
-     * @param {Array} properties 
+     * @param {Array} properties
      * @return {Boolean}
      */
     hasAttributes(properties = []) {
@@ -430,7 +427,7 @@ class Resource {
     /**
      * Returns true if attribute has value.
      *
-     * @param {Array} properties 
+     * @param {Array} properties
      * @return {Boolean}
      */
     isAttributeFilled(property) {
@@ -462,8 +459,8 @@ class Resource {
             throw new Error('No attribute properties provided!');
         }
 
-        for (let i = 0; i < properties.length; i++) {
-            const property = properties[i];
+        for (const element of properties) {
+            const property = element;
 
             if (typeof property !== 'string') {
                 continue;
