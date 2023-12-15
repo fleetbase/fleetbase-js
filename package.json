@@ -1,12 +1,14 @@
 {
     "name": "@fleetbase/sdk",
-    "version": "1.2.5",
+    "version": "1.2.8",
     "description": "Fleetbase JS & Node SDK",
     "main": "dist/cjs/fleetbase.js",
     "module": "dist/esm/fleetbase.js",
+    "types": "types/fleetbase.d.ts",
     "files": [
         "dist",
-        "src"
+        "src",
+        "types"
     ],
     "scripts": {
         "prebuild": "npm run lint",
@@ -51,7 +53,8 @@
         "prettier": "3.1.1",
         "rollup-plugin-eslint": "^7.0.0",
         "rollup-plugin-terser": "^7.0.2",
-        "source-map-support": "^0.5.21"
+        "source-map-support": "^0.5.21",
+        "typescript": "^5.3.3"
     },
     "directories": {
         "lib": "src",
