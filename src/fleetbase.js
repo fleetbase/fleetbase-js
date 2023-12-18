@@ -1,12 +1,13 @@
 import Store from './store';
 import Resource from './resource';
-import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote } from './resources';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
 import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, isResource, GoogleAddress, Collection, StoreActions } from './utils';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
 import { extendStoreActions } from './store';
 import { orderActions } from './resources/order';
 import { driverActions } from './resources/driver';
+import { organizationActions } from './resources/organization';
 
 /**
  * // instance
@@ -66,6 +67,7 @@ export default class Fleetbase {
         this.vehicles = new Store('vehicle', this.adapter);
         this.vendors = new Store('vendor', this.adapter);
         this.contacts = new Store('contact', this.adapter);
+        this.organizations = new Store('organization', this.adapter).extendActions(organizationActions);
     }
 
     static newInstance() {
@@ -98,6 +100,7 @@ export {
     ServiceArea,
     ServiceRate,
     ServiceQuote,
+    Organization,
     BrowserAdapter,
     NodeAdapter,
     EmberJsAdapter,
