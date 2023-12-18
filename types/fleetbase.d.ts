@@ -46,6 +46,7 @@ export default class Fleetbase {
     vehicles: Store;
     vendors: Store;
     contacts: Store;
+    organizations: any;
     setAdapter(adapter: any): void;
     getAdapter(): any;
 }
@@ -65,6 +66,7 @@ import { Zone } from './resources';
 import { ServiceArea } from './resources';
 import { ServiceRate } from './resources';
 import { ServiceQuote } from './resources';
+import { Organization } from './resources';
 import { BrowserAdapter } from './adapters';
 import { NodeAdapter } from './adapters';
 import { EmberJsAdapter } from './adapters';
@@ -100,6 +102,7 @@ export {
     ServiceArea,
     ServiceRate,
     ServiceQuote,
+    Organization,
     BrowserAdapter,
     NodeAdapter,
     EmberJsAdapter,
