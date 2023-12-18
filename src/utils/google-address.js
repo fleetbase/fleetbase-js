@@ -49,8 +49,8 @@ class GoogleAddress {
     }
 
     or(keys = []) {
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
+        for (const element of keys) {
+            const key = element;
 
             if (isArray(key)) {
                 const pkey = key[0];
@@ -72,7 +72,7 @@ class GoogleAddress {
     }
 
     has(key) {
-        return (key in this.components);
+        return key in this.components;
     }
 
     get(key, short = false) {
@@ -84,7 +84,7 @@ class GoogleAddress {
     }
 
     setAttributes(attributes = {}) {
-        this.attributes = {...this.attributes, ...attributes};
+        this.attributes = { ...this.attributes, ...attributes };
 
         return this;
     }

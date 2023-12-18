@@ -1,13 +1,11 @@
-// rollup.config.js
-import { terser } from 'rollup-plugin-terser';
-// import { eslint } from 'rollup-plugin-eslint';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import babel from '@rollup/plugin-babel';
-import pkg from './package.json';
+const { terser } = require('rollup-plugin-terser');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const babel = require('@rollup/plugin-babel');
+const pkg = require('./package.json');
 
 const input = ['src/fleetbase.js'];
 
-export default [
+module.exports = [
     {
         // umd
         input,
@@ -17,8 +15,8 @@ export default [
                 modulesOnly: true,
             }),
             babel({
-				babelHelpers: 'bundled',
-			}),
+                babelHelpers: 'bundled',
+            }),
             terser(),
         ],
         output: [
@@ -35,7 +33,7 @@ export default [
             exclude: ['node_modules/**'],
             include: ['lib/**'],
         },
-        external: ['axios']
+        external: ['axios'],
     },
     {
         // esm and cjs
@@ -45,10 +43,10 @@ export default [
                 browser: true,
                 modulesOnly: true,
             }),
-			babel({
-				babelHelpers: 'bundled',
-			}),
-			terser()
+            babel({
+                babelHelpers: 'bundled',
+            }),
+            terser(),
         ],
         output: [
             {
@@ -64,6 +62,6 @@ export default [
                 sourcemap: true,
             },
         ],
-        external: ['axios']
+        external: ['axios'],
     },
 ];

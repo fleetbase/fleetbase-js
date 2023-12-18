@@ -7,6 +7,6 @@ const detectAdapter = (options = {}) => {
     }
 
     return lookup('adapter', 'BrowserAdapter', options);
-}
+};
 
 export default detectAdapter;
