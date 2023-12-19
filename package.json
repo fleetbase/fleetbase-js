@@ -1,6 +1,6 @@
 {
     "name": "@fleetbase/sdk",
-    "version": "1.2.8",
+    "version": "1.2.6",
     "description": "Fleetbase JS & Node SDK",
     "main": "dist/cjs/fleetbase.js",
     "module": "dist/esm/fleetbase.js",
