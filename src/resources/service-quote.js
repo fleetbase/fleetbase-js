@@ -5,13 +5,9 @@ class ServiceQuote extends Resource {
         super(attributes, adapter, 'service-quote', options);
     }
 
-    fromPreliminary() {
+    fromPreliminary() {}
 
-    }
-
-    fromPayload() {
-        
-    }
+    fromPayload() {}
 }
 
 export default ServiceQuote;

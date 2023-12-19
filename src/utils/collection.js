@@ -214,8 +214,8 @@ class Collection extends Array {
         let sortKeys = arguments;
 
         return this.sort((a, b) => {
-            for (let i = 0; i < sortKeys.length; i++) {
-                let key = sortKeys[i];
+            for (const element of sortKeys) {
+                let key = element;
                 let propA = a[key];
                 let propB = b[key];
                 // return 1 or -1 else continue to the next sortKey

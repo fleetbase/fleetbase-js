@@ -118,10 +118,10 @@ const extend = (target, classes = []) => {
     if (arguments.length > 1) {
         classes = arguments;
     }
-    for (let index = 0; index < classes.length; index++) {
-        for (const property in classes[index]) {
-            if (Object.prototype.hasOwnProperty.call(classes[index], property)) {
-                target[property] = classes[index][property];
+    for (const element of classes) {
+        for (const property in element) {
+            if (Object.prototype.hasOwnProperty.call(element, property)) {
+                target[property] = element[property];
             }
         }
     }

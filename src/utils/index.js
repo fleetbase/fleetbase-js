@@ -13,19 +13,4 @@ import GoogleAddress from './google-address';
 import Point from './point';
 import StoreActions from './store-actions';
 
-export {
-    Collection,
-    isNodeEnvironment,
-    detectAdapter,
-    isBlank,
-    isEmpty,
-    isLatitude,
-    isLongitude,
-    isResource,
-    isPhone,
-    isEmail,
-    uuid,
-    GoogleAddress,
-    StoreActions,
-    Point
-};
+export { Collection, isNodeEnvironment, detectAdapter, isBlank, isEmpty, isLatitude, isLongitude, isResource, isPhone, isEmail, uuid, GoogleAddress, StoreActions, Point };

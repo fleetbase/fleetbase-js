@@ -1,5 +1,3 @@
 const { isArray } = Array;
 
-export {
-    isArray
-};
+export { isArray };

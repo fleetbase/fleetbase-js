@@ -1,75 +1,86 @@
 {
-  "name": "@fleetbase/sdk",
-  "version": "1.2.5",
-  "description": "Fleetbase JS & Node SDK",
-  "main": "dist/cjs/fleetbase.js",
-  "module": "dist/esm/fleetbase.js",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "scripts": {
-    "prebuild": "npm run lint",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "lint:tests": "eslint tests",
-    "bundle": "rollup -c",
-    "dev": "rollup -c -w",
-    "test": "mocha --require @babel/polyfill --require @babel/register --require source-map-support/register tests/*.test.js"
-  },
-  "author": "Ronald A. Richardson <ron@fleetbase.io> (https://ron.dev)",
-  "license": "BSD-3-Clause",
-  "devDependencies": {
-    "@babel/core": "^7.14.0",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/plugin-proposal-decorators": "^7.13.15",
-    "@babel/plugin-transform-spread": "^7.13.0",
-    "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.14.1",
-    "@babel/register": "^7.13.16",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^13.0.5",
-    "chai": "^4.3.4",
-    "eslint": "^7.26.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.16.0",
-    "mocha": "^8.4.0",
-    "rollup-plugin-eslint": "^5.1.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "source-map-support": "^0.5.19"
-  },
-  "dependencies": {
-    "@babel/runtime": "^7.15.4",
-    "axios": "^0.21.1",
-    "cross-fetch": "^3.1.4",
-    "global": "^4.4.0",
-    "rollup": "^2.50.5"
-  },
-  "directories": {
-    "lib": "src",
-    "test": "tests"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fleetbase/fleetbase-js.git"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "logistics",
-    "ondemand",
-    "delivery",
-    "operations",
-    "logistics",
-    "api",
-    "fleet",
-    "management",
-    "fleet",
-    "api"
-  ],
-  "bugs": {
-    "url": "https://github.com/fleetbase/fleetbase-js/issues"
-  },
-  "homepage": "https://github.com/fleetbase/fleetbase-js#readme"
+    "name": "@fleetbase/sdk",
+    "version": "1.2.6",
+    "description": "Fleetbase JS & Node SDK",
+    "main": "dist/cjs/fleetbase.js",
+    "module": "dist/esm/fleetbase.js",
+    "types": "types/fleetbase.d.ts",
+    "files": [
+        "dist",
+        "src",
+        "types"
+    ],
+    "scripts": {
+        "prebuild": "npm run lint",
+        "lint": "eslint src",
+        "lint:fix": "eslint src --fix",
+        "lint:tests": "eslint tests",
+        "bundle": "rollup -c",
+        "dev": "rollup -c -w",
+        "test": "mocha --require @babel/polyfill --require @babel/register --require source-map-support/register tests/*.test.js",
+        "prepare": "husky install",
+        "format": "prettier . --write"
+    },
+    "author": "Ronald A. Richardson <ron@fleetbase.io> (https://ron.dev)",
+    "license": "BSD-3-Clause",
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
+    },
+    "dependencies": {
+        "@babel/runtime": "^7.23.6",
+        "axios": "^1.6.2",
+        "cross-fetch": "^4.0.0",
+        "global": "^4.4.0",
+        "rollup": "^4.9.0"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.23.6",
+        "@babel/plugin-proposal-class-properties": "^7.18.6",
+        "@babel/plugin-proposal-decorators": "^7.23.6",
+        "@babel/plugin-transform-spread": "^7.23.3",
+        "@babel/polyfill": "^7.12.1",
+        "@babel/preset-env": "^7.23.6",
+        "@babel/register": "^7.22.15",
+        "@rollup/plugin-babel": "^6.0.4",
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "chai": "^4.3.10",
+        "eslint": "^8.55.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-plugin-import": "^2.29.0",
+        "husky": "^8.0.3",
+        "lint-staged": "^15.2.0",
+        "mocha": "^10.2.0",
+        "prettier": "3.1.1",
+        "rollup-plugin-eslint": "^7.0.0",
+        "rollup-plugin-terser": "^7.0.2",
+        "source-map-support": "^0.5.21",
+        "typescript": "^5.3.3"
+    },
+    "directories": {
+        "lib": "src",
+        "test": "tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fleetbase/fleetbase-js.git"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "keywords": [
+        "logistics",
+        "ondemand",
+        "delivery",
+        "operations",
+        "logistics",
+        "api",
+        "fleet",
+        "management",
+        "fleet",
+        "api"
+    ],
+    "bugs": {
+        "url": "https://github.com/fleetbase/fleetbase-js/issues"
+    },
+    "homepage": "https://github.com/fleetbase/fleetbase-js#readme"
 }

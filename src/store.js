@@ -1,15 +1,14 @@
 import { lookup } from './resolver';
-import { pluralize, classify } from './utils/string';
+import { Collection, StoreActions, detectAdapter, isResource } from './utils';
 import { isArray } from './utils/array';
-import { Collection, detectAdapter, isResource, StoreActions } from './utils';
-import { set, isCallable, invoke } from './utils/object';
+import { classify, pluralize } from './utils/string';
 
 const extendStoreActions = (store, actions = []) => {
     store.actions = isArray(actions) ? actions : [actions];
 
     if (isArray(actions)) {
-        for (let i = 0; i < actions.length; i++) {
-            const action = actions[i];
+        for (const element of actions) {
+            const action = element;
 
             store.extendActions(action);
         }
@@ -31,8 +30,8 @@ const afterFetch = (store, json) => {
     if (isArray(json)) {
         const serialized = [];
 
-        for (let i = 0; i < json.length; i++) {
-            serialized.push(store.afterFetch(json[i]));
+        for (const element of json) {
+            serialized.push(store.afterFetch(element));
         }
 
         return new Collection(...serialized);
@@ -133,4 +132,4 @@ class Store {
 
 export default Store;
 
-export { extendStoreActions, afterFetch };
+export { afterFetch, extendStoreActions };
