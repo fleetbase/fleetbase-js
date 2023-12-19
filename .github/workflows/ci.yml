@@ -17,16 +17,16 @@ jobs:
                 node-version: [18.x] # Build on Node.js 16
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Setup Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v2
+              uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node-version }}
             - uses: actions/cache@v3
-              id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+              id: npm-cache
               with:
-                  path: ${{ steps.npm-cache-dir.outputs.dir }}
+                  path: ~/.pnpm-store # Replace this with the path you want to cache
                   key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-node-
@@ -46,10 +46,10 @@ jobs:
         runs-on: ubuntu-latest
         if: startsWith(github.ref, 'refs/tags/')
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Setup Node.js 18.x
-              uses: actions/setup-node@v2
+              uses: actions/setup-node@v4
               with:
                   node-version: 18.x
 
@@ -75,10 +75,10 @@ jobs:
         runs-on: ubuntu-latest
         if: startsWith(github.ref, 'refs/tags/')
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Setup Node.js 18.x
-              uses: actions/setup-node@v2
+              uses: actions/setup-node@v4
               with:
                   node-version: 18.x
 
@@ -91,7 +91,7 @@ jobs:
               run: pnpm install
 
             - name: Build
-              run: pnpm run build
+              run: pnpm run bundle
 
             - name: Configure npm for GitHub registry
               run: |
