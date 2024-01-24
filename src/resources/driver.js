@@ -24,6 +24,14 @@ const driverActions = new StoreActions({
         return this.adapter.post(`drivers/${id}/track`, params, options).then(this.afterFetch.bind(this));
     },
 
+    listOrganizations: function (id, params = {}, options = {}) {
+        return this.adapter.post(`drivers/${id}/list-organizations`, params, options).then(this.afterFetch.bind(this));
+    },
+
+    switchOrganization: function (id, params = {}, options = {}) {
+        return this.adapter.post(`drivers/${id}/switch-organization`, params, options).then(this.afterFetch.bind(this));
+    },
+
     retrieve: function (id) {
         return this.findRecord(id);
     },
@@ -81,6 +89,14 @@ class Driver extends Resource {
 
     syncDevice(params = {}, options = {}) {
         return this.store.syncDevice(this.id, params, options);
+    }
+
+    listOrganizations(params = {}, options = {}) {
+        return this.store.listOrganizations(this.id, params, options);
+    }
+
+    switchOrganization(organizationId, options = {}) {
+        return this.store.switchOrganization(this.id, { next: organizationId }, options);
     }
 }
 
