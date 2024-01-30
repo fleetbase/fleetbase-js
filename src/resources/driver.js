@@ -1,5 +1,17 @@
 import Resource from '../resource';
-import { StoreActions, isPhone, isEmail } from '../utils';
+import Organization from './organization';
+import { StoreActions, isPhone, Collection } from '../utils';
+import { isArray } from '../utils/array';
+
+const serializeOrganizations = (response, adapter) => {
+    if (isArray(response)) {
+        return response.map((organizationJson) => {
+            return new Organization(organizationJson, adapter);
+        });
+    }
+
+    return new Organization(response, adapter);
+};
 
 const driverActions = new StoreActions({
     // const { error } = await fleetbase.drivers.login('+1 111-1111');
@@ -25,11 +37,11 @@ const driverActions = new StoreActions({
     },
 
     listOrganizations: function (id, params = {}, options = {}) {
-        return this.adapter.post(`drivers/${id}/list-organizations`, params, options).then(this.afterFetch.bind(this));
+        return this.adapter.get(`drivers/${id}/organizations`, params, options).then((response) => serializeOrganizations(response, this.adapter));
     },
 
     switchOrganization: function (id, params = {}, options = {}) {
-        return this.adapter.post(`drivers/${id}/switch-organization`, params, options).then(this.afterFetch.bind(this));
+        return this.adapter.post(`drivers/${id}/switch-organization`, params, options).then((response) => serializeOrganizations(response, this.adapter));
     },
 
     retrieve: function (id) {
