@@ -44,6 +44,10 @@ const driverActions = new StoreActions({
         return this.adapter.post(`drivers/${id}/switch-organization`, params, options).then((response) => serializeOrganizations(response, this.adapter));
     },
 
+    currentOrganization: function (id, params = {}, options = {}) {
+        return this.adapter.get(`drivers/${id}/current-organization`, params, options).then((response) => serializeOrganizations(response, this.adapter));
+    },
+
     retrieve: function (id) {
         return this.findRecord(id);
     },
@@ -109,6 +113,10 @@ class Driver extends Resource {
 
     switchOrganization(organizationId, options = {}) {
         return this.store.switchOrganization(this.id, { next: organizationId }, options);
+    }
+
+    currentOrganization(params = {}, options = {}) {
+        return this.store.currentOrganization(this.id, params, options);
     }
 }
 
