@@ -1,6 +1,6 @@
 {
     "name": "@fleetbase/sdk",
-    "version": "1.2.7",
+    "version": "1.2.8",
     "description": "Fleetbase JS & Node SDK",
     "main": "dist/cjs/fleetbase.js",
     "module": "dist/esm/fleetbase.js",
@@ -19,7 +19,10 @@
         "dev": "rollup -c -w",
         "test": "mocha --require @babel/polyfill --require @babel/register --require source-map-support/register tests/*.test.js",
         "prepare": "husky install",
-        "format": "prettier . --write"
+        "format": "prettier . --write",
+        "publish-verdaccio": "npm publish --registry http://localhost:4873",
+        "unpublish-verdaccio": "npm unpublish --registry http://localhost:4873 --force",
+        "reset-verdaccio": "pnpm unpublish-verdaccio && pnpm publish-verdaccio"
     },
     "author": "Ronald A. Richardson <ron@fleetbase.io> (https://ron.dev)",
     "license": "BSD-3-Clause",
