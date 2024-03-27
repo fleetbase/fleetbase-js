@@ -8,6 +8,7 @@ import { extendStoreActions } from './store';
 import { orderActions } from './resources/order';
 import { driverActions } from './resources/driver';
 import { organizationActions } from './resources/organization';
+import { lookup } from './resolver';
 
 /**
  * // instance
@@ -119,4 +120,5 @@ export {
     classify,
     dasherize,
     camelize,
+    lookup,
 };
