@@ -1,6 +1,6 @@
 import Resource from '../resource';
+import { StoreActions, isPhone, isEmail, Point } from '../utils';
 import Organization from './organization';
-import { StoreActions, isPhone, Collection } from '../utils';
 import { isArray } from '../utils/array';
 
 const serializeOrganizations = (response, adapter) => {

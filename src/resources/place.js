@@ -12,7 +12,7 @@ class Place extends Resource {
             name: null,
             address: googleAddress.getAttribute('address'),
             location: new Point(latitude, longitude),
-            street1: googleAddress.getAttribute('streetName'),
+            street1: googleAddress.getAttribute('address'),
             street2: null,
             city: googleAddress.getAttribute('city'),
             province: googleAddress.getAttribute('stateLong'),
