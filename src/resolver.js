@@ -1,4 +1,4 @@
-import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote } from './resources';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
 import { pluralize, singularize } from './utils/string';
 
@@ -17,6 +17,7 @@ const resources = {
     ServiceArea,
     ServiceRate,
     ServiceQuote,
+    Organization,
 };
 
 const adapters = {

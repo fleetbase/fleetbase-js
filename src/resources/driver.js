@@ -1,5 +1,17 @@
 import Resource from '../resource';
 import { StoreActions, isPhone, isEmail, Point } from '../utils';
+import Organization from './organization';
+import { isArray } from '../utils/array';
+
+const serializeOrganizations = (response, adapter) => {
+    if (isArray(response)) {
+        return response.map((organizationJson) => {
+            return new Organization(organizationJson, adapter);
+        });
+    }
+
+    return new Organization(response, adapter);
+};
 
 const driverActions = new StoreActions({
     // const { error } = await fleetbase.drivers.login('+1 111-1111');
@@ -22,6 +34,18 @@ const driverActions = new StoreActions({
 
     track: function (id, params = {}, options = {}) {
         return this.adapter.post(`drivers/${id}/track`, params, options).then(this.afterFetch.bind(this));
+    },
+
+    listOrganizations: function (id, params = {}, options = {}) {
+        return this.adapter.get(`drivers/${id}/organizations`, params, options).then((response) => serializeOrganizations(response, this.adapter));
+    },
+
+    switchOrganization: function (id, params = {}, options = {}) {
+        return this.adapter.post(`drivers/${id}/switch-organization`, params, options).then((response) => serializeOrganizations(response, this.adapter));
+    },
+
+    currentOrganization: function (id, params = {}, options = {}) {
+        return this.adapter.get(`drivers/${id}/current-organization`, params, options).then((response) => serializeOrganizations(response, this.adapter));
     },
 
     retrieve: function (id) {
@@ -75,20 +99,24 @@ class Driver extends Resource {
         return [latitude, longitude];
     }
 
-    get token() {
-        return this.getAttribute('token');
-    }
-
-    get isOnline() {
-        return this.getAttribute('online') === true;
-    }
-
     track(params = {}, options = {}) {
         return this.store.track(this.id, params, options);
     }
 
     syncDevice(params = {}, options = {}) {
         return this.store.syncDevice(this.id, params, options);
+    }
+
+    listOrganizations(params = {}, options = {}) {
+        return this.store.listOrganizations(this.id, params, options);
+    }
+
+    switchOrganization(organizationId, options = {}) {
+        return this.store.switchOrganization(this.id, { next: organizationId }, options);
+    }
+
+    currentOrganization(params = {}, options = {}) {
+        return this.store.currentOrganization(this.id, params, options);
     }
 }
 

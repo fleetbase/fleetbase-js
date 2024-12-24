@@ -21,7 +21,7 @@ export default class Point {
     }
 
     static fromGeoJson(json) {
-        [ longitude, latitude ] = json.coordinates;
+        const [longitude, latitude] = json.coordinates;
 
         return new Point(latitude, longitude);
     }
@@ -29,7 +29,7 @@ export default class Point {
     serialize() {
         return {
             type: 'Point',
-            coorindates: [this.lat(), this.lng()]
+            coorindates: [this.lat(), this.lng()],
         };
     }
 

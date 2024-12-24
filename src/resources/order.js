@@ -1,6 +1,5 @@
 import Resource from '../resource';
 import { StoreActions, isResource } from '../utils';
-import { isValid as isValidDate } from 'date-fns';
 
 const orderActions = new StoreActions({
     getDistanceAndTime: function (id, params = {}, options = {}) {

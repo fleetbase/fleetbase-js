@@ -12,7 +12,7 @@ class BrowserAdapter extends Adapter {
         this.setHeaders({
             Authorization: `Bearer ${config.publicKey}`,
             'Content-Type': 'application/json',
-            'User-Agent': '@fleetbase/sdk;browser'
+            'User-Agent': '@fleetbase/sdk;browser',
         });
     }
 
@@ -36,17 +36,21 @@ class BrowserAdapter extends Adapter {
      * @return {Promise}
      */
     parseJSON(response) {
-        return new Promise((resolve, reject) => response
-            .json()
-            .then((json) => resolve({
-                statusText: response.statusText,
-                status: response.status,
-                ok: response.ok,
-                json,
-            }))
-            .catch(() => {
-                reject(new Error('Oops! Something went wrong when handling your request.'));
-            }));
+        return new Promise((resolve, reject) =>
+            response
+                .json()
+                .then((json) =>
+                    resolve({
+                        statusText: response.statusText,
+                        status: response.status,
+                        ok: response.ok,
+                        json,
+                    })
+                )
+                .catch(() => {
+                    reject(new Error('Oops! Something went wrong when handling your request.'));
+                })
+        );
     }
 
     /**
@@ -60,26 +64,28 @@ class BrowserAdapter extends Adapter {
      * @return {Promise}
      */
     request(path, method = 'GET', data = {}, options = {}) {
-        return new Promise((resolve, reject) => fetch(options.url || `${this.host}/${this.namespace}/${path}`, {
-            method,
-            mode: options.mode || 'cors',
-            headers: new Headers({
-                ...(this.headers || {}),
-                ...(options.headers || {}),
-            }),
-            ...data,
-        })
-            .then(this.parseJSON)
-            .then((response) => {
-                if (response.ok) {
-                    return resolve(response.json);
-                }
-
-                return reject(new Error(response.json.errors ? response.json.errors[0] : response.statusText));
+        return new Promise((resolve, reject) =>
+            fetch(options.url || `${this.host}/${this.namespace}/${path}`, {
+                method,
+                mode: options.mode || 'cors',
+                headers: new Headers({
+                    ...(this.headers || {}),
+                    ...(options.headers || {}),
+                }),
+                ...data,
             })
-            .catch((error) => {
-                reject(error);
-            }));
+                .then(this.parseJSON)
+                .then((response) => {
+                    if (response.ok) {
+                        return resolve(response.json);
+                    }
+
+                    return reject(new Error(response.json.errors ? response.json.errors[0] : response.statusText));
+                })
+                .catch((error) => {
+                    reject(error);
+                })
+        );
     }
 
     /**

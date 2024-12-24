@@ -7,6 +7,7 @@ import TrackingStatus from './resources/tracking-status';
 import Vehicle from './resources/vehicle';
 import Driver from './resources/driver';
 import Vendor from './resources/vendor';
+import Organization from './resources/organization';
 import Contact from './resources/contact';
 import Zone from './resources/zone';
 import ServiceArea from './resources/service-area';
