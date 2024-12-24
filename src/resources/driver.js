@@ -1,5 +1,5 @@
 import Resource from '../resource';
-import { StoreActions, isPhone, isEmail } from '../utils';
+import { StoreActions, isPhone, isEmail, Point } from '../utils';
 
 const driverActions = new StoreActions({
     // const { error } = await fleetbase.drivers.login('+1 111-1111');

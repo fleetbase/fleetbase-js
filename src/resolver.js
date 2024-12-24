@@ -54,3 +54,4 @@ const lookup = function () {
 };
 
 export { Resolver, lookup };
+export default Resolver;

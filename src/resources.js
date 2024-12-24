@@ -12,6 +12,7 @@ import Zone from './resources/zone';
 import ServiceArea from './resources/service-area';
 import ServiceRate from './resources/service-rate';
 import ServiceQuote from './resources/service-quote';
+import Organization from './resources/organization';
 
 export {
     Order,
@@ -27,5 +28,6 @@ export {
     Zone,
     ServiceArea,
     ServiceRate,
-    ServiceQuote
+    ServiceQuote,
+    Organization
 };
