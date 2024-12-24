@@ -9,7 +9,7 @@
  * instance
  * const string = new String();
  * string.humanize('hello_world').get() => "Hello world"
- * 
+ *
  * no chain
  * new String('hello_world', false).humanize() => "Hello world"
  *
@@ -445,89 +445,76 @@ export default class String {
     }
 }
 
-const pluralize = function() {
+const pluralize = function () {
     const argz = ['pluralize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const singularize = function() {
+const singularize = function () {
     const argz = ['singularize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const humanize = function() {
+const humanize = function () {
     const argz = ['humanize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const underscore = function() {
+const underscore = function () {
     const argz = ['underscore', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const camelize = function() {
+const camelize = function () {
     const argz = ['camelize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const capitalize = function() {
+const capitalize = function () {
     const argz = ['capitalize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const dasherize = function() {
+const dasherize = function () {
     const argz = ['dasherize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const normify = function() {
+const normify = function () {
     const argz = ['normify', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const demodulize = function() {
+const demodulize = function () {
     const argz = ['demodulize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const tableize = function() {
+const tableize = function () {
     const argz = ['tableize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const classify = function() {
+const classify = function () {
     const argz = ['classify', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const foreignKey = function() {
+const foreignKey = function () {
     const argz = ['foreignKey', ...arguments];
 
     return String.invoke(...argz);
 };
 
-export {
-    pluralize,
-    singularize,
-    humanize,
-    underscore,
-    camelize,
-    capitalize,
-    dasherize,
-    normify,
-    demodulize,
-    tableize,
-    classify,
-    foreignKey
-}
+export { pluralize, singularize, humanize, underscore, camelize, capitalize, dasherize, normify, demodulize, tableize, classify, foreignKey };

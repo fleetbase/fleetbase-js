@@ -2,7 +2,6 @@ import { assert } from 'chai';
 import String, { pluralize, dasherize } from '../src/utils/string';
 
 describe('Create a new String() instance', () => {
-
     it('should be an instance of String', () => {
         const s = new String('Hello World');
         assert.instanceOf(s, String);
@@ -20,7 +19,7 @@ describe('Create a new String() instance', () => {
 
             it('string should be pluralized', () => assert.equal(pluralized, 'entities'));
         });
-    })
+    });
 });
 
 describe('pluralize() function', () => {

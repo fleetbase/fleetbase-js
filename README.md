@@ -48,11 +48,11 @@ const fleetbase = new Fleetbase('Your Public Key');
 
 // create a place
 const speceNeedle = await fleetbase.places.create({
-  name: 'Space Needle',
-  street1: '400 Broad Street',
-  city: 'Seattle',
-  state: 'WA',
-  country: 'US'
+    name: 'Space Needle',
+    street1: '400 Broad Street',
+    city: 'Seattle',
+    state: 'WA',
+    country: 'US',
 });
 ```
 
@@ -65,17 +65,17 @@ const fleetbase = new Fleetbase('Your Secret Key');
 
 // create a place
 const speceNeedle = await fleetbase.places.create({
-  name: 'Space Needle',
-  street1: '400 Broad Street',
-  city: 'Seattle',
-  state: 'WA',
-  country: 'US'
+    name: 'Space Needle',
+    street1: '400 Broad Street',
+    city: 'Seattle',
+    state: 'WA',
+    country: 'US',
 });
 ```
 
 ## Create a custom adapter
 
-You're able to create a custom adapter to handle network request in the Fleetbase SDK. 
+You're able to create a custom adapter to handle network request in the Fleetbase SDK.
 The Fleetbase SDK ships with two standard adapters. The BrowserAdapter which is based on `fetch()` and
 the NodeAdapter based on axios.
 
@@ -83,14 +83,14 @@ the NodeAdapter based on axios.
 import { Adapter } from '@fleetbase/sdk';
 
 class CustomAdapter extends Adapter {
-  constructor(config) {
-    super(config);
-  }
+    constructor(config) {
+        super(config);
+    }
 
-  get() {}
-  post() {}
-  put() {}
-  patch() {}
-  delete() {}
+    get() {}
+    post() {}
+    put() {}
+    patch() {}
+    delete() {}
 }
 ```
