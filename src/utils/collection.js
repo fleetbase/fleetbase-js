@@ -1,15 +1,15 @@
-import { isArray } from './array';
+/* eslint no-undef: "off" */
+import { isArray } from './array.js';
 
 /**
  * Collection
  * Extended array inspired by Ember's NativeArray
  **/
-
 const CHUNK_SIZE = 60000;
 
 // To avoid overflowing the stack, we splice up to CHUNK_SIZE items at a time.
 // See https://code.google.com/p/chromium/issues/detail?id=56588 for more details.
-const replace = (array, start, deleteCount, items = []) => {
+export function replace(array, start, deleteCount, items = []) {
     if (isArray(array)) {
         if (items.length <= CHUNK_SIZE) {
             array.splice(start, deleteCount, ...items);
@@ -21,19 +21,21 @@ const replace = (array, start, deleteCount, items = []) => {
                 array.splice(start + i, 0, ...chunk);
             }
         }
-    } else if (isCollection(arr)) {
+    } else if (isCollection(array)) {
         array.replace(start, deleteCount, items);
     }
-};
+}
 
-const identityFunction = (item) => item;
+export function identityFunction(item) {
+    return item;
+}
 
-const uniqBy = (array, key = identityFunction) => {
+export function uniqBy(array, key = identityFunction) {
     let ret = [];
     let seen = new Set();
     let getter = typeof key === 'function' ? key : (item) => get(item, key);
 
-    array.forEach((item) => {
+    array.forEach(function (item) {
         let val = getter(item);
         if (!seen.has(val)) {
             seen.add(val);
@@ -42,11 +44,13 @@ const uniqBy = (array, key = identityFunction) => {
     });
 
     return ret;
-};
+}
 
-const isCollection = (mixed) => mixed instanceof Collection;
+export function isCollection(mixed) {
+    return mixed instanceof Collection;
+}
 
-const objectAt = (array, index) => {
+export function objectAt(array, index) {
     if (isArray(array)) {
         return array[index];
     } else if (isCollection(array)) {
@@ -54,14 +58,20 @@ const objectAt = (array, index) => {
     }
 
     return null;
-};
+}
 
-const iter = (key, value) => {
+export function iter(key, value) {
     let valueProvided = arguments.length === 2;
-    return valueProvided ? (item) => value === item[key] : (item) => Boolean(item[key]);
-};
+    return valueProvided
+        ? function (item) {
+              return value === item[key];
+          }
+        : function (item) {
+              return Boolean(item[key]);
+          };
+}
 
-const findIndex = (array, predicate, startAt = 0) => {
+export function findIndex(array, predicate, startAt = 0) {
     let len = array.length;
     for (let index = startAt; index < len; index++) {
         let item = objectAt(array, index);
@@ -70,26 +80,28 @@ const findIndex = (array, predicate, startAt = 0) => {
         }
     }
     return -1;
-};
+}
 
-const find = (array, callback, target) => {
+export function find(array, callback, target) {
     let predicate = callback.bind(target);
     let index = findIndex(array, predicate, 0);
     return index === -1 ? undefined : objectAt(array, index);
-};
+}
 
-const any = (array, callback, target) => {
+export function any(array, callback, target) {
     let predicate = callback.bind(target);
     return findIndex(array, predicate, 0) !== -1;
-};
+}
 
-const every = (array, callback, target) => {
+export function every(array, callback, target) {
     let cb = callback.bind(target);
-    let predicate = (item, index, array) => !cb(item, index, array);
+    let predicate = function (item, index, array) {
+        return !cb(item, index, array);
+    };
     return findIndex(array, predicate, 0) === -1;
-};
+}
 
-const indexOf = (array, val, startAt = 0, withNaNCheck) => {
+export function indexOf(array, val, startAt = 0, withNaNCheck) {
     let len = array.length;
 
     if (startAt < 0) {
@@ -97,22 +109,33 @@ const indexOf = (array, val, startAt = 0, withNaNCheck) => {
     }
 
     // SameValueZero comparison (NaN !== NaN)
-    let predicate = withNaNCheck && val !== val ? (item) => item !== item : (item) => item === val;
+    let predicate =
+        withNaNCheck && val !== val
+            ? function (item) {
+                  return item !== item;
+              }
+            : function (item) {
+                  return item === val;
+              };
     return findIndex(array, predicate, startAt);
-};
+}
 
-const removeAt = (array, index, len = 1) => {
+export function removeAt(array, index, len = 1) {
     replace(array, index, len, []);
     return array;
-};
+}
 
-const insertAt = (array, index, item) => {
+export function insertAt(array, index, item) {
     replace(array, index, 0, [item]);
     return item;
-};
+}
 
-class Collection extends Array {
-    constructor(...items) {
+export function createCollection() {
+    return new Collection(...arguments);
+}
+
+export default class Collection extends Array {
+    constructor() {
         if (isArray(arguments[0])) {
             super(...arguments[0]);
         } else {
@@ -361,7 +384,3 @@ class Collection extends Array {
         return this;
     }
 }
-
-export default Collection;
-
-export { replace, uniqBy, isCollection, objectAt, iter, findIndex, find, any, every, indexOf, removeAt, insertAt };

@@ -1,9 +1,9 @@
 import { assert } from 'chai';
-import Fleetbase from '../src/fleetbase';
-import Store from '../src/store';
-import Resource from '../src/resource';
-import { Place } from '../src/resources';
-import 'cross-fetch/polyfill';
+import Fleetbase from '../src/fleetbase.js';
+import Store from '../src/store.js';
+import Resource from '../src/resource.js';
+import { Place } from '../src/resources.js';
+// import 'cross-fetch/polyfill';
 
 // create an instance of the fleetbase sdk
 describe('Create a Fleetbase SDK instance', () => {

@@ -1,4 +1,26 @@
-import { set } from './object';
+import { set } from './object.js';
+import { isArray } from './array.js';
+
+export function isStoreActions(target) {
+    return target instanceof StoreActions;
+}
+
+export function extendStoreActions(store, actions = []) {
+    store.actions = isArray(actions) ? actions : [actions];
+
+    if (isArray(actions)) {
+        for (const element of actions) {
+            store.extendActions(element);
+        }
+        return;
+    }
+
+    if (isStoreActions(actions)) {
+        actions.extend(store);
+    }
+
+    return store;
+}
 
 export default class StoreActions {
     constructor(actions = {}, bind = null) {

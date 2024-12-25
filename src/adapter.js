@@ -1,4 +1,6 @@
-class Adapter {
+import { register } from './registry.js';
+
+export default class Adapter {
     /**
      * Creates a configured base adapter for Fleetbase.
      *
@@ -12,4 +14,4 @@ class Adapter {
     }
 }
 
-export default Adapter;
+register('adapter', 'Adapter', Adapter);

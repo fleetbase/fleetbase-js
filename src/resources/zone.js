@@ -1,9 +1,10 @@
-import Resource from '../resource';
+import Resource from '../resource.js';
+import { register } from '../registry.js';
 
-class Zone extends Resource {
+export default class Zone extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'zone', options);
     }
 }
 
-export default Zone;
+registerResource('resource', 'Zone', Zone);

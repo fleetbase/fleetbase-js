@@ -1,17 +1,17 @@
-import Resource from '../resource';
-import { StoreActions } from '../utils';
+import Resource from '../resource.js';
+import { register } from '../registry.js';
+import { StoreActions } from '../utils/index.js';
 
-const organizationActions = new StoreActions({
+export const organizationActions = new StoreActions({
     current: function (params = {}, options = {}) {
         return this.adapter.get(`${this.namespace}/current`, params, options);
     },
 });
 
-class Organization extends Resource {
+export default class Organization extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'organization', { actions: organizationActions, ...options });
     }
 }
 
-export default Organization;
-export { organizationActions };
+registerResource('resource', 'Organization', Organization);

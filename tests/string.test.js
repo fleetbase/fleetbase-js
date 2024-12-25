@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import String, { pluralize, dasherize } from '../src/utils/string';
+import String, { pluralize, dasherize } from '../src/utils/string.js';
 
 describe('Create a new String() instance', () => {
     it('should be an instance of String', () => {

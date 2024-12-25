@@ -41,3 +41,5 @@ export default class Point {
         return `(${this.latitude}, ${this.longitude})`;
     }
 }
+
+export { Point };

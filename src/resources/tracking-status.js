@@ -1,9 +1,10 @@
-import Resource from '../resource';
+import Resource from '../resource.js';
+import { register } from '../registry.js';
 
-class TrackingStatus extends Resource {
+export default class TrackingStatus extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'tracking-status', options);
     }
 }
 
-export default TrackingStatus;
+registerResource('resource', 'TrackingStatus', TrackingStatus);

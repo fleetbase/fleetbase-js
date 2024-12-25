@@ -1,27 +1,26 @@
-const { terser } = require('rollup-plugin-terser');
-const { nodeResolve } = require('@rollup/plugin-node-resolve');
-const babel = require('@rollup/plugin-babel');
-const pkg = require('./package.json');
+import terser from '@rollup/plugin-terser';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { babel } from '@rollup/plugin-babel';
 
 const input = ['src/fleetbase.js'];
+const plugins = [
+    nodeResolve({
+        browser: true,
+        modulesOnly: true,
+    }),
+    babel({
+        babelHelpers: 'bundled',
+    }),
+    terser(),
+];
 
-module.exports = [
+export default [
     {
-        // umd
         input,
-        plugins: [
-            nodeResolve({
-                browser: true,
-                modulesOnly: true,
-            }),
-            babel({
-                babelHelpers: 'bundled',
-            }),
-            terser(),
-        ],
+        plugins,
         output: [
             {
-                file: `dist/${pkg.name}.min.js`,
+                file: 'dist/fleetbase.min.js',
                 format: 'umd',
                 name: '@fleetbase/sdk',
                 esModule: false,
@@ -33,21 +32,11 @@ module.exports = [
             exclude: ['node_modules/**'],
             include: ['lib/**'],
         },
-        external: ['axios'],
+        external: [],
     },
     {
-        // esm and cjs
         input,
-        plugins: [
-            nodeResolve({
-                browser: true,
-                modulesOnly: true,
-            }),
-            babel({
-                babelHelpers: 'bundled',
-            }),
-            terser(),
-        ],
+        plugins,
         output: [
             {
                 dir: 'dist/esm',
@@ -62,6 +51,6 @@ module.exports = [
                 sourcemap: true,
             },
         ],
-        external: ['axios'],
+        external: [],
     },
 ];

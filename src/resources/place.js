@@ -1,7 +1,8 @@
-import Resource from '../resource';
-import { isResource, Point } from '../utils';
+import Resource, { isResource } from '../resource.js';
+import { register } from '../registry.js';
+import { Point } from '../utils/index.js';
 
-class Place extends Resource {
+export default class Place extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'place', options);
     }
@@ -76,4 +77,4 @@ class Place extends Resource {
     }
 }
 
-export default Place;
+registerResource('resource', 'Place', Place);

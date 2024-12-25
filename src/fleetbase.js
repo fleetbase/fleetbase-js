@@ -1,14 +1,14 @@
-import Store from './store';
-import Resource from './resource';
-import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources';
-import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters';
-import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, isResource, GoogleAddress, Collection, StoreActions } from './utils';
-import { pluralize, singularize, classify, dasherize, camelize } from './utils/string';
-import { extendStoreActions } from './store';
-import { orderActions } from './resources/order';
-import { driverActions } from './resources/driver';
-import { organizationActions } from './resources/organization';
-import { lookup } from './resolver';
+import Store from './store.js';
+import Resource, { isResource } from './resource.js';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources.js';
+import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters.js';
+import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, GoogleAddress, Collection, StoreActions } from './utils/index.js';
+import { pluralize, singularize, classify, dasherize, camelize } from './utils/string.js';
+import { extendStoreActions } from './utils/store-actions.js';
+import { orderActions } from './resources/order.js';
+import { driverActions } from './resources/driver.js';
+import { organizationActions } from './resources/organization.js';
+import { lookup } from './resolver.js';
 
 /**
  * // instance
@@ -31,7 +31,6 @@ import { lookup } from './resolver';
  *
  * contact.save();
  */
-
 export default class Fleetbase {
     /**
      * Builds an instance of the Fleetbase SDK

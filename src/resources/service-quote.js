@@ -1,6 +1,7 @@
-import Resource from '../resource';
+import Resource from '../resource.js';
+import { register } from '../registry.js';
 
-class ServiceQuote extends Resource {
+export default class ServiceQuote extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'service-quote', options);
     }
@@ -10,4 +11,4 @@ class ServiceQuote extends Resource {
     fromPayload() {}
 }
 
-export default ServiceQuote;
+registerResource('resource', 'ServiceQuote', ServiceQuote);
