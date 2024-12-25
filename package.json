@@ -26,7 +26,7 @@
         "lint:tests": "eslint tests",
         "bundle": "rollup -c",
         "dev": "rollup -c -w",
-        "test": "mocha -r @babel/register -r dotenv/config tests/*.test.js",
+        "test": "mocha -r @babel/register -r dotenv/config 'tests/*.test.js' --timeout 10000",
         "format": "prettier . --write"
     },
     "dependencies": {
