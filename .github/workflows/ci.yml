@@ -39,7 +39,7 @@ jobs:
               run: pnpm install
 
             - name: Test
-              run: pnpm test
+              run: pnpm test --timeout 10000
               env:
                   FLEETBASE_KEY: ${{ secrets.FLEETBASE_KEY }}
                   FLEETBASE_HOST: ${{ secrets.FLEETBASE_HOST }}
