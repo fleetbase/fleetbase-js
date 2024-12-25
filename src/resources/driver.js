@@ -1,9 +1,10 @@
-import Resource from '../resource';
-import { StoreActions, isPhone, isEmail, Point } from '../utils';
-import Organization from './organization';
-import { isArray } from '../utils/array';
+import Resource from '../resource.js';
+import Organization from './organization.js';
+import { register } from '../registry.js';
+import { StoreActions, isPhone, Point } from '../utils/index.js';
+import { isArray } from '../utils/array.js';
 
-const serializeOrganizations = (response, adapter) => {
+export const serializeOrganizations = (response, adapter) => {
     if (isArray(response)) {
         return response.map((organizationJson) => {
             return new Organization(organizationJson, adapter);
@@ -13,7 +14,7 @@ const serializeOrganizations = (response, adapter) => {
     return new Organization(response, adapter);
 };
 
-const driverActions = new StoreActions({
+export const driverActions = new StoreActions({
     // const { error } = await fleetbase.drivers.login('+1 111-1111');
     login: function (identity, password = null, attributes = {}) {
         // handle phone number authentication
@@ -57,7 +58,7 @@ const driverActions = new StoreActions({
     },
 });
 
-class Driver extends Resource {
+export default class Driver extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'driver', { actions: driverActions, ...options });
     }
@@ -120,5 +121,4 @@ class Driver extends Resource {
     }
 }
 
-export default Driver;
-export { driverActions };
+register('resource', 'Driver', Driver);

@@ -1,4 +1,4 @@
-const isEmpty = (obj) => {
+export function isEmpty(obj) {
     const none = obj === null || obj === undefined;
     if (none) {
         return none;
@@ -29,6 +29,6 @@ const isEmpty = (obj) => {
     }
 
     return false;
-};
+}
 
 export default isEmpty;

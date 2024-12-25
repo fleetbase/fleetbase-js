@@ -1,58 +1,29 @@
-import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources';
-import { BrowserAdapter, NodeAdapter, EmberJsAdapter } from './adapters';
-import { pluralize, singularize } from './utils/string';
+import { create } from './registry.js';
+import { classify } from './utils/string.js';
 
-const resources = {
-    Contact,
-    Driver,
-    Entity,
-    Order,
-    Payload,
-    Place,
-    TrackingStatus,
-    Vehicle,
-    Vendor,
-    Waypoint,
-    Zone,
-    ServiceArea,
-    ServiceRate,
-    ServiceQuote,
-    Organization,
-};
-
-const adapters = {
-    BrowserAdapter,
-    NodeAdapter,
-    EmberJsAdapter,
-};
-
-class Resolver {
+export default class Resolver {
     constructor() {
-        this.resources = resources;
-        this.adapters = adapters;
-
         return this.lookup(...arguments);
     }
 
-    lookup(type, className) {
-        const key = pluralize(type);
-        const params = [...arguments].slice(2);
-
-        if (!this[key]) {
-            throw new Error('Attempted to resolve invalid type');
-        }
-
-        if (!this[key][className]) {
-            throw new Error(`No ${singularize(type)} named ${className} to resolve`);
-        }
-
-        return new this[key][className](...params);
+    lookup(type, className, ...params) {
+        return create(type, className, ...params);
     }
 }
 
-const lookup = function () {
-    return new Resolver(...arguments);
-};
+export function lookup(type, className, ...params) {
+    return create(type, classify(className), ...params);
+}
 
-export { Resolver, lookup };
-export default Resolver;
+// alias for lookup
+export function resolve(type, className, ...params) {
+    return create(type, classify(className), ...params);
+}
+
+export function resolveResource(className, ...params) {
+    return lookup('resource', classify(className), ...params);
+}
+
+export function resolveAdapter(className, ...params) {
+    return lookup('adapter', classify(className), ...params);
+}

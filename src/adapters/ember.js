@@ -1,5 +1,6 @@
-import Adapter from '../adapter';
+import Adapter from '../adapter.js';
+import { register } from '../registry.js';
 
-class EmberJsAdapter extends Adapter {}
+export default class EmberJsAdapter extends Adapter {}
 
-export default EmberJsAdapter;
+register('adapter', 'EmberJsAdapter', EmberJsAdapter);

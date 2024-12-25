@@ -1,7 +1,8 @@
-import Resource from '../resource';
-import { StoreActions, isResource } from '../utils';
+import Resource, { isResource } from '../resource.js';
+import { register } from '../registry.js';
+import StoreActions from '../utils/store-actions.js';
 
-const orderActions = new StoreActions({
+export const orderActions = new StoreActions({
     getDistanceAndTime: function (id, params = {}, options = {}) {
         return this.adapter.get(`${this.namespace}/${id}/distance-and-time`, params, options);
     },
@@ -55,7 +56,7 @@ const orderActions = new StoreActions({
     },
 });
 
-class Order extends Resource {
+export default class Order extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'order', { actions: orderActions, ...options });
     }
@@ -149,6 +150,4 @@ class Order extends Resource {
     }
 }
 
-export default Order;
-
-export { orderActions };
+register('resource', 'Order', Order);

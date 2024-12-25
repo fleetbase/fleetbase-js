@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Javascript String
  *
@@ -19,7 +17,6 @@
  * exports {}
  * humanize('hello_world') => "Hello world"
  */
-
 export default class String {
     constructor(string, chain = true) {
         this.str = string;
@@ -211,7 +208,7 @@ export default class String {
     humanize(str, lowFirstLetter) {
         str = str || this.str;
 
-        var str = str.toLowerCase();
+        str = str.toLowerCase();
         str = str.replace(this.idSuffix, '');
         str = str.replace(this.underbar, ' ');
         if (!lowFirstLetter) {
@@ -399,7 +396,7 @@ export default class String {
         var str_arr = str.split(' ');
         for (var x = 0; x < str_arr.length; x++) {
             var i = parseInt(str_arr[x]);
-            if (i === NaN) {
+            if (isNaN(i)) {
                 var ltd = str_arr[x].substring(str_arr[x].length - 2);
                 var ld = str_arr[x].substring(str_arr[x].length - 1);
                 var suf = 'th';
@@ -445,76 +442,74 @@ export default class String {
     }
 }
 
-const pluralize = function () {
+export const pluralize = function () {
     const argz = ['pluralize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const singularize = function () {
+export const singularize = function () {
     const argz = ['singularize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const humanize = function () {
+export const humanize = function () {
     const argz = ['humanize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const underscore = function () {
+export const underscore = function () {
     const argz = ['underscore', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const camelize = function () {
+export const camelize = function () {
     const argz = ['camelize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const capitalize = function () {
+export const capitalize = function () {
     const argz = ['capitalize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const dasherize = function () {
+export const dasherize = function () {
     const argz = ['dasherize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const normify = function () {
+export const normify = function () {
     const argz = ['normify', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const demodulize = function () {
+export const demodulize = function () {
     const argz = ['demodulize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const tableize = function () {
+export const tableize = function () {
     const argz = ['tableize', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const classify = function () {
+export const classify = function () {
     const argz = ['classify', ...arguments];
 
     return String.invoke(...argz);
 };
 
-const foreignKey = function () {
+export const foreignKey = function () {
     const argz = ['foreignKey', ...arguments];
 
     return String.invoke(...argz);
 };
-
-export { pluralize, singularize, humanize, underscore, camelize, capitalize, dasherize, normify, demodulize, tableize, classify, foreignKey };

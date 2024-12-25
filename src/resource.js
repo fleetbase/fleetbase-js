@@ -1,9 +1,15 @@
-import Store from './store';
-import { isEmpty } from './utils';
-import { isArray } from './utils/array';
-import { set, get } from './utils/object';
+// import Store from './store.js';
+import { isEmpty } from './utils/index.js';
+import { isArray } from './utils/array.js';
+import { set, get } from './utils/object.js';
+import { lookup } from './resolver.js';
+import { register, createStore } from './registry.js';
 
-class Resource {
+export function isResource(target) {
+    return target instanceof Resource;
+}
+
+export default class Resource {
     /**
 	 * The base resource for all resources
 
@@ -31,7 +37,7 @@ class Resource {
      */
     setAdapter(adapter) {
         this.adapter = adapter;
-        this.store = new Store(this.resource, adapter, {
+        this.store = createStore(this.resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this),
             actions: this.options?.actions,
         });
@@ -511,4 +517,4 @@ class Resource {
     }
 }
 
-export default Resource;
+register('resource', 'Resource', Resource);

@@ -1,21 +1,26 @@
-import isEmpty from './is-empty';
+/* eslint no-undef: "off" */
+import isEmpty from './is-empty.js';
 
-const isResource = (mixed) => typeof mixed === 'object' && !isEmpty(mixed?.attributes) && typeof mixed?.attributes === 'object';
+export function isResource(mixed) {
+    return typeof mixed === 'object' && !isEmpty(mixed?.attributes) && typeof mixed?.attributes === 'object';
+}
 
-const isCallable = (object, property) => typeof object[property] === 'function';
+export function isCallable(object, property) {
+    return typeof object[property] === 'function';
+}
 
-const getResolved = (func, path) => {
+export function getResolved(func, path) {
     const resolved = func();
     return Array.isArray(resolved) || typeof resolved === 'object' ? get(resolved, path) : null;
-};
+}
 
-const invoke = (object, method) => {
+export function invoke(object, method) {
     if (typeof object[method] === 'function') {
         return object[method].bind(object);
     }
-};
+}
 
-const get = (object, path) => {
+export function get(object, path) {
     let current = object;
 
     const type = typeof object;
@@ -35,7 +40,7 @@ const get = (object, path) => {
             } else if (current) {
                 current = current[pathArray[i]];
 
-                // if is resource then return get on it's attributes
+                // if is resource then return get on its attributes
                 if (isResource(current) && pathArray[i + 1] !== undefined) {
                     const newPath = pathArray.slice(i + 1).join('.');
 
@@ -55,9 +60,9 @@ const get = (object, path) => {
     if (isFunction) {
         return getResolved(object, path);
     }
-};
+}
 
-const getProperties = (object, properties = []) => {
+export function getProperties(object, properties = []) {
     const selected = {};
     let propertyNames = arguments;
     let i = 1;
@@ -72,9 +77,9 @@ const getProperties = (object, properties = []) => {
     }
 
     return selected;
-};
+}
 
-const set = (object, path, value) => {
+export function set(object, path, value) {
     let current = object;
     const type = typeof object;
     const isObject = type === 'object';
@@ -104,17 +109,17 @@ const set = (object, path, value) => {
     }
 
     return value;
-};
+}
 
-const setProperties = (object, properties = {}) => {
+export function setProperties(object, properties = {}) {
     for (const property in properties) {
         set(object, property, properties[property]);
     }
 
     return object;
-};
+}
 
-const extend = (target, classes = []) => {
+export function extend(target, classes = []) {
     if (arguments.length > 1) {
         classes = arguments;
     }
@@ -126,6 +131,4 @@ const extend = (target, classes = []) => {
         }
     }
     return target;
-};
-
-export { set, get, getProperties, setProperties, extend, isCallable, invoke };
+}

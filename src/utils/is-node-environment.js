@@ -3,12 +3,12 @@
  *
  * @returns boolean
  */
-const isNodeEnvironment = () => {
+export function isNodeEnvironment() {
     return (
         typeof process !== 'undefined' &&
         (typeof process?.env === 'object' || process.release?.name?.search(/node|io.js/) !== -1) &&
         (typeof window === 'undefined' || window?.navigator?.product === 'ReactNative')
     );
-};
+}
 
 export default isNodeEnvironment;

@@ -1,14 +1,13 @@
 import { assert } from 'chai';
-import Fleetbase from '../src/fleetbase';
-import Store from '../src/store';
-import Resource from '../src/resource';
-import { Place } from '../src/resources';
-import 'cross-fetch/polyfill';
+import Fleetbase from '../src/fleetbase.js';
+import Store from '../src/store.js';
+import Resource, { isResource } from '../src/resource.js';
+import Place from '../src/resources/place.js';
+import { resolveResource } from '../src/resolver.js';
 
 // create an instance of the fleetbase sdk
 describe('Create a Fleetbase SDK instance', () => {
-    // const fleetbase = new Fleetbase();
-    const fleetbase = new Fleetbase('$2y$10$uHbd1Sd3TxuvZKS2i4pe7OHDmxyN3xTBU1fDVYIGqtlyYs6jaO.hy', { host: 'https://v2api.fleetbase.engineering' });
+    const fleetbase = new Fleetbase(process.env.FLEETBASE_KEY, { host: process.env.FLEETBASE_HOST });
 
     it('should be an instance of Fleetbase', () => {
         assert.instanceOf(fleetbase, Fleetbase);
@@ -44,6 +43,35 @@ describe('Create a Place instance without SDK', () => {
 
     it('should be an instance of Resource', () => {
         assert.instanceOf(place, Resource);
+    });
+
+    it('should be an instance of Resource via isResource function', () => {
+        assert.equal(isResource(place), true);
+    });
+
+    it('should be able to get street1 attribute', () => {
+        assert.equal(place.getAttribute('street1'), '23 Serangoon Central Nex');
+    });
+});
+
+// resolve a place instance using the resolver and registry
+describe('Create a Place using the Resolver', () => {
+    const place = resolveResource('Place', {
+        name: 'Warehouse',
+        street1: '23 Serangoon Central Nex',
+        country: 'Singapore',
+    });
+
+    it('should be an instance of Place', () => {
+        assert.instanceOf(place, Place);
+    });
+
+    it('should be an instance of Resource', () => {
+        assert.instanceOf(place, Resource);
+    });
+
+    it('should be an instance of Resource via isResource function', () => {
+        assert.equal(isResource(place), true);
     });
 
     it('should be able to get street1 attribute', () => {

@@ -1,28 +1,17 @@
-import { lookup } from './resolver';
-import { Collection, StoreActions, detectAdapter, isResource } from './utils';
-import { isArray } from './utils/array';
-import { classify, pluralize } from './utils/string';
+import { lookup } from './resolver.js';
+import { isResource } from './resource.js';
+import { createCollection } from './utils/collection.js';
+import { detectAdapter } from './utils/detect-adapter.js';
+import { isArray } from './utils/array.js';
+import { classify, pluralize } from './utils/string.js';
+import { extendStoreActions } from './utils/store-actions.js';
+import { register } from './registry.js';
 
-const extendStoreActions = (store, actions = []) => {
-    store.actions = isArray(actions) ? actions : [actions];
+export function createStore() {
+    return new Store(...arguments);
+}
 
-    if (isArray(actions)) {
-        for (const element of actions) {
-            const action = element;
-
-            store.extendActions(action);
-        }
-        return;
-    }
-
-    if (actions instanceof StoreActions) {
-        actions.extend(store);
-    }
-
-    return store;
-};
-
-const afterFetch = (store, json) => {
+export function afterFetch(store, json) {
     if (typeof store.options.onAfterFetch === 'function') {
         store.options.onAfterFetch(json);
     }
@@ -34,19 +23,19 @@ const afterFetch = (store, json) => {
             serialized.push(store.afterFetch(element));
         }
 
-        return new Collection(...serialized);
+        return createCollection(...serialized);
     }
 
     const resourceInstance = store.serialize(json);
     return store.deposit(resourceInstance);
-};
+}
 
-class Store {
+export default class Store {
     constructor(resource, adapter, options = {}) {
         this.resource = resource;
         this.adapter = adapter || detectAdapter();
         this.namespace = pluralize(resource);
-        this.storage = new Collection();
+        this.storage = createCollection();
         this.options = options;
         this.extendActions(options.actions);
     }
@@ -57,7 +46,6 @@ class Store {
 
     deposit(resourceInstance) {
         // this.storage[this.namespace].pushObject(resourceInstance);
-
         return resourceInstance;
     }
 
@@ -69,67 +57,92 @@ class Store {
         return afterFetch(this, json);
     }
 
-    create(attributes = {}, options = {}) {
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.post(`${this.namespace}`, attributes, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+    /**
+     * Creates a new record via POST
+     *
+     * @param {Object} attributes - The attributes to create the record with
+     * @param {Object} options - Adapter options (headers, etc.)
+     * @returns {Promise<any>}
+     */
+    async create(attributes = {}, options = {}) {
+        const response = await this.adapter.post(`${this.namespace}`, attributes, options);
+        return this.afterFetch(response);
     }
 
-    update(id, attributes = {}, options = {}) {
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.put(`${this.namespace}/${id}`, attributes, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+    /**
+     * Updates an existing record via PUT
+     *
+     * @param {string|number} id - ID of the record to update
+     * @param {Object} attributes - The attributes to update
+     * @param {Object} options - Adapter options (headers, etc.)
+     * @returns {Promise<any>}
+     */
+    async update(id, attributes = {}, options = {}) {
+        const response = await this.adapter.put(`${this.namespace}/${id}`, attributes, options);
+        return this.afterFetch(response);
     }
 
-    findRecord(id, options = {}) {
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}/${id}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+    /**
+     * Finds a single record by ID
+     *
+     * @param {string|number} id - ID of the record to fetch
+     * @param {Object} options - Adapter options
+     * @returns {Promise<any>}
+     */
+    async findRecord(id, options = {}) {
+        const response = await this.adapter.get(`${this.namespace}/${id}`, {}, options);
+        return this.afterFetch(response);
     }
 
-    findAll(options = {}) {
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+    /**
+     * Fetches all records from the resource
+     *
+     * @param {Object} options - Adapter options
+     * @returns {Promise<Collection|any>}
+     */
+    async findAll(options = {}) {
+        const response = await this.adapter.get(`${this.namespace}`, {}, options);
+        return this.afterFetch(response);
     }
 
-    query(query = {}, options = {}) {
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}`, query, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+    /**
+     * Queries the resource using the given query params
+     *
+     * @param {Object} query - Query parameters
+     * @param {Object} options - Adapter options
+     * @returns {Promise<Collection|any>}
+     */
+    async query(query = {}, options = {}) {
+        const response = await this.adapter.get(`${this.namespace}`, query, options);
+        return this.afterFetch(response);
     }
 
-    queryRecord(query = {}, options = {}) {
+    /**
+     * Queries the resource, but returns a single record
+     *
+     * @param {Object} query - Query parameters (with `query.single = true`)
+     * @param {Object} options - Adapter options
+     * @returns {Promise<any>}
+     */
+    async queryRecord(query = {}, options = {}) {
         query.single = true;
 
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.get(`${this.namespace}`, query, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+        const response = await this.adapter.get(`${this.namespace}`, query, options);
+        return this.afterFetch(response);
     }
 
-    destroy(record, options = {}) {
+    /**
+     * Deletes/destroys a record by ID
+     *
+     * @param {any} record - Resource or ID
+     * @param {Object} options - Adapter options
+     * @returns {Promise<any>}
+     */
+    async destroy(record, options = {}) {
         const id = isResource(record) ? record.getAttribute('id') : record;
-
-        return new Promise(async (resolve, reject) => {
-            const response = await this.adapter.delete(`${this.namespace}/${id}`, {}, options).then(this.afterFetch.bind(this)).catch(reject);
-
-            resolve(response);
-        });
+        const response = await this.adapter.delete(`${this.namespace}/${id}`, {}, options);
+        return this.afterFetch(response);
     }
 }
 
-export default Store;
-
-export { afterFetch, extendStoreActions };
+register('store', 'Store', Store);

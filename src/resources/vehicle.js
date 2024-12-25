@@ -1,9 +1,10 @@
-import Resource from '../resource';
+import Resource from '../resource.js';
+import { register } from '../registry.js';
 
-class Vehicle extends Resource {
+export default class Vehicle extends Resource {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'vehicle', options);
     }
 }
 
-export default Vehicle;
+register('resource', 'Vehicle', Vehicle);

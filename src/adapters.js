@@ -1,6 +1,4 @@
-import BrowserAdapter from './adapters/browser';
-import NodeAdapter from './adapters/node';
-import EmberJsAdapter from './adapters/ember';
-import Adapter from './adapter';
-
-export { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter };
+export { default as BrowserAdapter } from './adapters/browser.js';
+export { default as NodeAdapter } from './adapters/node.js';
+export { default as EmberJsAdapter } from './adapters/ember.js';
+export { default as Adapter } from './adapter.js';

@@ -1,6 +1,6 @@
-const { isArray } = Array;
+import { isArray } from './array.js';
 
-class GoogleAddress {
+export default class GoogleAddress {
     constructor(place) {
         this.place = place;
         this.geometry = place?.geometry;
@@ -100,4 +100,8 @@ class GoogleAddress {
     }
 }
 
-export default GoogleAddress;
+export function createGoogleAddress() {
+    return new GoogleAddress(...arguments);
+}
+
+export { GoogleAddress };

@@ -1,9 +1,10 @@
-import Place from './place';
+import Place from './place.js';
+import { register } from '../registry.js';
 
-class Waypoint extends Place {
+export default class Waypoint extends Place {
     constructor(attributes = {}, adapter, options = {}) {
         super(attributes, adapter, 'waypoint', options);
     }
 }
 
-export default Waypoint;
+register('resource', 'Waypoint', Waypoint);

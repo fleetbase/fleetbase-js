@@ -1,5 +1,7 @@
-import isEmpty from './is-empty';
+import isEmpty from './is-empty.js';
 
-const isBlank = (obj) => isEmpty(obj) || (typeof obj === 'string' && /\S/.test(obj) === false);
+export function isBlank(obj) {
+    return isEmpty(obj) || (typeof obj === 'string' && /\S/.test(obj) === false);
+}
 
 export default isBlank;
