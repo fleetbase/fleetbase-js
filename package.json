@@ -13,6 +13,12 @@
     ],
     "main": "dist/cjs/fleetbase.js",
     "module": "dist/esm/fleetbase.js",
+    "exports": {
+        ".": {
+            "import": "./dist/esm/fleetbase.js",
+            "require": "./dist/cjs/fleetbase.js"
+        }
+    },
     "scripts": {
         "prebuild": "npm run lint",
         "lint": "eslint src",
