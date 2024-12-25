@@ -40,6 +40,9 @@ jobs:
 
             - name: Test
               run: pnpm test
+              env:
+                  FLEETBASE_KEY: ${{ secrets.FLEETBASE_KEY }}
+                  FLEETBASE_HOST: ${{ secrets.FLEETBASE_HOST }}
 
             - name: Build
               run: pnpm run bundle
