@@ -37,10 +37,6 @@ export default class Resource {
      */
     setAdapter(adapter) {
         this.adapter = adapter;
-        // this.store = new Store(this.resource, adapter, {
-        //     onAfterFetch: this.syncAttributes.bind(this),
-        //     actions: this.options?.actions,
-        // });
         this.store = createStore(this.resource, adapter, {
             onAfterFetch: this.syncAttributes.bind(this),
             actions: this.options?.actions,

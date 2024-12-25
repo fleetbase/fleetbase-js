@@ -1,5 +1,6 @@
 import { set } from './object.js';
 import { isArray } from './array.js';
+import { register } from '../registry.js';
 
 export function isStoreActions(target) {
     return target instanceof StoreActions;
@@ -20,6 +21,12 @@ export function extendStoreActions(store, actions = []) {
     }
 
     return store;
+}
+
+export function createStoreActions(name, ...params) {
+    const actions = new StoreActions(...params);
+    register('action', name, actions);
+    return actions;
 }
 
 export default class StoreActions {

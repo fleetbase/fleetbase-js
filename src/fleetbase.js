@@ -2,13 +2,15 @@ import Store from './store.js';
 import Resource, { isResource } from './resource.js';
 import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources.js';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters.js';
-import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, GoogleAddress, Collection, StoreActions } from './utils/index.js';
+import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, GoogleAddress, StoreActions } from './utils/index.js';
+import Collection, { createCollection } from './utils/collection.js';
 import { pluralize, singularize, classify, dasherize, camelize } from './utils/string.js';
-import { extendStoreActions } from './utils/store-actions.js';
+import { extendStoreActions, createStoreActions } from './utils/store-actions.js';
 import { orderActions } from './resources/order.js';
 import { driverActions } from './resources/driver.js';
 import { organizationActions } from './resources/organization.js';
-import { lookup } from './resolver.js';
+import Resolver, { lookup, resolve, resolveResource } from './resolver.js';
+import { register, createResource, createStore } from './registry.js';
 
 /**
  * // instance
@@ -105,6 +107,7 @@ export {
     NodeAdapter,
     EmberJsAdapter,
     Adapter,
+    detectAdapter,
     isNodeEnvironment,
     isLatitude,
     isLongitude,
@@ -112,12 +115,20 @@ export {
     isResource,
     GoogleAddress,
     Collection,
+    createCollection,
     StoreActions,
     extendStoreActions,
+    createStoreActions,
     pluralize,
     singularize,
     classify,
     dasherize,
     camelize,
     lookup,
+    register,
+    createResource,
+    Resolver,
+    resolve,
+    resolveResource,
+    createStore,
 };

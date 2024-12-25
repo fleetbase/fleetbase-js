@@ -1,26 +1,29 @@
 import { pluralize, singularize } from './utils/string.js';
 
 export const registry = {
-    resource: {},
-    adapter: {},
-    store: {},
+    resources: {},
+    adapters: {},
+    storse: {},
+    actions: {},
 };
 
 export function register(type, className, cls) {
-    if (!registry[type]) {
-        registry[type] = {};
+    const key = pluralize(type);
+    if (!registry[key]) {
+        registry[key] = {};
     }
-    registry[type][className] = cls;
+    registry[key][className] = cls;
 }
 
 export function create(type, className, ...params) {
-    if (!registry[type]) {
-        throw new Error(`Unknown type: ${type}`);
+    const key = pluralize(type);
+    if (!registry[key]) {
+        throw new Error(`Unknown type: ${singularize(type)}`);
     }
-    if (!registry[type][className]) {
+    if (!registry[key][className]) {
         throw new Error(`No ${singularize(type)} named '${className}' registered.`);
     }
-    const ResourceClass = registry[type][className];
+    const ResourceClass = registry[key][className];
     return new ResourceClass(...params);
 }
 

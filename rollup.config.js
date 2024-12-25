@@ -1,4 +1,5 @@
 import terser from '@rollup/plugin-terser';
+import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { babel } from '@rollup/plugin-babel';
 
@@ -6,8 +7,8 @@ const input = ['src/fleetbase.js'];
 const plugins = [
     nodeResolve({
         browser: true,
-        modulesOnly: true,
     }),
+    commonjs(),
     babel({
         babelHelpers: 'bundled',
     }),

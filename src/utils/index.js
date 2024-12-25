@@ -11,3 +11,4 @@ export { default as uuid } from './uuid.js';
 export { default as GoogleAddress } from './google-address.js';
 export { default as Point } from './point.js';
 export { default as StoreActions } from './store-actions.js';
+export { isArray } from './array.js';
