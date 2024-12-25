@@ -7,4 +7,4 @@ export default class TrackingStatus extends Resource {
     }
 }
 
-registerResource('resource', 'TrackingStatus', TrackingStatus);
+register('resource', 'TrackingStatus', TrackingStatus);

@@ -7,4 +7,4 @@ export default class Vendor extends Resource {
     }
 }
 
-registerResource('resource', 'Vendor', Vendor);
+register('resource', 'Vendor', Vendor);

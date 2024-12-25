@@ -7,4 +7,4 @@ export default class ServiceArea extends Resource {
     }
 }
 
-registerResource('resource', 'ServiceArea', ServiceArea);
+register('resource', 'ServiceArea', ServiceArea);

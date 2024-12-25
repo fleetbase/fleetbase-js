@@ -11,6 +11,8 @@
         "delivery",
         "fleet"
     ],
+    "main": "dist/cjs/storefront.js",
+    "module": "dist/esm/storefront.js",
     "scripts": {
         "prebuild": "npm run lint",
         "lint": "eslint src",
@@ -18,7 +20,7 @@
         "lint:tests": "eslint tests",
         "bundle": "rollup -c",
         "dev": "rollup -c -w",
-        "test": "mocha -r @babel/register -r regenerator-runtime/runtime tests/*.test.js",
+        "test": "mocha -r @babel/register -r dotenv/config tests/*.test.js",
         "format": "prettier . --write"
     },
     "dependencies": {
@@ -39,11 +41,10 @@
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-terser": "^0.4.4",
         "chai": "^5.1.2",
-        "cross-fetch": "^4.1.0",
+        "dotenv": "^16.4.7",
         "eslint": "^9.17.0",
         "globals": "^15.14.0",
         "mocha": "^11.0.1",
-        "prettier": "3.4.2",
-        "regenerator-runtime": "^0.14.1"
+        "prettier": "3.4.2"
     }
 }

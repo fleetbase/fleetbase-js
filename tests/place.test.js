@@ -1,10 +1,9 @@
 import { assert } from 'chai';
 import Fleetbase from '../src/fleetbase.js';
-// import Resource from '../src/resource.js';
-// import { Place } from '../src/resources.js';
-// import 'cross-fetch/polyfill';
+import Resource from '../src/resource.js';
+import Place from '../src/resources/place.js';
 
-const fleetbase = new Fleetbase('$2y$10$uHbd1Sd3TxuvZKS2i4pe7OHDmxyN3xTBU1fDVYIGqtlyYs6jaO.hy', { host: 'http://localhost:8000' });
+const fleetbase = new Fleetbase(process.env.FLEETBASE_KEY, { host: process.env.FLEETBASE_HOST });
 const adapter = fleetbase.getAdapter();
 
 // create an instance of the fleetbase sdk

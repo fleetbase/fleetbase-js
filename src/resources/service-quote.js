@@ -11,4 +11,4 @@ export default class ServiceQuote extends Resource {
     fromPayload() {}
 }
 
-registerResource('resource', 'ServiceQuote', ServiceQuote);
+register('resource', 'ServiceQuote', ServiceQuote);

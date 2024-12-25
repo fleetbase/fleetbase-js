@@ -150,4 +150,4 @@ export default class Order extends Resource {
     }
 }
 
-registerResource('resource', 'Order', Order);
+register('resource', 'Order', Order);

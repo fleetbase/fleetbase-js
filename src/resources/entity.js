@@ -7,4 +7,4 @@ export default class Entity extends Resource {
     }
 }
 
-registerResource('resource', 'Entity', Entity);
+register('resource', 'Entity', Entity);

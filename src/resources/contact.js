@@ -7,4 +7,4 @@ export default class Contact extends Resource {
     }
 }
 
-registerResource('resource', 'Contact', Contact);
+register('resource', 'Contact', Contact);

@@ -77,4 +77,4 @@ export default class Place extends Resource {
     }
 }
 
-registerResource('resource', 'Place', Place);
+register('resource', 'Place', Place);

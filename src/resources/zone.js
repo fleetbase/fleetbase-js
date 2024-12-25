@@ -7,4 +7,4 @@ export default class Zone extends Resource {
     }
 }
 
-registerResource('resource', 'Zone', Zone);
+register('resource', 'Zone', Zone);

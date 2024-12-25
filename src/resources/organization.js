@@ -14,4 +14,4 @@ export default class Organization extends Resource {
     }
 }
 
-registerResource('resource', 'Organization', Organization);
+register('resource', 'Organization', Organization);

@@ -7,4 +7,4 @@ export default class ServiceRate extends Resource {
     }
 }
 
-registerResource('resource', 'ServiceRate', ServiceRate);
+register('resource', 'ServiceRate', ServiceRate);

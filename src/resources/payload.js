@@ -57,4 +57,4 @@ export default class Payload extends Resource {
     }
 }
 
-registerResource('resource', 'Payload', Payload);
+register('resource', 'Payload', Payload);

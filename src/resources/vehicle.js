@@ -7,4 +7,4 @@ export default class Vehicle extends Resource {
     }
 }
 
-registerResource('resource', 'Vehicle', Vehicle);
+register('resource', 'Vehicle', Vehicle);

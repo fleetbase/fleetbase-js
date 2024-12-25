@@ -7,4 +7,4 @@ export default class Waypoint extends Place {
     }
 }
 
-registerResource('resource', 'Waypoint', Waypoint);
+register('resource', 'Waypoint', Waypoint);

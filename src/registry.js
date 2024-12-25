@@ -14,14 +14,13 @@ export function register(type, className, cls) {
 }
 
 export function create(type, className, ...params) {
-    const key = pluralize(type);
-    if (!registry[key]) {
+    if (!registry[type]) {
         throw new Error(`Unknown type: ${type}`);
     }
-    if (!registry[key][className]) {
+    if (!registry[type][className]) {
         throw new Error(`No ${singularize(type)} named '${className}' registered.`);
     }
-    const ResourceClass = registry[key][className];
+    const ResourceClass = registry[type][className];
     return new ResourceClass(...params);
 }
 

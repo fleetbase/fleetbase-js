@@ -121,4 +121,4 @@ export default class Driver extends Resource {
     }
 }
 
-registerResource('resource', 'Driver', Driver);
+register('resource', 'Driver', Driver);
