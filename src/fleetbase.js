@@ -1,6 +1,6 @@
 import Store from './store.js';
 import Resource, { isResource } from './resource.js';
-import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization } from './resources.js';
+import { Contact, Driver, Entity, Order, Payload, Place, TrackingStatus, Vehicle, Vendor, Waypoint, Zone, ServiceArea, ServiceRate, ServiceQuote, Organization, Fleet } from './resources.js';
 import { BrowserAdapter, NodeAdapter, EmberJsAdapter, Adapter } from './adapters.js';
 import { isNodeEnvironment, detectAdapter, isLatitude, isLongitude, Point, GoogleAddress, StoreActions } from './utils/index.js';
 import Collection, { createCollection } from './utils/collection.js';
@@ -69,6 +69,9 @@ export default class Fleetbase {
         this.vehicles = new Store('vehicle', this.adapter);
         this.vendors = new Store('vendor', this.adapter);
         this.contacts = new Store('contact', this.adapter);
+        this.serviceAreas = new Store('service-area', this.adapter);
+        this.zones = new Store('zone', this.adapter);
+        this.fleets = new Store('fleet', this.adapter);
         this.organizations = new Store('organization', this.adapter).extendActions(organizationActions);
     }
 
@@ -103,6 +106,7 @@ export {
     ServiceRate,
     ServiceQuote,
     Organization,
+    Fleet,
     BrowserAdapter,
     NodeAdapter,
     EmberJsAdapter,

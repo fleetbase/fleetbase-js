@@ -13,3 +13,4 @@ export { default as Zone } from './resources/zone.js';
 export { default as ServiceArea } from './resources/service-area.js';
 export { default as ServiceRate } from './resources/service-rate.js';
 export { default as ServiceQuote } from './resources/service-quote.js';
+export { default as Fleet } from './resources/fleet.js';
