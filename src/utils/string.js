@@ -362,7 +362,7 @@ export default class String {
         // Use the provided string or fallback to the instance's string.
         str = str || this.str;
         // Ensure we're working with a string and remove any extra whitespace.
-        str = String(str).trim();
+        str = `${str}`.trim();
 
         // Normalize the input:
         // Replace one or more spaces, dashes, or underscores with a single underscore.
