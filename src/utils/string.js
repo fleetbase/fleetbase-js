@@ -335,7 +335,14 @@ export default class String {
     tableize(str) {
         str = str || this.str;
 
+        // Temporarily disable chaining so that singularize and camelize return strings.
+        const originalChain = this.chain;
+        this.chain = false;
+
         str = this.pluralize(this.underscore(str));
+
+        // Restore the original chaining setting.
+        this.chain = originalChain;
 
         // set str
         this.str = str;
@@ -352,19 +359,35 @@ export default class String {
         String.classify('message_bus_properties')    -> 'MessageBusProperty'
     */
     classify(str) {
+        // Use the provided string or fallback to the instance's string.
         str = str || this.str;
+        // Ensure we're working with a string and remove any extra whitespace.
+        str = `${str}`.trim();
 
-        str = this.singularize(this.camelize(str));
+        // Normalize the input:
+        // Replace one or more spaces, dashes, or underscores with a single underscore.
+        // This handles cases like "service-area", "service area", "service_area", etc.
+        str = str.replace(/[\s\-_]+/g, '_');
 
-        // set str
+        // Temporarily disable chaining so that singularize and camelize return strings.
+        const originalChain = this.chain;
+        this.chain = false;
+
+        // First, singularize the underscored string.
+        str = this.singularize(str);
+
+        // Next, camelize the result.
+        // Passing false for the lowFirstLetter parameter ensures the first letter is capitalized.
+        str = this.camelize(str, false);
+
+        // Restore the original chaining setting.
+        this.chain = originalChain;
+
+        // Update the instance's string.
         this.str = str;
 
-        if (this.chain === true) {
-            return this;
-        }
-
-        // return result
-        return str;
+        // Return the instance if chaining is enabled, or the string otherwise.
+        return this.chain ? this : str;
     }
 
     /*
