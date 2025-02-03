@@ -2,7 +2,6 @@
 import { isEmpty } from './utils/index.js';
 import { isArray } from './utils/array.js';
 import { set, get } from './utils/object.js';
-import { lookup } from './resolver.js';
 import { register, createStore } from './registry.js';
 
 export function isResource(target) {
