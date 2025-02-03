@@ -26,7 +26,7 @@ export default class Payload extends Resource {
      * @return {Collection} [description]
      */
     get entities() {
-        return new Collection(this.entities.map((data) => resolveResource('Entity', data, this.adapter)));
+        return createCollection(this.entities.map((data) => resolveResource('Entity', data, this.adapter)));
     }
 
     /**
@@ -53,7 +53,7 @@ export default class Payload extends Resource {
      * @return {Collection} [description]
      */
     get waypoints() {
-        return new Collection(this.waypoints.map((data) => resolveResource('Waypoint', data, this.adapter)));
+        return createCollection(this.waypoints.map((data) => resolveResource('Waypoint', data, this.adapter)));
     }
 }
 
