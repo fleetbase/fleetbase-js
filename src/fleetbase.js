@@ -70,6 +70,7 @@ export default class Fleetbase {
         this.vendors = new Store('vendor', this.adapter);
         this.contacts = new Store('contact', this.adapter);
         this.serviceAreas = new Store('service-area', this.adapter);
+        this.serviceQuotes = new Store('service-quote', this.adapter);
         this.zones = new Store('zone', this.adapter);
         this.fleets = new Store('fleet', this.adapter);
         this.organizations = new Store('organization', this.adapter).extendActions(organizationActions);
