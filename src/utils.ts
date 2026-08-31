@@ -32,7 +32,9 @@ export function isPhone(value = ''): boolean {
 }
 
 export function isEmail(value = ''): boolean {
-    return /^\S+@\S+\.\S+$/.test(value);
+    const at = value.indexOf('@');
+    const dot = value.lastIndexOf('.');
+    return !/\s/.test(value) && at > 0 && dot > at + 1 && dot < value.length - 1;
 }
 
 export function isNodeEnvironment(): boolean {
@@ -81,13 +83,13 @@ export function set(target: object, path: string, value: unknown): unknown {
     let current = target as Record<string, unknown>;
     for (const part of parts.slice(0, -1)) {
         if (!current[part] || typeof current[part] !== 'object') {
-            current[part] = {};
+            Object.defineProperty(current, part, { configurable: true, enumerable: true, value: {}, writable: true });
         }
         current = current[part] as Record<string, unknown>;
     }
     const final = parts.at(-1);
     if (final) {
-        current[final] = value;
+        Object.defineProperty(current, final, { configurable: true, enumerable: true, value, writable: true });
     }
     return value;
 }

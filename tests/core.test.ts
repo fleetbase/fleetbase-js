@@ -104,6 +104,10 @@ describe('utility compatibility', () => {
         expect(isPhone('hello')).toBe(false);
         expect(isEmail('sdk@fleetbase.io')).toBe(true);
         expect(isEmail('sdk')).toBe(false);
+        expect(isEmail(' sdk@fleetbase.io')).toBe(false);
+        expect(isEmail('@fleetbase.io')).toBe(false);
+        expect(isEmail('sdk@.io')).toBe(false);
+        expect(isEmail('sdk@fleetbase.')).toBe(false);
         expect(isNodeEnvironment()).toBe(true);
     });
 
