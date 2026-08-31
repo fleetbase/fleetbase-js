@@ -1,0 +1,71 @@
+name: Live API integration
+
+on:
+    workflow_dispatch:
+        inputs:
+            api_host:
+                description: Fleetbase API origin
+                required: true
+                default: https://api.fleetbase.io
+                type: string
+            namespace:
+                description: API namespace
+                required: true
+                default: v1
+                type: string
+    schedule:
+        - cron: '23 5 * * 1'
+
+concurrency:
+    group: integration-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+env:
+    FLEETBASE_PUBLIC_KEY: ${{ secrets.FLEETBASE_PUBLIC_KEY }}
+    FLEETBASE_API_HOST: ${{ inputs.api_host || vars.FLEETBASE_API_HOST || 'https://api.fleetbase.io' }}
+    FLEETBASE_API_NAMESPACE: ${{ inputs.namespace || vars.FLEETBASE_API_NAMESPACE || 'v1' }}
+
+jobs:
+    smoke:
+        name: Read-only packed SDK smoke
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Require credentials for manual runs
+              if: github.event_name == 'workflow_dispatch' && env.FLEETBASE_PUBLIC_KEY == ''
+              run: |
+                  echo 'The FLEETBASE_PUBLIC_KEY repository secret is required for a manual integration run.' >&2
+                  exit 1
+            - name: Record skipped scheduled run
+              if: github.event_name == 'schedule' && env.FLEETBASE_PUBLIC_KEY == ''
+              run: echo 'Live API smoke skipped because FLEETBASE_PUBLIC_KEY is not configured.' >> "$GITHUB_STEP_SUMMARY"
+            - uses: actions/checkout@v4
+              if: env.FLEETBASE_PUBLIC_KEY != ''
+            - uses: pnpm/action-setup@v4
+              if: env.FLEETBASE_PUBLIC_KEY != ''
+              with:
+                  run_install: false
+            - uses: actions/setup-node@v4
+              if: env.FLEETBASE_PUBLIC_KEY != ''
+              with:
+                  node-version: 22.13.0
+                  cache: pnpm
+            - name: Build immutable SDK candidate
+              if: env.FLEETBASE_PUBLIC_KEY != ''
+              run: |
+                  pnpm install --frozen-lockfile
+                  pnpm run build
+                  mkdir -p artifacts
+                  pnpm pack --pack-destination artifacts
+                  mv artifacts/*.tgz artifacts/fleetbase-sdk.tgz
+            - name: Install exact candidate
+              if: env.FLEETBASE_PUBLIC_KEY != ''
+              working-directory: fixtures/integration
+              run: npm install ../../artifacts/fleetbase-sdk.tgz
+            - name: Execute read-only live contract
+              if: env.FLEETBASE_PUBLIC_KEY != ''
+              working-directory: fixtures/integration
+              run: npm run smoke

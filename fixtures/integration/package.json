@@ -1,0 +1,8 @@
+{
+    "name": "@fleetbase/sdk-fixture-integration",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "smoke": "node smoke.mjs"
+    }
+}

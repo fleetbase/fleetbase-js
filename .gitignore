@@ -8,6 +8,7 @@ dist/
 .output/
 /fixtures/compat/**/pnpm-lock.yaml
 /fixtures/browser/pnpm-lock.yaml
+/fixtures/integration/package-lock.json
 /fixtures/compat/ember/tmp/
 .angular/
 .expo/

@@ -16,3 +16,5 @@ Every supported consumer gate installs the exact tarball produced by the CI pack
 | Browser execution | Chromium execution of constructors, exports, Fetch transport, authorization headers, resource serialization, and browser-only key validation |
 
 Framework fixtures use Node 24.15 because current Angular requires Node 24.15 or newer. This does not change the SDK's separately tested Node 22.13 runtime floor.
+
+The separate secret-gated live integration workflow installs the packed candidate and calls the read-only current-organization endpoint. It requires the `FLEETBASE_PUBLIC_KEY` repository secret for manual runs and never runs API mutations.

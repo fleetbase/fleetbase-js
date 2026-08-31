@@ -163,6 +163,8 @@ pnpm run verify
 
 Pull-request tests are deterministic and do not need Fleetbase credentials. API behavior is cross-checked against the official [Postman collections](https://github.com/fleetbase/postman), [Core API](https://github.com/fleetbase/core-api), and [Fleet-Ops](https://github.com/fleetbase/fleetops) sources.
 
+Maintainers can also run the secret-gated `Live API integration` workflow. It installs the exact packed SDK candidate and performs a read-only current-organization request using the `FLEETBASE_PUBLIC_KEY` repository secret; scheduled runs skip cleanly until that secret is configured, while manually dispatched runs fail clearly when it is absent.
+
 See the [modernization plan](https://github.com/fleetbase/fleetbase-js/blob/main/MODERNIZATION_PLAN.md) for the v2 compatibility and release program and the [contribution guide](https://github.com/fleetbase/fleetbase-js/blob/main/CONTRIBUTING.md) for the development workflow.
 
 ## License
