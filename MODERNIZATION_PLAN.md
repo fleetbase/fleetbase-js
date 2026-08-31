@@ -316,7 +316,7 @@ Every PR description must include: public API effect, compatibility evidence, te
 - [x] Publint and Are The Types Wrong report no release-blocking defects.
 - [x] Package content and size budgets pass; no secrets or internal-only files are present.
 - [x] API report contains no unapproved changes.
-- [ ] Full CI passes on the release commit with frozen dependencies.
+- [x] Full CI passes on the release commit with frozen dependencies.
 - [x] Release workflow dry run proves one immutable artifact is used throughout.
 - [ ] npm trusted publishing, protected environment, and provenance are configured.
 - [x] Migration guide, changelog, support policy, deprecations, and rollback steps are published.
