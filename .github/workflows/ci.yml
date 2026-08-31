@@ -1,108 +1,284 @@
-name: fleetbase-js
+name: CI
 
 on:
     push:
-        branches: [master]
-        tags:
-            - 'v*'
+        branches: [main, master]
     pull_request:
-        branches: [master]
+        branches: [main, master]
+    workflow_dispatch:
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+env:
+    CI: true
 
 jobs:
-    build:
+    quality:
+        name: Quality
         runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22.13.0
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm run format:check
+            - run: pnpm run lint
+            - run: pnpm run typecheck
 
+    test:
+        name: Test / Node ${{ matrix.node }}
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
         strategy:
+            fail-fast: false
             matrix:
-                node-version: [18.x] # Build on Node.js 16
-
+                node: [22.13.0, 24.x]
         steps:
             - uses: actions/checkout@v4
-
-            - name: Setup Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3
+            - uses: pnpm/action-setup@v4
               with:
-                  node-version: ${{ matrix.node-version }}
-            - uses: actions/cache@v3
-              id: npm-cache
+                  run_install: false
+            - uses: actions/setup-node@v4
               with:
-                  path: ~/.pnpm-store # Replace this with the path you want to cache
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v2.0.1
+                  node-version: ${{ matrix.node }}
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm run test:coverage
+            - name: Upload coverage
+              if: matrix.node == '22.13.0'
+              uses: codecov/codecov-action@v5
               with:
-                  version: latest
+                  files: coverage/lcov.info
+                  fail_ci_if_error: true
+                  use_oidc: true
 
-            - name: Install Dependencies
-              run: pnpm install
-
-            - name: Test
-              run: pnpm test
-              env:
-                  FLEETBASE_KEY: ${{ secrets.FLEETBASE_KEY }}
-                  FLEETBASE_HOST: ${{ secrets.FLEETBASE_HOST }}
-
-            - name: Build
-              run: pnpm run bundle
-
-    npm_publish:
-        needs: build
+    package:
+        name: Package artifact
         runs-on: ubuntu-latest
-        if: startsWith(github.ref, 'refs/tags/')
         steps:
             - uses: actions/checkout@v4
-
-            - name: Setup Node.js 18.x
-              uses: actions/setup-node@v4
+            - uses: pnpm/action-setup@v4
               with:
-                  node-version: 18.x
-
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v2.0.1
+                  run_install: false
+            - uses: actions/setup-node@v4
               with:
-                  version: latest
-
-            - name: Install Dependencies
-              run: pnpm install
-
-            - name: Build
-              run: pnpm run bundle
-
-            - name: Set up npm
-              run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
-
-            - name: Publish
-              run: npm publish --access public
-
-    github_publish:
-        needs: build
-        runs-on: ubuntu-latest
-        if: startsWith(github.ref, 'refs/tags/')
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Node.js 18.x
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 18.x
-
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v2.0.1
-              with:
-                  version: latest
-
-            - name: Install Dependencies
-              run: pnpm install
-
-            - name: Build
-              run: pnpm run bundle
-
-            - name: Configure npm for GitHub registry
+                  node-version: 22.13.0
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm run build
+            - run: pnpm run package:check
+            - name: Create immutable candidate tarball
               run: |
-                  echo "@fleetbase:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-                  echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
+                  mkdir -p artifacts
+                  pnpm pack --pack-destination artifacts
+                  mv artifacts/*.tgz artifacts/fleetbase-sdk.tgz
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts/*.tgz
+                  if-no-files-found: error
+                  retention-days: 14
 
-            - name: Publish to GitHub registry
-              run: npm publish
+    cross-platform:
+        name: Smoke / ${{ matrix.os }}
+        needs: package
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest, windows-latest]
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22.13.0
+            - name: Install exact candidate
+              run: node -e "const fs=require('fs'); fs.mkdirSync('consumer'); fs.writeFileSync('consumer/package.json', JSON.stringify({name:'sdk-consumer',private:true,type:'module'}))"
+            - run: npm install ../artifacts/fleetbase-sdk.tgz
+              working-directory: consumer
+            - run: node --input-type=module -e "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)"
+              working-directory: consumer
+            - run: node -e "const sdk = require('@fleetbase/sdk'); if (typeof sdk.default !== 'function') process.exit(1)"
+              working-directory: consumer
+
+    package-manager:
+        name: Install / ${{ matrix.manager }}
+        needs: package
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                manager: [npm, pnpm, yarn, bun]
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22.13.0
+            - uses: pnpm/action-setup@v4
+              if: matrix.manager == 'pnpm'
+              with:
+                  version: 11.24.0
+            - uses: oven-sh/setup-bun@v2
+              if: matrix.manager == 'bun'
+              with:
+                  bun-version: 1.3.14
+            - name: Prepare consumer
+              run: mkdir -p consumer && echo '{"name":"sdk-consumer","private":true,"type":"module"}' > consumer/package.json
+            - name: Install with npm
+              if: matrix.manager == 'npm'
+              working-directory: consumer
+              run: npm install ../artifacts/fleetbase-sdk.tgz && node --input-type=module -e "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)" && node -e "if (typeof require('@fleetbase/sdk').default !== 'function') process.exit(1)"
+            - name: Install with pnpm
+              if: matrix.manager == 'pnpm'
+              working-directory: consumer
+              run: pnpm add ../artifacts/fleetbase-sdk.tgz && node --input-type=module -e "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)" && node -e "if (typeof require('@fleetbase/sdk').default !== 'function') process.exit(1)"
+            - name: Install with Yarn Berry
+              if: matrix.manager == 'yarn'
+              working-directory: consumer
+              run: corepack prepare yarn@4.18.0 --activate && yarn add ../artifacts/fleetbase-sdk.tgz && yarn node --input-type=module -e "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)" && yarn node -e "if (typeof require('@fleetbase/sdk').default !== 'function') process.exit(1)"
+            - name: Install with Bun
+              if: matrix.manager == 'bun'
+              working-directory: consumer
+              run: bun add ../artifacts/fleetbase-sdk.tgz && bun --eval "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)"
+
+    type-consumer:
+        name: Types / ${{ matrix.resolution }}
+        needs: package
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                resolution: [node16, nodenext, bundler]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22.13.0
+            - name: Install exact candidate and TypeScript
+              working-directory: fixtures/types
+              run: npm install ../../artifacts/fleetbase-sdk.tgz typescript@6.0.2
+            - name: Compile strict consumer
+              working-directory: fixtures/types
+              run: npx tsc -p tsconfig.${{ matrix.resolution }}.json
+
+    compatibility:
+        name: Build / ${{ matrix.fixture }}
+        needs: package
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                fixture: [vite, webpack, esbuild, react, vue, svelte, angular, ember, next, nuxt, expo, edge]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24.15.0
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 11.24.0
+            - name: Install pinned fixture dependencies
+              working-directory: fixtures/compat/${{ matrix.fixture }}
+              run: pnpm install --no-frozen-lockfile
+            - name: Install exact SDK candidate
+              working-directory: fixtures/compat/${{ matrix.fixture }}
+              run: pnpm add --save-dev ../../../artifacts/fleetbase-sdk.tgz
+            - name: Build production fixture
+              working-directory: fixtures/compat/${{ matrix.fixture }}
+              run: pnpm run build
+
+    browser:
+        name: Browser / Playwright engines
+        needs: package
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24.15.0
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 11.24.0
+            - name: Install pinned browser dependencies
+              working-directory: fixtures/browser
+              run: pnpm install --no-frozen-lockfile
+            - name: Install exact SDK candidate
+              working-directory: fixtures/browser
+              run: pnpm add --save-dev ../../artifacts/fleetbase-sdk.tgz
+            - name: Install browser engines
+              working-directory: fixtures/browser
+              run: pnpm exec playwright install --with-deps chromium firefox webkit
+            - name: Build and execute browser fixture
+              working-directory: fixtures/browser
+              run: pnpm run build && pnpm run test:browser
+
+    dependency-review:
+        name: Dependency review
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/dependency-review-action@v4
+              with:
+                  fail-on-severity: high
+
+    security:
+        name: Dependency audit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22.13.0
+                  cache: pnpm
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm audit --prod --audit-level high
+            - run: pnpm audit --audit-level high
+
+    ci-success:
+        name: CI success
+        if: always()
+        needs: [quality, test, package, cross-platform, package-manager, type-consumer, compatibility, browser, dependency-review, security]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Require successful jobs
+              env:
+                  RESULTS: ${{ join(needs.*.result, ',') }}
+              run: |
+                  case "$RESULTS" in
+                    *failure*|*cancelled*) exit 1 ;;
+                    *) exit 0 ;;
+                  esac
