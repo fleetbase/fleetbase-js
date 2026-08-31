@@ -1,0 +1,12 @@
+import { babelCompatSupport, templateCompatSupport } from '@embroider/compat/babel';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export default {
+    plugins: [
+        ['babel-plugin-ember-template-compilation', { enableLegacyModules: ['ember-cli-htmlbars'], transforms: [...templateCompatSupport()] }],
+        ['module:decorator-transforms', { runtime: { import: fileURLToPath(import.meta.resolve('decorator-transforms/runtime-esm')) } }],
+        ['@babel/plugin-transform-runtime', { absoluteRuntime: dirname(fileURLToPath(import.meta.url)), useESModules: true, regenerator: false }],
+        ...babelCompatSupport(),
+    ],
+};

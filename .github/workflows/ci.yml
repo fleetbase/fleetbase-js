@@ -190,7 +190,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                fixture: [vite, webpack, esbuild, react, vue, svelte, next, nuxt]
+                fixture: [vite, webpack, esbuild, react, vue, svelte, angular, ember, next, nuxt, expo, edge]
         steps:
             - uses: actions/checkout@v4
             - uses: actions/download-artifact@v4
@@ -199,7 +199,7 @@ jobs:
                   path: artifacts
             - uses: actions/setup-node@v4
               with:
-                  node-version: 22.22.2
+                  node-version: 24.15.0
             - uses: pnpm/action-setup@v4
               with:
                   version: 11.24.0

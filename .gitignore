@@ -7,6 +7,11 @@ dist/
 .nuxt/
 .output/
 /fixtures/compat/**/pnpm-lock.yaml
+/fixtures/compat/ember/tmp/
+.angular/
+.expo/
+dist-android/
+dist-web/
 
 # dependencies
 /bower_components/

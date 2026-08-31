@@ -152,7 +152,7 @@ The npm package contains:
 
 Every release candidate is checked with Publint, Are The Types Wrong, packed-tarball content and size assertions, ESM/CommonJS export parity, strict TypeScript, cross-platform smoke tests, and 100% statement, branch, function, and line coverage.
 
-Production-build fixtures verify the exact candidate tarball with Vite, webpack, esbuild, React, Vue, Svelte, Next.js (client and server), and Nuxt (client and server). See the [compatibility policy](./docs/compatibility.md) for the release-blocking matrix and remaining prerelease gates.
+Production-build fixtures verify the exact candidate tarball with Vite, webpack, esbuild, React, Vue, Svelte, Angular, Ember, Next.js (client and server), Nuxt (client and server), Expo web/React Native Android, and an edge-runtime VM. See the [compatibility policy](./docs/compatibility.md) for the release-blocking matrix and remaining prerelease gates.
 
 ## Development
 
