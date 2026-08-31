@@ -8,7 +8,6 @@
 
 <p align="center">
   <a href="https://github.com/fleetbase/fleetbase-js/actions/workflows/ci.yml?query=branch%3Amain"><img src="https://github.com/fleetbase/fleetbase-js/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" /></a>
-  <a href="https://github.com/fleetbase/fleetbase-js/actions/workflows/codeql.yml?query=branch%3Amain"><img src="https://github.com/fleetbase/fleetbase-js/actions/workflows/codeql.yml/badge.svg?branch=main" alt="CodeQL" /></a>
   <a href="https://codecov.io/gh/fleetbase/fleetbase-js"><img src="https://codecov.io/gh/fleetbase/fleetbase-js/branch/main/graph/badge.svg" alt="Coverage" /></a>
   <a href="https://www.npmjs.com/package/@fleetbase/sdk"><img src="https://img.shields.io/npm/v/@fleetbase/sdk?label=npm" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/@fleetbase/sdk"><img src="https://img.shields.io/npm/dw/@fleetbase/sdk" alt="Weekly downloads" /></a>
