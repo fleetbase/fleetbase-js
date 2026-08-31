@@ -200,17 +200,18 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: 22.22.2
-                  cache: npm
-                  cache-dependency-path: fixtures/compat/${{ matrix.fixture }}/package.json
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 11.24.0
             - name: Install pinned fixture dependencies
               working-directory: fixtures/compat/${{ matrix.fixture }}
-              run: npm install --no-package-lock
+              run: pnpm install --no-frozen-lockfile
             - name: Install exact SDK candidate
               working-directory: fixtures/compat/${{ matrix.fixture }}
-              run: npm install --no-package-lock --no-save ../../../artifacts/fleetbase-sdk.tgz
+              run: pnpm add --save-dev ../../../artifacts/fleetbase-sdk.tgz
             - name: Build production fixture
               working-directory: fixtures/compat/${{ matrix.fixture }}
-              run: npm run build
+              run: pnpm run build
 
     dependency-review:
         name: Dependency review

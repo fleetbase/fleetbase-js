@@ -6,6 +6,7 @@ dist/
 .next/
 .nuxt/
 .output/
+/fixtures/compat/**/pnpm-lock.yaml
 
 # dependencies
 /bower_components/
