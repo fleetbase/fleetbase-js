@@ -183,6 +183,35 @@ jobs:
               working-directory: fixtures/types
               run: npx tsc -p tsconfig.${{ matrix.resolution }}.json
 
+    compatibility:
+        name: Build / ${{ matrix.fixture }}
+        needs: package
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                fixture: [vite, webpack, esbuild, react, vue, svelte, next, nuxt]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22.22.2
+                  cache: npm
+                  cache-dependency-path: fixtures/compat/${{ matrix.fixture }}/package.json
+            - name: Install pinned fixture dependencies
+              working-directory: fixtures/compat/${{ matrix.fixture }}
+              run: npm install --no-package-lock
+            - name: Install exact SDK candidate
+              working-directory: fixtures/compat/${{ matrix.fixture }}
+              run: npm install --no-package-lock --no-save ../../../artifacts/fleetbase-sdk.tgz
+            - name: Build production fixture
+              working-directory: fixtures/compat/${{ matrix.fixture }}
+              run: npm run build
+
     dependency-review:
         name: Dependency review
         if: github.event_name == 'pull_request'
@@ -212,7 +241,7 @@ jobs:
     ci-success:
         name: CI success
         if: always()
-        needs: [quality, test, package, cross-platform, package-manager, type-consumer, dependency-review, security]
+        needs: [quality, test, package, cross-platform, package-manager, type-consumer, compatibility, dependency-review, security]
         runs-on: ubuntu-latest
         steps:
             - name: Require successful jobs

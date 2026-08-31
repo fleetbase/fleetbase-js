@@ -1,8 +1,11 @@
 # compiled output
-/dist/
+dist/
 /.types/
 /.pnpm-store/
 /tmp/
+.next/
+.nuxt/
+.output/
 
 # dependencies
 /bower_components/
