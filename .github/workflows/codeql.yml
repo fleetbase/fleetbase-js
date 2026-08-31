@@ -1,0 +1,28 @@
+name: CodeQL
+
+on:
+    push:
+        branches: [main, master, dev-v2.0.0]
+    pull_request:
+        branches: [main, master, dev-v2.0.0]
+    schedule:
+        - cron: '23 3 * * 1'
+
+concurrency:
+    group: codeql-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+    security-events: write
+
+jobs:
+    analyze:
+        name: Analyze JavaScript and TypeScript
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: github/codeql-action/init@v3
+              with:
+                  languages: javascript-typescript
+            - uses: github/codeql-action/analyze@v3

@@ -1,0 +1,8 @@
+{
+    "sourceCommit": "69ace0808f8738bc4dc8b0930452c0d793217f8b",
+    "sourceBranch": "dev-v1.2.14",
+    "additions": {
+        "stores": ["serviceQuotes"],
+        "serviceQuoteActions": ["fromPayload", "fromPreliminary"]
+    }
+}

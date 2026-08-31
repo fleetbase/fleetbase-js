@@ -1,6 +1,6 @@
 # Fleetbase JavaScript SDK modernization and v2 release plan
 
-Status: proposed for review
+Status: implementation in progress on PR #33
 
 Target branch: `dev-v2.0.0`
 
@@ -144,16 +144,16 @@ Every regression fix must first add a failing test. The initial coverage PR must
 
 ### Required release-blocking matrix
 
-| Dimension | Required support/gate |
-| --- | --- |
-| Node | Node 22 and 24 LTS on Linux; smoke tests on macOS and Windows; Node 26 allowed-to-fail until it enters LTS, then promoted |
-| Module systems | Native ESM import, dynamic import, and CommonJS require from the packed tarball |
-| TypeScript | `node16`, `nodenext`, and `bundler` resolution; strict consumer fixtures; declarations match runtime exports |
-| Package managers | npm, pnpm, Yarn Berry, and Bun install/import smoke tests using the same tarball |
-| Bundlers | Vite/Rollup, webpack, esbuild, and the bundlers exercised transitively by required framework fixtures |
-| Browsers | Current and previous major Chrome, Firefox, Safari, and Edge through browser tests; document the browserslist policy |
-| Frameworks | Vite vanilla, React, Vue, Svelte, Angular, Next.js, Nuxt, and Ember minimal production builds |
-| Mobile/edge | React Native/Expo and one standards-based edge runtime are release-blocking only after adapter behavior is explicitly supported and documented |
+| Dimension        | Required support/gate                                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node             | Node 22 and 24 LTS on Linux; smoke tests on macOS and Windows; Node 26 allowed-to-fail until it enters LTS, then promoted                      |
+| Module systems   | Native ESM import, dynamic import, and CommonJS require from the packed tarball                                                                |
+| TypeScript       | `node16`, `nodenext`, and `bundler` resolution; strict consumer fixtures; declarations match runtime exports                                   |
+| Package managers | npm, pnpm, Yarn Berry, and Bun install/import smoke tests using the same tarball                                                               |
+| Bundlers         | Vite/Rollup, webpack, esbuild, and the bundlers exercised transitively by required framework fixtures                                          |
+| Browsers         | Current and previous major Chrome, Firefox, Safari, and Edge through browser tests; document the browserslist policy                           |
+| Frameworks       | Vite vanilla, React, Vue, Svelte, Angular, Next.js, Nuxt, and Ember minimal production builds                                                  |
+| Mobile/edge      | React Native/Expo and one standards-based edge runtime are release-blocking only after adapter behavior is explicitly supported and documented |
 
 The matrix must distinguish “supported and blocking” from “best effort/canary.” A badge or README claim is permitted only after the corresponding fixture runs in CI.
 
@@ -184,7 +184,7 @@ Split workflows by responsibility and use least-privilege permissions, pinned ma
 
 ### `release.yml` — reviewed automation
 
-Use Changesets (or a comparably reviewable release-PR tool) so every user-visible change carries a semver intent and changelog entry. On merges to `master`, automation should maintain a version PR. Merging that reviewed version PR should:
+Use Changesets (or a comparably reviewable release-PR tool) so every user-visible change carries a semver intent and changelog entry. After the reviewed default-branch migration, merges to `main` should maintain a version PR. Merging that reviewed version PR should:
 
 1. Re-run the complete protected CI suite on the exact commit.
 2. Build and pack once.
