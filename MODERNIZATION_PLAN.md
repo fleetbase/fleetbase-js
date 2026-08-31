@@ -308,18 +308,18 @@ Every PR description must include: public API effect, compatibility evidence, te
 
 ## Release approval checklist
 
-- [ ] v1.2.13 and v1.2.14 candidate contracts are captured and reviewed.
-- [ ] All maintained source is at 100% lines/statements/functions/branches.
-- [ ] Mutation-testing results for core modules are reviewed.
-- [ ] ESM, CommonJS, and TypeScript consumers pass from the packed tarball.
-- [ ] Required runtime/framework/bundler/package-manager matrix is green.
-- [ ] Publint and Are The Types Wrong report no release-blocking defects.
-- [ ] Package content and size budgets pass; no secrets or internal-only files are present.
-- [ ] API report contains no unapproved changes.
+- [x] v1.2.13 and v1.2.14 candidate contracts are captured and reviewed.
+- [x] All maintained source is at 100% lines/statements/functions/branches.
+- [x] Mutation-testing results for core modules are reviewed.
+- [x] ESM, CommonJS, and TypeScript consumers pass from the packed tarball.
+- [x] Required runtime/framework/bundler/package-manager matrix is green.
+- [x] Publint and Are The Types Wrong report no release-blocking defects.
+- [x] Package content and size budgets pass; no secrets or internal-only files are present.
+- [x] API report contains no unapproved changes.
 - [ ] Full CI passes on the release commit with frozen dependencies.
-- [ ] Release workflow dry run proves one immutable artifact is used throughout.
+- [x] Release workflow dry run proves one immutable artifact is used throughout.
 - [ ] npm trusted publishing, protected environment, and provenance are configured.
-- [ ] Migration guide, changelog, support policy, deprecations, and rollback steps are published.
+- [x] Migration guide, changelog, support policy, deprecations, and rollback steps are published.
 - [ ] First-party Fleetbase consumers pass against the release candidate.
 - [ ] Post-publish verification and provenance checks pass before `latest` promotion.
 

@@ -3,7 +3,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-    { ignores: ['coverage/**', 'dist/**', '.types/**', 'fixtures/**'] },
+    { ignores: ['coverage/**', 'dist/**', '.types/**', '.stryker-tmp/**', 'reports/**', 'fixtures/**'] },
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked.map((config) => ({
         ...config,

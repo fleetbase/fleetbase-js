@@ -27,6 +27,8 @@ node_modules/
 /connect.lock
 /coverage/
 /artifacts/
+/reports/mutation/
+/.stryker-tmp/
 /libpeerconnection.log
 /npm-debug.log*
 /testem.log

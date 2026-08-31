@@ -137,7 +137,7 @@ export default class Collection<T = unknown> extends Array<T> {
         return this.replace(0, 0, items);
     }
     reverseObjects(): this {
-        super.reverse();
+        Array.prototype.reverse.call(this);
         return this;
     }
     setObjects(items: T[]): this {

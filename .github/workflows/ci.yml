@@ -2,9 +2,9 @@ name: CI
 
 on:
     push:
-        branches: [main, master, dev-v2.0.0]
+        branches: [main, master]
     pull_request:
-        branches: [main, master, dev-v2.0.0]
+        branches: [main, master]
     workflow_dispatch:
 
 concurrency:
@@ -214,7 +214,7 @@ jobs:
               run: pnpm run build
 
     browser:
-        name: Browser / Chromium
+        name: Browser / Playwright engines
         needs: package
         runs-on: ubuntu-latest
         steps:
@@ -235,9 +235,9 @@ jobs:
             - name: Install exact SDK candidate
               working-directory: fixtures/browser
               run: pnpm add --save-dev ../../artifacts/fleetbase-sdk.tgz
-            - name: Install Chromium
+            - name: Install browser engines
               working-directory: fixtures/browser
-              run: pnpm exec playwright install --with-deps chromium
+              run: pnpm exec playwright install --with-deps chromium firefox webkit
             - name: Build and execute browser fixture
               working-directory: fixtures/browser
               run: pnpm run build && pnpm run test:browser

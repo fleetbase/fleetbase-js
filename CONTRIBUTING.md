@@ -15,6 +15,8 @@ Thank you for improving the Fleetbase JavaScript SDK.
 4. Run `pnpm run verify` before opening a pull request.
 5. Add a Changeset for user-visible package changes with `pnpm changeset`.
 
+The scheduled mutation workflow runs `pnpm run test:mutation` against the core resource, store, collection, registry, resolver, and Fetch transport boundary. It enforces the reviewed baseline described in the [testing policy](./docs/testing.md). Run it locally when changing those behaviors.
+
 Pull-request tests must not depend on production Fleetbase credentials or mutable remote data. Use an injected adapter or Fetch implementation for deterministic tests.
 
 Maintainers should follow the [release guide](./docs/releasing.md). Registry publication is restricted to the protected GitHub Actions workflow; local release validation uses `node scripts/publish.mjs --dry-run`.
