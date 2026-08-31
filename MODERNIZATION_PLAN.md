@@ -30,7 +30,7 @@ The work should be delivered as small, independently reviewable pull requests on
 - The current test run produces 15 passing and 9 failing tests without Fleetbase credentials and a reachable API. All nine failures come from live API CRUD tests. Pull-request correctness therefore depends on secrets, network availability, mutable remote data, and cleanup succeeding.
 - No coverage provider, coverage report, or coverage threshold is configured. “100% coverage” is currently neither measured nor enforced.
 - The workflow tests only Node 18, which reached end of life in March 2025. As of this plan, Node 22 and 24 are the supported LTS lines; Node 26 is Current.
-- pnpm is installed as unpinned `latest`. The cache hashes `package-lock.json` even though the repository uses `pnpm-lock.yaml`, and installs are not explicitly documented as frozen/immutable.
+- pnpm is installed as unpinned `latest`. This plan PR reproduced the resulting breakage in GitHub Actions on 2026-08-31: the selected pnpm required Node 22.13 or newer while the job ran Node 18.20.8, so dependency installation failed before tests. The cache also hashes `package-lock.json` even though the repository uses `pnpm-lock.yaml`, and installs are not explicitly documented as frozen/immutable.
 - CI has no concurrency cancellation, minimal permission declarations, dependency review, code scanning, package smoke tests, type tests, bundle-size budget, or cross-platform/consumer matrix.
 
 ### Dependency security baseline
