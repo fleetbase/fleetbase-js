@@ -69,6 +69,7 @@
         "changeset": "changeset",
         "version-packages": "changeset version",
         "release": "changeset publish",
+        "publish:ci": "node scripts/publish.mjs",
         "prepublishOnly": "pnpm run verify"
     },
     "devDependencies": {

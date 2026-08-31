@@ -17,6 +17,8 @@ Thank you for improving the Fleetbase JavaScript SDK.
 
 Pull-request tests must not depend on production Fleetbase credentials or mutable remote data. Use an injected adapter or Fetch implementation for deterministic tests.
 
+Maintainers should follow the [release guide](./docs/releasing.md). Registry publication is restricted to the protected GitHub Actions workflow; local release validation uses `node scripts/publish.mjs --dry-run`.
+
 ## Compatibility
 
 Existing default and named exports, constructors, stores, resources, adapter signatures, and return shapes are compatibility contracts. Call out any proposed public API change in the pull request and include runtime and type-level evidence.

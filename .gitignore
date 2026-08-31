@@ -26,6 +26,7 @@ node_modules/
 /.sass-cache
 /connect.lock
 /coverage/
+/artifacts/
 /libpeerconnection.log
 /npm-debug.log*
 /testem.log

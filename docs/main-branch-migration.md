@@ -8,6 +8,7 @@ This is an owner-operated release step. PR #33 prepares repository files for `ma
 - Branch protection for `main` is configured with the `CI success` and CodeQL checks required.
 - The protected `npm` environment exists and permits only reviewed release runs.
 - npm trusted publishing is configured for `.github/workflows/release.yml` on `main`.
+- GitHub Actions is allowed to create the Changesets release pull request.
 - Open pull requests and external automation have been inventoried for hard-coded `master` references.
 
 ## Owner procedure
