@@ -213,6 +213,35 @@ jobs:
               working-directory: fixtures/compat/${{ matrix.fixture }}
               run: pnpm run build
 
+    browser:
+        name: Browser / Chromium
+        needs: package
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/download-artifact@v4
+              with:
+                  name: npm-package
+                  path: artifacts
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24.15.0
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 11.24.0
+            - name: Install pinned browser dependencies
+              working-directory: fixtures/browser
+              run: pnpm install --no-frozen-lockfile
+            - name: Install exact SDK candidate
+              working-directory: fixtures/browser
+              run: pnpm add --save-dev ../../artifacts/fleetbase-sdk.tgz
+            - name: Install Chromium
+              working-directory: fixtures/browser
+              run: pnpm exec playwright install --with-deps chromium
+            - name: Build and execute browser fixture
+              working-directory: fixtures/browser
+              run: pnpm run build && pnpm run test:browser
+
     dependency-review:
         name: Dependency review
         if: github.event_name == 'pull_request'
@@ -242,7 +271,7 @@ jobs:
     ci-success:
         name: CI success
         if: always()
-        needs: [quality, test, package, cross-platform, package-manager, type-consumer, compatibility, dependency-review, security]
+        needs: [quality, test, package, cross-platform, package-manager, type-consumer, compatibility, browser, dependency-review, security]
         runs-on: ubuntu-latest
         steps:
             - name: Require successful jobs
