@@ -184,13 +184,13 @@ Split workflows by responsibility and use least-privilege permissions, pinned ma
 
 ### `release.yml` — reviewed automation
 
-Use Changesets (or a comparably reviewable release-PR tool) so every user-visible change carries a semver intent and changelog entry. After the reviewed default-branch migration, merges to `main` should maintain a version PR. Merging that reviewed version PR should:
+Use Changesets to record semver intent where useful, and prepare `release/v<version>` PRs with current release notes. Merging a reviewed release branch into `main` automatically runs the complete release in `release.yml`; the PR approval is the publishing authorization. The workflow must:
 
 1. Re-run the complete protected CI suite on the exact commit.
 2. Build and pack once.
 3. Verify version/tag consistency and package contents.
-4. Publish to npm through npm trusted publishing (OIDC) from a protected `npm` environment; no long-lived npm token.
-5. Publish provenance automatically, create the signed/annotated git tag and GitHub Release, and attach checksums plus the exact tarball or build metadata.
+4. Create an annotated tag on the exact PR merge commit, then publish to npm through trusted publishing (OIDC), without a second approval or enable flag.
+5. Publish provenance automatically, create the GitHub Release after registry verification, and attach checksums plus the exact tarball or build metadata.
 6. Optionally publish the identical tarball to GitHub Packages in a separate authorized step; never rebuild it.
 7. Verify the registry version, provenance, ESM/CJS imports, and a minimal API construction smoke test after publication.
 

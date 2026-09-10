@@ -1,23 +1,4 @@
-name: Release Tag
-
-# Tags a release when a release branch is merged to main, and pushes the tag.
-# Delegates to the reusable workflow in fleetbase/fleetbase. Requires org secret
-# _GITHUB_AUTH_TOKEN (inherited); no-ops with a warning until it is set.
-#
-# Branch convention is `release/v0.0.0`; the legacy `dev-v0.0.0` is still accepted so
-# branches opened before the rename still release.
-#
-# It pushes the tag and nothing else; publish.yml handles review-gated npm publication.
-#
-# The version is never retyped: it comes from the branch name, and the tag is refused
-# unless package.json and RELEASE.md already agree with it.
-#
-# RELEASE.md is required, and its first line must name the version being released. That
-# check is the only thing that can tell notes written for this release from the previous
-# release's notes nobody replaced.
-#
-# workflow_dispatch is the recovery path, for when a release fails validation and the fix
-# lands on main after the merge.
+name: Release SDK
 
 on:
     pull_request:
@@ -26,19 +7,85 @@ on:
     workflow_dispatch:
         inputs:
             version:
-                description: 'Version to tag, e.g. 1.2.3. Recovery only — a normal release reads it from the branch.'
+                description: 'Recovery only: version to release from main, e.g. 2.0.0'
                 required: true
+                type: string
+
+# Avoid concurrent publication attempts.
+concurrency:
+    group: sdk-release
+    cancel-in-progress: false
+
 permissions:
     contents: read
 
 jobs:
-    tag:
-        if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+    release:
+        name: Tag, publish SDK, and create release
+        if: >-
+            (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
             (github.event.pull_request.merged == true &&
-            (startsWith(github.event.pull_request.head.ref, 'release/v') ||
-            startsWith(github.event.pull_request.head.ref, 'dev-v')))
-        uses: fleetbase/fleetbase/.github/workflows/release-tag.yml@main
-        with:
-            version-files: package.json
-            version: ${{ github.event.inputs.version || '' }}
-        secrets: inherit
+             (startsWith(github.event.pull_request.head.ref, 'release/v') ||
+              startsWith(github.event.pull_request.head.ref, 'dev-v')))
+        runs-on: ubuntu-latest
+        timeout-minutes: 25
+        permissions:
+            contents: write
+            id-token: write
+        env:
+            RELEASE_BRANCH: ${{ github.event.pull_request.head.ref || format('release/v{0}', inputs.version) }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  # Never tag whatever main happens to point at when the job starts.
+                  ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+                  fetch-depth: 0
+                  persist-credentials: false
+            - uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24.15.0
+                  cache: pnpm
+                  registry-url: https://registry.npmjs.org
+            - name: Validate reviewed commit and release metadata
+              id: metadata
+              run: |
+                  git merge-base --is-ancestor HEAD origin/main
+                  tag=$(node scripts/release-tag.mjs "$RELEASE_BRANCH" --name-only)
+                  node scripts/validate-release.mjs "$tag"
+                  echo "tag=$tag" >> "$GITHUB_OUTPUT"
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm run verify
+            - name: Tag the exact reviewed commit
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh auth setup-git
+                  node scripts/release-tag.mjs "$RELEASE_BRANCH"
+            # Continue directly: tags pushed by GITHUB_TOKEN do not trigger other workflows.
+            - name: Publish SDK with provenance
+              run: pnpm run publish:ci
+            - name: Verify registry checksum and clean consumers
+              run: node scripts/verify-published.mjs
+            - name: Preserve release evidence
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: npm-release-${{ github.sha }}
+                  path: artifacts/
+                  if-no-files-found: warn
+                  retention-days: 90
+            - name: Create GitHub release or attach verified evidence
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RELEASE_TAG: ${{ steps.metadata.outputs.tag }}
+              run: |
+                  if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+                      gh release upload "$RELEASE_TAG" artifacts/*.tgz artifacts/SHA256SUMS --clobber
+                  else
+                      extra=()
+                      if [[ "$RELEASE_TAG" == *-* ]]; then extra+=(--prerelease); fi
+                      gh release create "$RELEASE_TAG" artifacts/*.tgz artifacts/SHA256SUMS --verify-tag --notes-file RELEASE.md --title "$RELEASE_TAG" "${extra[@]}"
+                  fi

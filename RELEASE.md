@@ -6,7 +6,7 @@
 - Preserved adapter extension points, authentication/header overrides, mutation bodies, and driver GeoJSON coordinates used by Navigator and Storefront.
 - Deterministic contract tests with enforced 100% statement, branch, function, and line coverage, plus packed-artifact framework and package-manager checks.
 - Structured API errors, consistent resource state cleanup, and corrected collection and persistence helpers.
-- Review-gated npm publication with provenance, checksum verification, and post-publication ESM/CommonJS checks.
+- Automatic tagging, npm publication, and GitHub releases after a reviewed release-branch merge, with provenance, checksum verification, and post-publication ESM/CommonJS checks.
 
 ## Compatibility
 

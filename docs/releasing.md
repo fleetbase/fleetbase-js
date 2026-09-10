@@ -1,43 +1,51 @@
 # Releasing the Fleetbase SDK
 
-Publication is owner-approved. Do not publish from a developer machine.
+**Merging a `release/v<version>` PR into `main` authorizes and automatically performs the release.** Required PR review and CI are the approval gate; there is no second environment approval, enable flag, or manual publish step.
 
-## Repository prerequisites
+## One-time npm setup
 
-- The default branch is `main`; require CI success and CodeQL before merging a release PR.
-- Configure the protected `npm` GitHub environment with required maintainer review and allowed release tags.
-- Configure npm trusted publishing for repository `fleetbase/fleetbase-js`, workflow `publish.yml`, and environment `npm`, allowing publish.
-- Set repository variable `NPM_PUBLISH_ENABLED=true` only after the protection and trusted-publisher settings are verified. Publication jobs otherwise skip, including manual runs.
-- The shared release-tag workflow requires the organization secret `_GITHUB_AUTH_TOKEN`; without it, tagging explicitly warns and skips. It must not fall back to `GITHUB_TOKEN`, whose tag pushes do not trigger the publishing workflow.
+Configure the trusted publisher for `@fleetbase/sdk` on npm:
 
-The publisher uses Node 24.15 and npm's OIDC support, with no npm access token. See [npm trusted publishing requirements](https://docs.npmjs.com/trusted-publishers/) and [GitHub workflow triggering rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+- Organization: `fleetbase`
+- Repository: `fleetbase-js`
+- Workflow filename: `release.yml`
+- Environment: leave empty (this workflow does not use a GitHub environment)
+- Allow direct `npm publish`
 
-## Reviewed release flow
+This external npm authorization must exist before the first release merge. It cannot be inferred from repository settings. The workflow uses Node 24.15 with OIDC and provenance, not a long-lived npm token. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 
-1. Prepare `release/v<version>`, matching `package.json`, the first line of `RELEASE.md`, and the correct npm dist-tag. Changesets may assist version preparation, but there is no second automatic version-PR/publish path.
-2. Require packed-artifact CI, first-party acceptance, and owner approval before merging into `main`.
-3. `release.yml` calls the shared tag workflow, which validates metadata and tags the exact merge commit. Its main-only manual dispatch is a recovery path.
-4. The tag push starts `publish.yml`. After the protected environment review, it confirms the tag matches the package version and its commit is reachable from `main`, then reruns full SDK verification.
-5. `scripts/publish.mjs` packs once, writes `artifacts/SHA256SUMS`, and publishes that tarball with provenance.
-6. `scripts/verify-published.mjs` downloads the registry tarball, verifies its SHA-256 digest, installs from the registry in a clean directory, and executes ESM and CommonJS consumers.
-7. GitHub preserves release evidence for 90 days and attaches verified artifacts to the release.
+## Automatic merge-to-release flow
 
-A manual publishing retry must target the existing release tag, not a branch. Tag collisions and version mismatches are refused. If npm already has the version, publication continues only when its tarball checksum matches; it never replaces a published version.
+1. Merge an approved `release/v<version>` PR into protected `main`. Legacy `dev-v<version>` branches are also recognized.
+2. `release.yml` checks out the PR's exact merge commit, not whichever commit happens to be at main when the runner starts.
+3. Confirm the commit belongs to main and the branch, package version, RELEASE.md headline, and npm dist-tag agree.
+4. Run full verification, including release-tag regression tests, SDK coverage, build, and package validation.
+5. Create an annotated `v<version>` tag at that commit and push it with the repository-scoped `GITHUB_TOKEN`.
+6. Continue in the **same job** to pack and publish the SDK to npm with provenance. This does not rely on a second tag-triggered workflow, so GitHub's token-trigger recursion rules cannot silently stop the release. No `_GITHUB_AUTH_TOKEN` is needed.
+7. Verify the registry tarball checksum byte-for-byte and test clean ESM/CommonJS installation.
+8. Create the GitHub release from RELEASE.md and attach the exact published tarball and SHA256SUMS. Preserve workflow artifacts for 90 days.
 
-Prereleases use `next`; stable versions use `latest`. Updating review-branch metadata to 2.0.0 does not authorize publication.
+There is only one publishing workflow. Ordinary feature PRs, closed-but-unmerged PRs, branch pushes, and manual tag pushes do not publish.
 
-## Local validation
+## Versioning and retries
+
+Use `next` for prereleases and `latest` for stable releases. Example: merging `release/v2.0.0` releases tag `v2.0.0`, GitHub release `v2.0.0`, and `@fleetbase/sdk@2.0.0` on npm.
+
+Re-running the failed merge workflow uses the same reviewed commit. Existing tags on that commit are accepted; tags on other commits are never moved. If npm already accepted the version, the publisher continues only if its tarball matches the newly packed artifact byte-for-byte.
+
+The workflow_dispatch recovery path runs **only on main** and requires an explicit version. It releases that dispatch's main commit, subject to the same metadata and verification checks. A recovery commit cannot reuse an existing version/tag pointing elsewhere: rerun the original release or prepare a new version.
+
+Missing npm authorization or a failed validation fails the release visibly; it does not report success after silently skipping publication. A failed npm publication can leave the tag created; use the retry path after correcting authorization. Do not delete/move tags or replace published bytes.
+
+## Local checks
 
 ```sh
 pnpm run verify
 node scripts/validate-release.mjs v2.0.0
+node scripts/release-tag.mjs release/v2.0.0 --name-only
 node scripts/publish.mjs --dry-run
 ```
 
-The dry run requires an empty ignored `artifacts/` directory and never publishes. A real script invocation refuses to run outside GitHub Actions.
+The dry run requires an empty ignored artifacts directory. Tag creation and real registry publication refuse to run outside GitHub Actions. The tag tests use isolated temporary local repositories and never push this repository's refs.
 
-## Failure and rollback
-
-Preserve release evidence if registry verification fails. Fix the release branch before approval; after publication, ship a corrected version rather than moving tags or replacing package bytes. npm deprecation, unpublish, and dist-tag changes require explicit owner action.
-
-Native app acceptance, the shared tag secret, environment protection, and npm trusted-publisher access are external gates: passing local checks does not prove they are configured.
+All native acceptance and release review must finish **before merging**, because the merge starts publication automatically.

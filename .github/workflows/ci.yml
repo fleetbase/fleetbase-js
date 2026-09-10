@@ -34,6 +34,7 @@ jobs:
             - run: pnpm run format:check
             - run: pnpm run lint
             - run: pnpm run typecheck
+            - run: pnpm run test:release
             - name: Validate release metadata
               if: startsWith(github.head_ref, 'release/v')
               env:

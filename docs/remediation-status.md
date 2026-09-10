@@ -44,7 +44,7 @@ This uses the app's existing Metro configuration, overrides only SDK/dependency 
 ## Remaining release gates
 
 - Native iOS/Android device acceptance for real login, restored sessions, offline replay, tracking, and chat. Bundling alone does not validate native runtime behavior.
-- The protected `npm` environment, npm trusted publisher for `publish.yml`, and explicit `NPM_PUBLISH_ENABLED=true` setting must be configured before publication can run. Verify the shared tag secret as well.
+- Configure npm trusted publishing for `release.yml` with no environment restriction and direct publish allowed. Merging the release branch into main is the release authorization: tagging, npm publication, verification, and GitHub release creation run automatically in one job, without an enable flag or separate approval.
 - Review PR #35 before including the driver-store additions in the v2 release. Approve draft PR #36 only after acceptance; neither PR was merged.
 
 See [the original review and detailed regressions](consumer-compatibility-review.md) and [release instructions](releasing.md).
