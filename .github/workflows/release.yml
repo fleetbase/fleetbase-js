@@ -10,6 +10,10 @@ on:
                 description: 'Recovery only: version to release from main, e.g. 2.0.0'
                 required: true
                 type: string
+            github_packages_only:
+                description: 'Mirror an existing release to GitHub Packages only; never tag or publish to npm'
+                type: boolean
+                default: false
 
 # Avoid concurrent publication attempts.
 concurrency:
@@ -23,7 +27,7 @@ jobs:
     release:
         name: Tag, publish SDK, and create release
         if: >-
-            (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+            (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && !inputs.github_packages_only) ||
             (github.event.pull_request.merged == true &&
              (startsWith(github.event.pull_request.head.ref, 'release/v') ||
               startsWith(github.event.pull_request.head.ref, 'dev-v')))
@@ -32,6 +36,8 @@ jobs:
         permissions:
             contents: write
             id-token: write
+        outputs:
+            tag: ${{ steps.metadata.outputs.tag }}
         env:
             RELEASE_BRANCH: ${{ github.event.pull_request.head.ref || format('release/v{0}', inputs.version) }}
         steps:
@@ -99,3 +105,45 @@ jobs:
                       if [[ "$RELEASE_TAG" == *-* ]]; then extra+=(--prerelease); fi
                       gh release create "$RELEASE_TAG" artifacts/*.tgz artifacts/SHA256SUMS --verify-tag --notes-file RELEASE.md --title "$RELEASE_TAG" "${extra[@]}"
                   fi
+
+    github_packages:
+        name: Publish verified release to GitHub Packages
+        needs: release
+        if: >-
+            always() &&
+            (needs.release.result == 'success' ||
+             (github.event_name == 'workflow_dispatch' && inputs.github_packages_only))
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        permissions:
+            contents: read
+            packages: write
+        env:
+            RELEASE_TAG: ${{ needs.release.outputs.tag || format('v{0}', inputs.version) }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+                  fetch-depth: 0
+                  persist-credentials: false
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24.15.0
+                  registry-url: https://npm.pkg.github.com
+                  scope: '@fleetbase'
+            - name: Download the existing release artifact without rebuilding
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]
+                  git merge-base --is-ancestor "$RELEASE_TAG^{commit}" origin/main
+                  gh release download "$RELEASE_TAG" --pattern '*.tgz' --pattern SHA256SUMS --dir artifacts
+            - name: Publish identical bytes and verify GitHub Packages
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node scripts/publish-github.mjs "$RELEASE_TAG"
+            - name: Report GitHub package location and visibility
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh api /orgs/fleetbase/packages/npm/sdk --jq '{name, visibility, html_url, repository: .repository.full_name}'
