@@ -189,7 +189,7 @@ Use Changesets to record semver intent where useful, and prepare `release/v<vers
 1. Re-run the complete protected CI suite on the exact commit.
 2. Build and pack once.
 3. Verify version/tag consistency and package contents.
-4. Create an annotated tag on the exact PR merge commit, then publish to npm through trusted publishing (OIDC), without a second approval or enable flag.
+4. Create an annotated tag on the exact PR merge commit, then publish to npm using the existing `NPM_AUTH_TOKEN` secret, matching the other modules, without a second approval or enable flag. Retain OIDC permissions for provenance; trusted-publisher registration is not required.
 5. Publish provenance automatically, create the GitHub Release after registry verification, and attach checksums plus the exact tarball or build metadata.
 6. Optionally publish the identical tarball to GitHub Packages in a separate authorized step; never rebuild it.
 7. Verify the registry version, provenance, ESM/CJS imports, and a minimal API construction smoke test after publication.
@@ -318,7 +318,7 @@ Every PR description must include: public API effect, compatibility evidence, te
 - [x] API report contains no unapproved changes.
 - [x] Full CI passes on the release commit with frozen dependencies.
 - [x] Release workflow dry run proves one immutable artifact is used throughout.
-- [ ] npm trusted publishing, protected environment, and provenance are configured.
+- [ ] The existing `NPM_AUTH_TOKEN` is available to this repository and authorized for `@fleetbase/sdk`; the workflow retains provenance without an additional environment approval.
 - [x] Migration guide, changelog, support policy, deprecations, and rollback steps are published.
 - [ ] First-party Fleetbase consumers pass against the release candidate.
 - [ ] Post-publish verification and provenance checks pass before `latest` promotion.

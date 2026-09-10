@@ -35,6 +35,14 @@ jobs:
         env:
             RELEASE_BRANCH: ${{ github.event.pull_request.head.ref || format('release/v{0}', inputs.version) }}
         steps:
+            - name: Check npm publishing credential
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+              run: |
+                  if [[ -z "$NODE_AUTH_TOKEN" ]]; then
+                      echo "::error::NPM_AUTH_TOKEN must be available to this repository and authorized to publish @fleetbase/sdk."
+                      exit 1
+                  fi
             - uses: actions/checkout@v4
               with:
                   # Never tag whatever main happens to point at when the job starts.
@@ -66,6 +74,8 @@ jobs:
                   node scripts/release-tag.mjs "$RELEASE_BRANCH"
             # Continue directly: tags pushed by GITHUB_TOKEN do not trigger other workflows.
             - name: Publish SDK with provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
               run: pnpm run publish:ci
             - name: Verify registry checksum and clean consumers
               run: node scripts/verify-published.mjs

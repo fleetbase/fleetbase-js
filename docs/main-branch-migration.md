@@ -12,13 +12,13 @@ The existing one-reviewer rule is preserved and now requires `CI success` and `C
 
 - PR #36 and every required check are green and reviewed; first-party acceptance is complete.
 - Branch protection for `main` is configured with the `CI success` and CodeQL checks required.
-- npm trusted publishing authorizes `.github/workflows/release.yml` without an environment restriction and allows direct publishing.
+- The existing `NPM_AUTH_TOKEN` secret is available to `fleetbase-js` and authorized to publish `@fleetbase/sdk`; no npm trusted-publisher registration is required.
 - Merging the release PR is the release authorization; complete acceptance before merging.
 - Open pull requests and external automation have been inventoried for hard-coded `master` references.
 
 ## Owner procedure
 
-1. Complete native acceptance and npm trusted-publisher setup before merging the reviewed modernization PR; merging now publishes automatically.
+1. Complete native acceptance and confirm npm token access before merging the reviewed modernization PR; merging now publishes automatically.
 2. Rename the default branch in GitHub from `master` to `main` (or create `main` from the reviewed commit and make it default).
 3. Confirm branch protection, rulesets, environments, webhooks, Pages settings, and installed apps target `main`.
 4. Update local clones with GitHub's displayed branch-migration commands.
