@@ -20,6 +20,7 @@ The workflow retains `id-token: write` for npm provenance; npm publication is au
 6. Continue in the **same job** to pack and publish the SDK to npm using `NPM_AUTH_TOKEN`, with provenance. This does not rely on a second tag-triggered workflow, so GitHub's token-trigger recursion rules cannot silently stop the release. Unlike the modules' split tag/publish workflows, no `_GITHUB_AUTH_TOKEN` is needed.
 7. Verify the registry tarball checksum byte-for-byte and test clean ESM/CommonJS installation.
 8. Create the GitHub release from RELEASE.md and attach the exact published tarball and SHA256SUMS. Preserve workflow artifacts for 90 days.
+9. A dependent job downloads that release asset, checks its identity and checksum against npm, and publishes the identical tarball to GitHub Packages. It uses `GITHUB_TOKEN` with `packages: write`, not `NPM_AUTH_TOKEN`, and verifies the downloaded GitHub package byte-for-byte. Nothing is rebuilt.
 
 There is only one publishing workflow. Ordinary feature PRs, closed-but-unmerged PRs, branch pushes, and manual tag pushes do not publish.
 
@@ -29,7 +30,13 @@ Use `next` for prereleases and `latest` for stable releases. Example: merging `r
 
 Re-running the failed merge workflow uses the same reviewed commit. Existing tags on that commit are accepted; tags on other commits are never moved. If npm already accepted the version, the publisher continues only if its tarball matches the newly packed artifact byte-for-byte.
 
-The workflow_dispatch recovery path runs **only on main** and requires an explicit version. It releases that dispatch's main commit, subject to the same metadata and verification checks. A recovery commit cannot reuse an existing version/tag pointing elsewhere: rerun the original release or prepare a new version.
+The normal workflow_dispatch recovery path runs **only on main** and requires an explicit version. It releases that dispatch's main commit, subject to the same metadata and verification checks. A recovery commit cannot reuse an existing version/tag pointing elsewhere: rerun the original release or prepare a new version.
+
+### GitHub Packages-only recovery
+
+Run `Release SDK` manually with the existing version (for example `2.0.0`) and `github_packages_only` enabled. This skips the npm/tag/release job entirely and mirrors the existing release asset. It can run from a reviewed workflow-fix branch to recover a missing mirror before that fix merges; the existing release tag must still belong to main. It cannot rebuild, create a new tag, or republish to npm. Retries accept an existing identical GitHub package but refuse conflicting bytes.
+
+GitHub Packages uses `https://npm.pkg.github.com` and links the package to this repository via the artifact's `repository` field. Its job intentionally disables npm-specific provenance generation; the original npm provenance and release checksums remain intact. Package access/visibility is managed by GitHub independently of npm. See [GitHub's npm registry documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
 
 Missing npm authorization or a failed validation fails the release visibly; it does not report success after silently skipping publication. A failed npm publication can leave the tag created; use the retry path after correcting authorization. Do not delete/move tags or replace published bytes.
 

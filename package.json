@@ -65,7 +65,7 @@
         "typecheck": "tsc -p tsconfig.json --noEmit",
         "test": "vitest run",
         "test:coverage": "vitest run --coverage",
-        "test:release": "node --test scripts/release-tag.test.mjs",
+        "test:release": "node --test scripts/release-tag.test.mjs scripts/release-github.test.mjs",
         "test:mutation": "stryker run",
         "package:check": "publint && attw --pack . && node scripts/verify-package.mjs",
         "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:release && pnpm run test:coverage && pnpm run build && pnpm run package:check",
