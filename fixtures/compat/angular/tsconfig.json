@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "ES2022",
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "experimentalDecorators": true,
+        "useDefineForClassFields": false,
+        "lib": ["ES2022", "DOM"]
+    },
+    "angularCompilerOptions": { "strictTemplates": true }
+}

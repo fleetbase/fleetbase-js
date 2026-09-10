@@ -1,0 +1,16 @@
+{
+    "name": "@fleetbase/sdk-fixture-expo",
+    "private": true,
+    "main": "index.js",
+    "scripts": {
+        "build": "expo export --platform web --output-dir dist-web && expo export --platform android --output-dir dist-android"
+    },
+    "dependencies": {
+        "@expo/metro-runtime": "57.0.14",
+        "expo": "57.0.18",
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "react-native": "0.86.3",
+        "react-native-web": "0.21.2"
+    }
+}

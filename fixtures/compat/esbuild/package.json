@@ -1,0 +1,11 @@
+{
+    "name": "@fleetbase/sdk-fixture-esbuild",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "esbuild src/index.js --bundle --format=esm --platform=browser --outfile=dist/index.js"
+    },
+    "devDependencies": {
+        "esbuild": "0.28.2"
+    }
+}

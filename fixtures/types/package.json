@@ -1,0 +1,5 @@
+{
+    "name": "@fleetbase/sdk-type-fixture",
+    "private": true,
+    "type": "module"
+}

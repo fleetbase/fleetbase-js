@@ -1,0 +1,12 @@
+{
+    "name": "@fleetbase/sdk-fixture-edge",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "node build.mjs"
+    },
+    "devDependencies": {
+        "@edge-runtime/vm": "5.0.0",
+        "esbuild": "0.28.2"
+    }
+}

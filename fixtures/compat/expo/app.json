@@ -1,0 +1,9 @@
+{
+    "expo": {
+        "name": "Fleetbase SDK Expo Fixture",
+        "slug": "fleetbase-sdk-expo-fixture",
+        "version": "1.0.0",
+        "platforms": ["android", "web"],
+        "web": { "bundler": "metro" }
+    }
+}
