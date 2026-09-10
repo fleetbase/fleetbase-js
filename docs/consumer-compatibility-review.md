@@ -8,7 +8,7 @@ The release-base adapter, JSON body, header, GeoJSON, and declaration issues are
 
 CI now exercises packed ESM/CJS behavior across Node 20.19.4, 22.13, and 24, plus TypeScript 5.0.4/6.0.2. Node 20 is retained for legacy consumer compatibility, not recommended for new deployments.
 
-Release metadata now consistently targets 2.0.0. The tag-triggered, protected npm workflow is restored in `publish.yml`, disabled unless the owner enables `NPM_PUBLISH_ENABLED` after configuring the `npm` environment and trusted publisher. The environment and variable were not present in the repository checks during remediation. No package was published. The workflow definitions are prepared for `main`; default-branch migration and native device acceptance remain coordinated owner gates.
+Release metadata now consistently targets 2.0.0. The tag-triggered, protected npm workflow is restored in `publish.yml`, disabled unless the owner enables `NPM_PUBLISH_ENABLED` after configuring the `npm` environment and trusted publisher. The environment and variable were not present in the repository checks during remediation. No package was published. `main` is now the default branch with its existing approval rule preserved; `master` remains a compatibility branch. Required status checks, publishing configuration, and native device acceptance remain owner gates.
 
 PR #35 response handling and type exports are addressed separately on its own branch, keeping review history intact. Its final results are recorded in that PR. The historical findings and original test evidence below are retained for traceability.
 
