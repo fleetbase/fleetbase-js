@@ -6,6 +6,19 @@ import { createCollection } from './collection.js';
 import { isLatitude, isLongitude, isPhone, Point } from './utils.js';
 import type { AdapterLike, Identifier, RequestOptions, ResourceAttributes, ResourceOptions } from './types.js';
 
+/** Raw connection returned by trailer attach; not a Trailer representation. */
+export interface AssetConnectionAttributes extends ResourceAttributes {
+    id: string;
+}
+export interface TrailerDetachResponse {
+    status: string;
+    connection: AssetConnectionAttributes | null;
+}
+export interface WorkOrderSendResponse {
+    status: string;
+    message: string;
+}
+
 type ActionStore = Store & Record<string, unknown>;
 
 function callAction(store: Store, name: string, ...args: unknown[]): Promise<unknown> {
@@ -18,6 +31,15 @@ function callAction(store: Store, name: string, ...args: unknown[]): Promise<unk
 
 function resourceId(value: unknown): unknown {
     return isResource(value) ? value.id : value;
+}
+
+type ResourceConstructor<T extends Resource> = new (attributes: ResourceAttributes, adapter?: AdapterLike | null) => T;
+
+function serializeResources<T extends Resource>(Constructor: ResourceConstructor<T>, response: unknown, adapter: AdapterLike): T | ReturnType<typeof createCollection<T>> {
+    if (Array.isArray(response)) {
+        return createCollection<T>(response.map((attributes) => new Constructor(attributes as ResourceAttributes, adapter)));
+    }
+    return new Constructor(response as ResourceAttributes, adapter);
 }
 
 export class Contact extends Resource {
@@ -44,9 +66,114 @@ export class Vendor extends Resource {
     }
 }
 
+export const vehicleActions = new StoreActions({
+    /** `GET vehicles/{id}/trailers` — the trailers currently connected to a vehicle. */
+    trailers(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.get(`${this.namespace}/${String(id)}/trailers`, params, options).then((response) => serializeResources(Trailer, response, this.adapter));
+    },
+});
+
 export class Vehicle extends Resource {
     constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
-        super(attributes, adapter, 'vehicle', options);
+        super(attributes, adapter, 'vehicle', { actions: vehicleActions, ...options });
+    }
+    trailers(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
+        return callAction(this.store, 'trailers', this.id, params, options);
+    }
+}
+
+export const trailerActions = new StoreActions({
+    /** `POST trailers/{id}/attach` — connect the trailer to a vehicle (`{ vehicle, connected_at?, source?, position? }`). */
+    attach(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post(`${this.namespace}/${String(id)}/attach`, params, options) as Promise<AssetConnectionAttributes>;
+    },
+    /** `POST trailers/{id}/detach` — disconnect the trailer from its vehicle (`{ disconnected_at?, notes? }`). */
+    detach(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post(`${this.namespace}/${String(id)}/detach`, params, options) as Promise<TrailerDetachResponse>;
+    },
+    /** `GET trailers/{id}/connections` — the trailer's connection history. */
+    connections(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.get(`${this.namespace}/${String(id)}/connections`, params, options);
+    },
+    /** `PATCH trailers/{id}/track` — record a position or telemetry update for the trailer. */
+    track(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.patch(`${this.namespace}/${String(id)}/track`, params, options).then((response) => this.afterFetch(response));
+    },
+});
+
+export class Trailer extends Resource {
+    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
+        super(attributes, adapter, 'trailer', { actions: trailerActions, ...options });
+    }
+    attach(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<AssetConnectionAttributes> {
+        return callAction(this.store, 'attach', this.id, params, options) as Promise<AssetConnectionAttributes>;
+    }
+    detach(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<TrailerDetachResponse> {
+        return callAction(this.store, 'detach', this.id, params, options) as Promise<TrailerDetachResponse>;
+    }
+    connections(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
+        return callAction(this.store, 'connections', this.id, params, options);
+    }
+    track(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
+        return callAction(this.store, 'track', this.id, params, options);
+    }
+}
+
+export const manifestActions = new StoreActions({
+    /** `POST manifests/{id}/optimize` — re-sequence the manifest's stops, optionally from `{ latitude, longitude }`. */
+    optimize(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post(`${this.namespace}/${String(id)}/optimize`, params, options).then((response) => this.afterFetch(response));
+    },
+});
+
+/** A driver's route for the day. Read and run only: creating and cancelling manifests is dispatch work on the internal API. */
+export class Manifest extends Resource {
+    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
+        super(attributes, adapter, 'manifest', { actions: manifestActions, ...options });
+    }
+    optimize(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
+        return callAction(this.store, 'optimize', this.id, params, options);
+    }
+}
+
+export const manifestStopActions = new StoreActions({
+    /** `PATCH manifest-stops/{id}` — advance a stop (`{ status: 'arrived' | 'completed' | 'skipped', meta? }`). Replaces the store's default `PUT`. */
+    update(this: Store, id: Identifier, attributes: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.patch(`${this.namespace}/${String(id)}`, attributes, options).then((response) => this.afterFetch(response));
+    },
+});
+
+export class ManifestStop extends Resource {
+    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
+        super(attributes, adapter, 'manifest-stop', { actions: manifestStopActions, ...options });
+    }
+}
+
+export class FuelReport extends Resource {
+    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
+        super(attributes, adapter, 'fuel-report', options);
+    }
+}
+
+export class Issue extends Resource {
+    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
+        super(attributes, adapter, 'issue', options);
+    }
+}
+
+export const workOrderActions = new StoreActions({
+    /** `POST work-orders/{id}/send` — send the work order to its assignee. */
+    send(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post(`${this.namespace}/${String(id)}/send`, params, options) as Promise<WorkOrderSendResponse>;
+    },
+});
+
+export class WorkOrder extends Resource {
+    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
+        super(attributes, adapter, 'work-order', { actions: workOrderActions, ...options });
+    }
+    send(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<WorkOrderSendResponse> {
+        return callAction(this.store, 'send', this.id, params, options) as Promise<WorkOrderSendResponse>;
     }
 }
 
@@ -221,6 +348,22 @@ export const driverActions = new StoreActions({
     syncDevice(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
         return this.adapter.post(`drivers/${String(id)}/register-device`, params, options);
     },
+    /** `GET drivers/{id}/manifests` — the driver's manifests, filterable by `{ status?, on?, limit? }`. */
+    manifests(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.get(`drivers/${String(id)}/manifests`, params, options).then((response) => serializeResources(Manifest, response, this.adapter));
+    },
+    /** `POST drivers/{id}/change-password` — requires proof of the current password. */
+    changePassword(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post(`drivers/${String(id)}/change-password`, params, options);
+    },
+    /** `POST drivers/forgot-password` — start a password reset for an identity. */
+    forgotPassword(this: Store, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post('drivers/forgot-password', params, options);
+    },
+    /** `POST drivers/reset-password` — complete a password reset with the emailed code. */
+    resetPassword(this: Store, params: ResourceAttributes = {}, options: RequestOptions = {}) {
+        return this.adapter.post('drivers/reset-password', params, options);
+    },
 });
 
 export class Driver extends Resource {
@@ -269,6 +412,12 @@ export class Driver extends Resource {
     }
     currentOrganization(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
         return callAction(this.store, 'currentOrganization', this.id, params, options);
+    }
+    manifests(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
+        return callAction(this.store, 'manifests', this.id, params, options);
+    }
+    changePassword(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
+        return callAction(this.store, 'changePassword', this.id, params, options);
     }
 }
 
@@ -408,6 +557,10 @@ for (const [name, constructor] of Object.entries({
     Driver,
     Entity,
     Fleet,
+    FuelReport,
+    Issue,
+    Manifest,
+    ManifestStop,
     Order,
     Organization,
     Payload,
@@ -416,9 +569,11 @@ for (const [name, constructor] of Object.entries({
     ServiceQuote,
     ServiceRate,
     TrackingStatus,
+    Trailer,
     Vehicle,
     Vendor,
     Waypoint,
+    WorkOrder,
     Zone,
 })) {
     register('resource', name, constructor);

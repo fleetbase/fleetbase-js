@@ -16,9 +16,13 @@ import Fleetbase, {
     Entity,
     Fleet,
     FleetbaseError,
+    FuelReport,
     GoogleAddress,
     isResource,
     isCollection,
+    Issue,
+    Manifest,
+    ManifestStop,
     objectAt,
     NodeAdapter,
     Order,
@@ -38,10 +42,12 @@ import Fleetbase, {
     Store,
     StoreActions,
     TrackingStatus,
+    Trailer,
     uniqBy,
     Vehicle,
     Vendor,
     Waypoint,
+    WorkOrder,
     Zone,
 } from '../src/index.js';
 import Resolver from '../src/resolver.js';
@@ -432,6 +438,238 @@ describe('resources, stores, and SDK compatibility', () => {
         const error = new FleetbaseError('bad', { status: 400, code: 'BAD', requestId: 'req', response: {}, cause: new Error('cause') });
         expect(error).toBeInstanceOf(Error);
         expect(error).toMatchObject({ name: 'FleetbaseError', status: 400, code: 'BAD', requestId: 'req' });
+    });
+});
+
+describe('driver app stores', () => {
+    const lastCall = (adapter: RecordingAdapter) => {
+        const [method, path, body] = adapter.calls.at(-1)!;
+        return { method, path, body };
+    };
+
+    it('exposes the FleetOps driver app stores on the client and registers their resources', () => {
+        const sdk = new Fleetbase('pk_test', { adapter: new RecordingAdapter() });
+        expect(sdk.manifests.namespace).toBe('manifests');
+        expect(sdk.manifestStops.namespace).toBe('manifest-stops');
+        expect(sdk.trailers.namespace).toBe('trailers');
+        expect(sdk.fuelReports.namespace).toBe('fuel-reports');
+        expect(sdk.issues.namespace).toBe('issues');
+        expect(sdk.workOrders.namespace).toBe('work-orders');
+        const replacement = new RecordingAdapter();
+        sdk.setAdapter(replacement);
+        for (const store of [sdk.manifests, sdk.manifestStops, sdk.trailers, sdk.fuelReports, sdk.issues, sdk.workOrders]) {
+            expect(store).toBeInstanceOf(Store);
+            expect(store.adapter).toBe(replacement);
+        }
+        for (const Constructor of [FuelReport, Issue, Manifest, ManifestStop, Trailer, WorkOrder]) {
+            expect(resolveResource<Resource>(Constructor.name, {})).toBeInstanceOf(Constructor);
+        }
+    });
+
+    it('reads, optimizes, and lists manifests', async () => {
+        const adapter = new RecordingAdapter();
+        const sdk = new Fleetbase('pk_test', { adapter });
+        adapter.response = { id: 'manifest_1' };
+        expect(await sdk.manifests.findRecord('manifest_1')).toBeInstanceOf(Manifest);
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'manifests/manifest_1', body: {} });
+
+        expect(await sdk.manifests.optimize('manifest_1', { latitude: 1.5, longitude: 2.5 })).toBeInstanceOf(Manifest);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'manifests/manifest_1/optimize', body: { latitude: 1.5, longitude: 2.5 } });
+
+        adapter.response = [{ id: 'manifest_1' }, { id: 'manifest_2' }];
+        const manifests = (await sdk.drivers.manifests('driver_1', { status: 'active', on: '2026-09-09', limit: 30 })) as Collection<Manifest>;
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'drivers/driver_1/manifests', body: { status: 'active', on: '2026-09-09', limit: 30 } });
+        expect(manifests).toBeInstanceOf(Collection);
+        expect(manifests).toHaveLength(2);
+        expect(manifests[0]).toBeInstanceOf(Manifest);
+
+        adapter.response = { id: 'manifest_1' };
+        const manifest = new Manifest({ id: 'manifest_1' }, adapter);
+        await manifest.optimize();
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'manifests/manifest_1/optimize', body: {} });
+        const driver = new Driver({ id: 'driver_1' }, adapter);
+        expect(await driver.manifests()).toBeInstanceOf(Manifest);
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'drivers/driver_1/manifests', body: {} });
+    });
+
+    it('advances manifest stops with PATCH', async () => {
+        const adapter = new RecordingAdapter();
+        const sdk = new Fleetbase('pk_test', { adapter });
+        adapter.response = { id: 'stop_1', status: 'arrived' };
+        expect(await sdk.manifestStops.update('stop_1', { status: 'arrived', meta: { note: 'gate 4' } })).toBeInstanceOf(ManifestStop);
+        expect(lastCall(adapter)).toEqual({ method: 'PATCH', path: 'manifest-stops/stop_1', body: { status: 'arrived', meta: { note: 'gate 4' } } });
+
+        const stop = new ManifestStop({ id: 'stop_1' }, adapter);
+        await stop.update({ status: 'completed' });
+        expect(lastCall(adapter)).toEqual({ method: 'PATCH', path: 'manifest-stops/stop_1', body: { status: 'completed' } });
+    });
+
+    it('manages trailers, their connections, and vehicle trailers', async () => {
+        const adapter = new RecordingAdapter();
+        const sdk = new Fleetbase('pk_test', { adapter });
+        adapter.response = { id: 'trailer_1' };
+        expect(await sdk.trailers.create({ name: 'T-1' })).toBeInstanceOf(Trailer);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'trailers', body: { name: 'T-1' } });
+        await sdk.trailers.findRecord('trailer_1');
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'trailers/trailer_1', body: {} });
+        await sdk.trailers.update('trailer_1', { name: 'T-2' });
+        expect(lastCall(adapter)).toEqual({ method: 'PUT', path: 'trailers/trailer_1', body: { name: 'T-2' } });
+        await sdk.trailers.destroy('trailer_1');
+        expect(lastCall(adapter)).toEqual({ method: 'DELETE', path: 'trailers/trailer_1', body: {} });
+
+        adapter.response = { id: 'asset_connection_1', trailer: { id: 'trailer_1' }, vehicle: { id: 'vehicle_1' } };
+        expect(await sdk.trailers.attach('trailer_1', { vehicle: 'vehicle_1', connected_at: '2026-09-09T08:00:00Z', source: 'driver', position: 1 })).toEqual(adapter.response);
+        expect(lastCall(adapter)).toEqual({
+            method: 'POST',
+            path: 'trailers/trailer_1/attach',
+            body: { vehicle: 'vehicle_1', connected_at: '2026-09-09T08:00:00Z', source: 'driver', position: 1 },
+        });
+        adapter.response = { status: 'ok', connection: null };
+        expect(await sdk.trailers.detach('trailer_1', { disconnected_at: '2026-09-09T17:00:00Z', notes: 'end of shift' })).toEqual(adapter.response);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'trailers/trailer_1/detach', body: { disconnected_at: '2026-09-09T17:00:00Z', notes: 'end of shift' } });
+
+        adapter.response = [{ id: 'connection_1' }];
+        expect(await sdk.trailers.connections('trailer_1')).toEqual([{ id: 'connection_1' }]);
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'trailers/trailer_1/connections', body: {} });
+
+        adapter.response = { id: 'trailer_1' };
+        expect(await sdk.trailers.track('trailer_1', { latitude: 1, longitude: 2 })).toBeInstanceOf(Trailer);
+        expect(lastCall(adapter)).toEqual({ method: 'PATCH', path: 'trailers/trailer_1/track', body: { latitude: 1, longitude: 2 } });
+
+        adapter.response = [{ id: 'trailer_1' }, { id: 'trailer_2' }];
+        const trailers = (await sdk.vehicles.trailers('vehicle_1')) as Collection<Trailer>;
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'vehicles/vehicle_1/trailers', body: {} });
+        expect(trailers).toHaveLength(2);
+        expect(trailers[1]).toBeInstanceOf(Trailer);
+
+        adapter.response = { id: 'trailer_1' };
+        const trailer = new Trailer({ id: 'trailer_1' }, adapter);
+        await trailer.attach({ vehicle: 'vehicle_1' });
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'trailers/trailer_1/attach', body: { vehicle: 'vehicle_1' } });
+        await trailer.detach();
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'trailers/trailer_1/detach', body: {} });
+        await trailer.connections();
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'trailers/trailer_1/connections', body: {} });
+        await trailer.track({ odometer: 10 });
+        expect(lastCall(adapter)).toEqual({ method: 'PATCH', path: 'trailers/trailer_1/track', body: { odometer: 10 } });
+        const vehicle = new Vehicle({ id: 'vehicle_1' }, adapter);
+        expect(await vehicle.trailers()).toBeInstanceOf(Trailer);
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'vehicles/vehicle_1/trailers', body: {} });
+    });
+
+    it('performs CRUD on fuel reports, issues, and work orders, and sends work orders', async () => {
+        const adapter = new RecordingAdapter();
+        const sdk = new Fleetbase('pk_test', { adapter });
+
+        adapter.response = [{ id: 'fuel_report_1' }];
+        const reports = (await sdk.fuelReports.query({ driver: 'driver_1', sort: '-created_at' })) as Collection<FuelReport>;
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'fuel-reports', body: { driver: 'driver_1', sort: '-created_at' } });
+        expect(reports[0]).toBeInstanceOf(FuelReport);
+        adapter.response = { id: 'fuel_report_1' };
+        expect(await sdk.fuelReports.create({ volume: 10, odometer: 1200 })).toBeInstanceOf(FuelReport);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'fuel-reports', body: { volume: 10, odometer: 1200 } });
+        await sdk.fuelReports.findRecord('fuel_report_1');
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'fuel-reports/fuel_report_1', body: {} });
+        await sdk.fuelReports.update('fuel_report_1', { volume: 12 });
+        expect(lastCall(adapter)).toEqual({ method: 'PUT', path: 'fuel-reports/fuel_report_1', body: { volume: 12 } });
+        await sdk.fuelReports.destroy('fuel_report_1');
+        expect(lastCall(adapter)).toEqual({ method: 'DELETE', path: 'fuel-reports/fuel_report_1', body: {} });
+
+        adapter.response = [{ id: 'issue_1' }];
+        const issues = (await sdk.issues.query({ driver: 'driver_1' })) as Collection<Issue>;
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'issues', body: { driver: 'driver_1' } });
+        expect(issues[0]).toBeInstanceOf(Issue);
+        adapter.response = { id: 'issue_1' };
+        expect(await sdk.issues.create({ report: 'flat tyre' })).toBeInstanceOf(Issue);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'issues', body: { report: 'flat tyre' } });
+        await sdk.issues.findRecord('issue_1');
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'issues/issue_1', body: {} });
+        await sdk.issues.update('issue_1', { status: 'resolved' });
+        expect(lastCall(adapter)).toEqual({ method: 'PUT', path: 'issues/issue_1', body: { status: 'resolved' } });
+        await sdk.issues.destroy('issue_1');
+        expect(lastCall(adapter)).toEqual({ method: 'DELETE', path: 'issues/issue_1', body: {} });
+
+        adapter.response = { id: 'work_order_1' };
+        expect(await sdk.workOrders.create({ title: 'Brake check' })).toBeInstanceOf(WorkOrder);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'work-orders', body: { title: 'Brake check' } });
+        await sdk.workOrders.query({ status: 'open' });
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'work-orders', body: { status: 'open' } });
+        await sdk.workOrders.findRecord('work_order_1');
+        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'work-orders/work_order_1', body: {} });
+        await sdk.workOrders.update('work_order_1', { status: 'in_progress' });
+        expect(lastCall(adapter)).toEqual({ method: 'PUT', path: 'work-orders/work_order_1', body: { status: 'in_progress' } });
+        await sdk.workOrders.destroy('work_order_1');
+        expect(lastCall(adapter)).toEqual({ method: 'DELETE', path: 'work-orders/work_order_1', body: {} });
+        adapter.response = { status: 'ok', message: 'Work order sent.' };
+        expect(await sdk.workOrders.send('work_order_1')).toEqual(adapter.response);
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'work-orders/work_order_1/send', body: {} });
+        const workOrder = new WorkOrder({ id: 'work_order_1' }, adapter);
+        await workOrder.send({ notify: true });
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'work-orders/work_order_1/send', body: { notify: true } });
+    });
+
+    it('preserves resource identity across connection and acknowledgement actions', async () => {
+        const adapter = new RecordingAdapter();
+        const trailer = new Trailer({ id: 'trailer_1', name: 'T-1' }, adapter);
+        const original = trailer.serialize();
+        const connection = { id: 'asset_connection_1', trailer: { id: 'trailer_1' }, vehicle: { id: 'vehicle_1' } };
+        adapter.response = connection;
+        expect(await trailer.attach({ vehicle: 'vehicle_1' })).toBe(connection);
+        expect(trailer.serialize()).toEqual(original);
+        for (const detachedConnection of [connection, null]) {
+            const ack = { status: 'ok', connection: detachedConnection };
+            adapter.response = ack;
+            expect(await trailer.detach()).toBe(ack);
+            expect(trailer.id).toBe('trailer_1');
+            expect(trailer.serialize()).toEqual(original);
+        }
+        adapter.response = { id: 'trailer_1', name: 'T-1', odometer: 10 };
+        await trailer.track({ odometer: 10 });
+        expect(lastCall(adapter).path).toBe('trailers/trailer_1/track');
+        expect(trailer.getAttribute('odometer')).toBe(10);
+        const workOrder = new WorkOrder({ id: 'work_order_1', status: 'open' }, adapter);
+        const workAttributes = workOrder.serialize();
+        adapter.response = { status: 'ok', message: 'Work order sent.' };
+        expect(await workOrder.send()).toBe(adapter.response);
+        expect(workOrder.serialize()).toEqual(workAttributes);
+        expect(workOrder.id).toBe('work_order_1');
+        expect(workOrder.getAttribute('status')).toBe('open');
+        adapter.response = { id: 'work_order_1', status: 'in_progress' };
+        await workOrder.update({ status: 'in_progress' });
+        expect(lastCall(adapter).path).toBe('work-orders/work_order_1');
+        adapter.failure = new Error('denied');
+        await expect(trailer.attach()).rejects.toThrow('denied');
+        await expect(trailer.detach()).rejects.toThrow('denied');
+        await expect(workOrder.send()).rejects.toThrow('denied');
+        expect(trailer.id).toBe('trailer_1');
+        expect(workOrder.id).toBe('work_order_1');
+        const sdk = new Fleetbase('pk', { adapter });
+        expect('inspections' in sdk).toBe(false);
+        expect('inspectionForms' in sdk).toBe(false);
+        expect('inspections' in sdk.vehicles).toBe(false);
+    });
+
+    it('changes, forgets, and resets driver passwords', async () => {
+        const adapter = new RecordingAdapter();
+        const sdk = new Fleetbase('pk_test', { adapter });
+        adapter.response = { status: 'ok' };
+        expect(await sdk.drivers.changePassword('driver_1', { password: 'old', new_password: 'new', new_password_confirmation: 'new' })).toEqual({ status: 'ok' });
+        expect(lastCall(adapter)).toEqual({
+            method: 'POST',
+            path: 'drivers/driver_1/change-password',
+            body: { password: 'old', new_password: 'new', new_password_confirmation: 'new' },
+        });
+        await sdk.drivers.forgotPassword({ identity: 'driver@example.com' });
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'drivers/forgot-password', body: { identity: 'driver@example.com' } });
+        await sdk.drivers.resetPassword({ identity: 'driver@example.com', code: '123456', password: 'new', password_confirmation: 'new' });
+        expect(lastCall(adapter)).toEqual({
+            method: 'POST',
+            path: 'drivers/reset-password',
+            body: { identity: 'driver@example.com', code: '123456', password: 'new', password_confirmation: 'new' },
+        });
+        const driver = new Driver({ id: 'driver_1' }, adapter);
+        await driver.changePassword({ password: 'old', new_password: 'new' });
+        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'drivers/driver_1/change-password', body: { password: 'old', new_password: 'new' } });
     });
 });
 
