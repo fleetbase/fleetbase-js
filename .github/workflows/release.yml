@@ -1,117 +1,44 @@
-name: Release
+name: Release Tag
+
+# Tags a release when a release branch is merged to main, and pushes the tag.
+# Delegates to the reusable workflow in fleetbase/fleetbase. Requires org secret
+# _GITHUB_AUTH_TOKEN (inherited); no-ops with a warning until it is set.
+#
+# Branch convention is `release/v0.0.0`; the legacy `dev-v0.0.0` is still accepted so
+# branches opened before the rename still release.
+#
+# It pushes the tag and nothing else; publish.yml handles review-gated npm publication.
+#
+# The version is never retyped: it comes from the branch name, and the tag is refused
+# unless package.json and RELEASE.md already agree with it.
+#
+# RELEASE.md is required, and its first line must name the version being released. That
+# check is the only thing that can tell notes written for this release from the previous
+# release's notes nobody replaced.
+#
+# workflow_dispatch is the recovery path, for when a release fails validation and the fix
+# lands on main after the merge.
 
 on:
-    push:
+    pull_request:
+        types: [closed]
         branches: [main]
     workflow_dispatch:
-
-concurrency:
-    group: release
-    cancel-in-progress: false
-
+        inputs:
+            version:
+                description: 'Version to tag, e.g. 1.2.3. Recovery only — a normal release reads it from the branch.'
+                required: true
 permissions:
     contents: read
 
 jobs:
-    select-mode:
-        name: Select release mode
-        if: github.ref == 'refs/heads/main'
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-        outputs:
-            mode: ${{ steps.select-mode.outputs.mode }}
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-            - uses: pnpm/action-setup@v4
-              with:
-                  run_install: false
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 24.x
-                  cache: pnpm
-            - run: pnpm install --frozen-lockfile
-            - name: Select version, publish, or no-op
-              id: select-mode
-              uses: changesets/action/select-mode@v2
-
-    version:
-        name: Create or update release PR
-        if: needs.select-mode.outputs.mode == 'version'
-        needs: select-mode
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-        permissions:
-            contents: write
-            pull-requests: write
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-            - uses: pnpm/action-setup@v4
-              with:
-                  run_install: false
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 24.x
-                  cache: pnpm
-            - run: pnpm install --frozen-lockfile
-            - name: Create reviewed version pull request
-              uses: changesets/action/version@v2
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: pnpm run version-packages
-                  commit-message: 'chore: release packages'
-                  pr-title: 'chore: release packages'
-
-    publish:
-        name: Publish reviewed version
-        if: needs.select-mode.outputs.mode == 'publish'
-        needs: select-mode
-        runs-on: ubuntu-latest
-        timeout-minutes: 20
-        environment: npm
-        permissions:
-            contents: write
-            id-token: write
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-            - uses: pnpm/action-setup@v4
-              with:
-                  run_install: false
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 24.x
-                  cache: pnpm
-                  registry-url: https://registry.npmjs.org
-            - run: pnpm install --frozen-lockfile
-            - run: pnpm run verify
-            - name: Publish immutable candidate with provenance
-              run: pnpm run publish:ci
-              env:
-                  NPM_CONFIG_PROVENANCE: true
-            - name: Verify exact registry artifact
-              run: node scripts/verify-published.mjs
-            - name: Upload immutable release evidence
-              uses: actions/upload-artifact@v4
-              with:
-                  name: npm-release-${{ github.sha }}
-                  path: |
-                      artifacts/*.tgz
-                      artifacts/SHA256SUMS
-                  if-no-files-found: error
-                  retention-days: 90
-            - name: Create GitHub release
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  version=$(node -p "require('./package.json').version")
-                  tag="v${version}"
-                  if gh release view "$tag" >/dev/null 2>&1; then
-                      echo "GitHub release $tag already exists."
-                  else
-                      gh release create "$tag" artifacts/*.tgz artifacts/SHA256SUMS --generate-notes --target "$GITHUB_SHA" --title "$tag"
-                  fi
+    tag:
+        if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+            (github.event.pull_request.merged == true &&
+            (startsWith(github.event.pull_request.head.ref, 'release/v') ||
+            startsWith(github.event.pull_request.head.ref, 'dev-v')))
+        uses: fleetbase/fleetbase/.github/workflows/release-tag.yml@main
+        with:
+            version-files: package.json
+            version: ${{ github.event.inputs.version || '' }}
+        secrets: inherit

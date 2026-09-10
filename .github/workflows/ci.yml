@@ -4,7 +4,7 @@ on:
     push:
         branches: [main, master]
     pull_request:
-        branches: [main, master]
+        branches: [main, master, 'release/**']
     workflow_dispatch:
 
 concurrency:
@@ -34,6 +34,11 @@ jobs:
             - run: pnpm run format:check
             - run: pnpm run lint
             - run: pnpm run typecheck
+            - name: Validate release metadata
+              if: startsWith(github.head_ref, 'release/v')
+              env:
+                  RELEASE_BRANCH: ${{ github.head_ref }}
+              run: node scripts/validate-release.mjs "${RELEASE_BRANCH#release/}"
 
     test:
         name: Test / Node ${{ matrix.node }}
@@ -92,21 +97,23 @@ jobs:
                   retention-days: 14
 
     cross-platform:
-        name: Smoke / ${{ matrix.os }}
+        name: Smoke / ${{ matrix.os }} / Node ${{ matrix.node }}
         needs: package
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest, windows-latest]
+                node: [20.19.4, 22.13.0, 24.x]
         steps:
+            - uses: actions/checkout@v4
             - uses: actions/download-artifact@v4
               with:
                   name: npm-package
                   path: artifacts
             - uses: actions/setup-node@v4
               with:
-                  node-version: 22.13.0
+                  node-version: ${{ matrix.node }}
             - name: Install exact candidate
               run: node -e "const fs=require('fs'); fs.mkdirSync('consumer'); fs.writeFileSync('consumer/package.json', JSON.stringify({name:'sdk-consumer',private:true,type:'module'}))"
             - run: npm install ../artifacts/fleetbase-sdk.tgz
@@ -114,6 +121,8 @@ jobs:
             - run: node --input-type=module -e "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)"
               working-directory: consumer
             - run: node -e "const sdk = require('@fleetbase/sdk'); if (typeof sdk.default !== 'function') process.exit(1)"
+              working-directory: consumer
+            - run: node ../scripts/verify-runtime.mjs
               working-directory: consumer
 
     package-manager:
@@ -160,13 +169,14 @@ jobs:
               run: bun add ../artifacts/fleetbase-sdk.tgz && bun --eval "import Fleetbase from '@fleetbase/sdk'; if (typeof Fleetbase !== 'function') process.exit(1)"
 
     type-consumer:
-        name: Types / ${{ matrix.resolution }}
+        name: Types / ${{ matrix.resolution }} / TS ${{ matrix.typescript }}
         needs: package
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
                 resolution: [node16, nodenext, bundler]
+                typescript: [5.0.4, 6.0.2]
         steps:
             - uses: actions/checkout@v4
             - uses: actions/download-artifact@v4
@@ -178,7 +188,7 @@ jobs:
                   node-version: 22.13.0
             - name: Install exact candidate and TypeScript
               working-directory: fixtures/types
-              run: npm install ../../artifacts/fleetbase-sdk.tgz typescript@6.0.2
+              run: npm install ../../artifacts/fleetbase-sdk.tgz typescript@${{ matrix.typescript }}
             - name: Compile strict consumer
               working-directory: fixtures/types
               run: npx tsc -p tsconfig.${{ matrix.resolution }}.json

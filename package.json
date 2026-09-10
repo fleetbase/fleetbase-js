@@ -1,6 +1,6 @@
 {
     "name": "@fleetbase/sdk",
-    "version": "2.0.0-next.0",
+    "version": "2.0.0",
     "description": "Official JavaScript and TypeScript SDK for the Fleetbase API",
     "type": "module",
     "main": "./dist/index.cjs",
@@ -22,19 +22,20 @@
     },
     "files": [
         "dist",
+        "types",
         "README.md",
         "LICENSE.md",
         "CHANGELOG.md"
     ],
     "sideEffects": false,
     "engines": {
-        "node": ">=22.13.0"
+        "node": ">=20.19.4"
     },
     "packageManager": "pnpm@11.24.0",
     "publishConfig": {
         "access": "public",
         "provenance": true,
-        "tag": "next"
+        "tag": "latest"
     },
     "repository": {
         "type": "git",

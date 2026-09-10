@@ -19,6 +19,7 @@ const requiredFiles = new Set([
     'dist/index.js',
     'dist/index.js.map',
     'package.json',
+    'types/fleetbase.d.ts',
 ]);
 
 const { stdout } = await execute('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { maxBuffer: 10 * 1024 * 1024 });

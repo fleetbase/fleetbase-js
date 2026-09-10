@@ -1,8 +1,8 @@
 # Fleetbase JavaScript SDK modernization and v2 release plan
 
-Status: implementation in progress on PR #33
+Status: first-party SDK regressions remediated on draft PR #36; native acceptance and owner-controlled release gates remain. Historical implementation PR #33 was closed by the branch rename. See [consumer compatibility review](docs/consumer-compatibility-review.md).
 
-Target branch: `dev-v2.0.0`
+Target branch: `release/v2.0.0`
 
 Prepared: 2026-08-31
 
@@ -289,7 +289,7 @@ Gate: npm provenance and post-publish smoke checks succeed; rollback owner and p
 
 ## Pull-request slicing
 
-Use small PRs into `dev-v2.0.0`, each with a changeset only when it changes a published behavior. Suggested slices:
+Use small PRs into `release/v2.0.0`, each with a changeset only when it changes a published behavior. Suggested slices:
 
 1. CI/test runner foundation.
 2. v1 API and package contract snapshots.
