@@ -32,7 +32,7 @@ yarn add @fleetbase/sdk
 bun add @fleetbase/sdk
 ```
 
-The SDK supports Node.js 22.13 and newer. Its browser transport uses the standard Fetch API, so it works without framework-specific dependencies in modern browser applications and bundlers.
+The SDK supports Node.js 20.19.4 and newer at runtime, including legacy Node 20 consumers. Use Node 22/24 for maintained deployments; building this repository requires Node 22.13 or newer. Its browser transport uses the standard Fetch API, so it works without framework-specific dependencies in modern browser applications and bundlers.
 
 ## Quick start
 

@@ -2,7 +2,7 @@
 
 All notable changes to the Fleetbase JavaScript SDK are documented here. This project follows semantic versioning.
 
-## 2.0.0-next.0
+## 2.0.0
 
 ### Changed
 
@@ -15,3 +15,5 @@ All notable changes to the Fleetbase JavaScript SDK are documented here. This pr
 ### Fixed
 
 - Corrected CommonJS loading, type resolution, resource flag cleanup, dirty-only saves, resource emptying, collection behavior, longitude validation, adapter propagation, and response parsing.
+- Preserved BrowserAdapter subclass interception, serialized mutation envelopes, spreadable headers, and plain GeoJSON driver coordinates for first-party consumers.
+- Retained the legacy declaration entry and Node 20.19.4 runtime compatibility independently of build tooling.

@@ -1,6 +1,6 @@
 # Fleetbase JavaScript SDK modernization and v2 release plan
 
-Status: release blocked by first-party compatibility review; historical implementation PR #33 was closed by the branch rename. See [consumer compatibility review](docs/consumer-compatibility-review.md).
+Status: first-party SDK regressions remediated on draft PR #36; native acceptance and owner-controlled release gates remain. Historical implementation PR #33 was closed by the branch rename. See [consumer compatibility review](docs/consumer-compatibility-review.md).
 
 Target branch: `release/v2.0.0`
 

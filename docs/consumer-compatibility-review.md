@@ -1,6 +1,16 @@
 # First-party compatibility and PR #35 review
 
-Reviewed: 2026-09-10. Decision: **hold PR #35 and the v2 release**. The refactor does not currently preserve the behavior required by Navigator and Storefront. Passing SDK coverage and package checks are not application acceptance.
+Original review: 2026-09-10. The findings below describe the original revisions, not the fixed release candidate. Passing SDK coverage and package checks are not application acceptance.
+
+## Remediation update (2026-09-10)
+
+The release-base adapter, JSON body, header, GeoJSON, and declaration issues are fixed. A compatibility declaration entry preserves Navigator's existing path mapping; BrowserAdapter's host is now a non-null string. The exact packed base passes all nine diagnostic probes on Node 20.19.4 and the actual Storefront hook check. Navigator's adapter/provider suites pass 32/32 with the fixed build. Strict SDK coverage remains 100% across all four metrics (27 tests), and full package verification passes.
+
+CI now exercises packed ESM/CJS behavior across Node 20.19.4, 22.13, and 24, plus TypeScript 5.0.4/6.0.2. Node 20 is retained for legacy consumer compatibility, not recommended for new deployments.
+
+Release metadata now consistently targets 2.0.0. The tag-triggered, protected npm workflow is restored in `publish.yml`, disabled unless the owner enables `NPM_PUBLISH_ENABLED` after configuring the `npm` environment and trusted publisher. The environment and variable were not present in the repository checks during remediation. No package was published. The workflow definitions are prepared for `main`; default-branch migration and native device acceptance remain coordinated owner gates.
+
+PR #35 response handling and type exports are addressed separately on its own branch, keeping review history intact. Its final results are recorded in that PR. The historical findings and original test evidence below are retained for traceability.
 
 ## Reviewed revisions and scope
 

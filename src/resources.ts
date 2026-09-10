@@ -3,7 +3,7 @@ import { register } from './registry.js';
 import type Store from './store.js';
 import StoreActions from './store-actions.js';
 import { createCollection } from './collection.js';
-import { isPhone, Point } from './utils.js';
+import { isLatitude, isLongitude, isPhone, Point } from './utils.js';
 import type { AdapterLike, Identifier, RequestOptions, ResourceAttributes, ResourceOptions } from './types.js';
 
 type ActionStore = Store & Record<string, unknown>;
@@ -244,7 +244,16 @@ export class Driver extends Resource {
     }
     private get location(): Point {
         const value = this.getAttribute('location');
-        return value instanceof Point ? value : new Point();
+        if (value instanceof Point) {
+            return value;
+        }
+        if (value && typeof value === 'object' && 'coordinates' in value) {
+            const coordinates = value.coordinates;
+            if (Array.isArray(coordinates) && coordinates.length >= 2 && isLongitude(coordinates[0]) && isLatitude(coordinates[1])) {
+                return Point.fromGeoJson({ coordinates: [Number(coordinates[0]), Number(coordinates[1])] });
+            }
+        }
+        return new Point();
     }
     track(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
         return callAction(this.store, 'track', this.id, params, options);
