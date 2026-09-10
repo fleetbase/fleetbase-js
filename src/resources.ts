@@ -6,6 +6,19 @@ import { createCollection } from './collection.js';
 import { isLatitude, isLongitude, isPhone, Point } from './utils.js';
 import type { AdapterLike, Identifier, RequestOptions, ResourceAttributes, ResourceOptions } from './types.js';
 
+/** Raw connection returned by trailer attach; not a Trailer representation. */
+export interface AssetConnectionAttributes extends ResourceAttributes {
+    id: string;
+}
+export interface TrailerDetachResponse {
+    status: string;
+    connection: AssetConnectionAttributes | null;
+}
+export interface WorkOrderSendResponse {
+    status: string;
+    message: string;
+}
+
 type ActionStore = Store & Record<string, unknown>;
 
 function callAction(store: Store, name: string, ...args: unknown[]): Promise<unknown> {
@@ -58,13 +71,6 @@ export const vehicleActions = new StoreActions({
     trailers(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
         return this.adapter.get(`${this.namespace}/${String(id)}/trailers`, params, options).then((response) => serializeResources(Trailer, response, this.adapter));
     },
-    /**
-     * `GET vehicles/{id}/inspections` — inspection history for a vehicle.
-     * Available from the FleetOps release that ships the driver inspection API.
-     */
-    inspections(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
-        return this.adapter.get(`${this.namespace}/${String(id)}/inspections`, params, options).then((response) => serializeResources(Inspection, response, this.adapter));
-    },
 });
 
 export class Vehicle extends Resource {
@@ -74,20 +80,16 @@ export class Vehicle extends Resource {
     trailers(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
         return callAction(this.store, 'trailers', this.id, params, options);
     }
-    /** Available from the FleetOps release that ships the driver inspection API. */
-    inspections(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
-        return callAction(this.store, 'inspections', this.id, params, options);
-    }
 }
 
 export const trailerActions = new StoreActions({
     /** `POST trailers/{id}/attach` — connect the trailer to a vehicle (`{ vehicle, connected_at?, source?, position? }`). */
     attach(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
-        return this.adapter.post(`${this.namespace}/${String(id)}/attach`, params, options).then((response) => this.afterFetch(response));
+        return this.adapter.post(`${this.namespace}/${String(id)}/attach`, params, options) as Promise<AssetConnectionAttributes>;
     },
     /** `POST trailers/{id}/detach` — disconnect the trailer from its vehicle (`{ disconnected_at?, notes? }`). */
     detach(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
-        return this.adapter.post(`${this.namespace}/${String(id)}/detach`, params, options).then((response) => this.afterFetch(response));
+        return this.adapter.post(`${this.namespace}/${String(id)}/detach`, params, options) as Promise<TrailerDetachResponse>;
     },
     /** `GET trailers/{id}/connections` — the trailer's connection history. */
     connections(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
@@ -103,11 +105,11 @@ export class Trailer extends Resource {
     constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
         super(attributes, adapter, 'trailer', { actions: trailerActions, ...options });
     }
-    attach(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
-        return callAction(this.store, 'attach', this.id, params, options);
+    attach(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<AssetConnectionAttributes> {
+        return callAction(this.store, 'attach', this.id, params, options) as Promise<AssetConnectionAttributes>;
     }
-    detach(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
-        return callAction(this.store, 'detach', this.id, params, options);
+    detach(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<TrailerDetachResponse> {
+        return callAction(this.store, 'detach', this.id, params, options) as Promise<TrailerDetachResponse>;
     }
     connections(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
         return callAction(this.store, 'connections', this.id, params, options);
@@ -162,7 +164,7 @@ export class Issue extends Resource {
 export const workOrderActions = new StoreActions({
     /** `POST work-orders/{id}/send` — send the work order to its assignee. */
     send(this: Store, id: Identifier, params: ResourceAttributes = {}, options: RequestOptions = {}) {
-        return this.adapter.post(`${this.namespace}/${String(id)}/send`, params, options).then((response) => this.afterFetch(response));
+        return this.adapter.post(`${this.namespace}/${String(id)}/send`, params, options) as Promise<WorkOrderSendResponse>;
     },
 });
 
@@ -170,28 +172,8 @@ export class WorkOrder extends Resource {
     constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
         super(attributes, adapter, 'work-order', { actions: workOrderActions, ...options });
     }
-    send(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<unknown> {
-        return callAction(this.store, 'send', this.id, params, options);
-    }
-}
-
-/**
- * An inspection form (`GET inspection-forms`, `GET inspection-forms/{id}`).
- * Available from the FleetOps release that ships the driver inspection API.
- */
-export class InspectionForm extends Resource {
-    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
-        super(attributes, adapter, 'inspection-form', options);
-    }
-}
-
-/**
- * A submitted inspection (`POST inspections`, `GET inspections`, `GET inspections/{id}`).
- * Available from the FleetOps release that ships the driver inspection API.
- */
-export class Inspection extends Resource {
-    constructor(attributes: ResourceAttributes = {}, adapter?: AdapterLike | null, options: ResourceOptions = {}) {
-        super(attributes, adapter, 'inspection', options);
+    send(params: ResourceAttributes = {}, options: RequestOptions = {}): Promise<WorkOrderSendResponse> {
+        return callAction(this.store, 'send', this.id, params, options) as Promise<WorkOrderSendResponse>;
     }
 }
 
@@ -576,8 +558,6 @@ for (const [name, constructor] of Object.entries({
     Entity,
     Fleet,
     FuelReport,
-    Inspection,
-    InspectionForm,
     Issue,
     Manifest,
     ManifestStop,

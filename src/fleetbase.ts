@@ -12,13 +12,14 @@ import {
     workOrderActions,
 } from './resources.js';
 import type {
+    AssetConnectionAttributes,
+    TrailerDetachResponse,
+    WorkOrderSendResponse,
     Contact,
     Driver,
     Entity,
     Fleet,
     FuelReport,
-    Inspection,
-    InspectionForm,
     Issue,
     Manifest,
     ManifestStop,
@@ -59,15 +60,13 @@ export type DriverStore = Store<Driver> & {
 export type VehicleStore = Store<Vehicle> & {
     /** `GET vehicles/{id}/trailers` */
     trailers(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<unknown>;
-    /** `GET vehicles/{id}/inspections` — available from the FleetOps release that ships the driver inspection API. */
-    inspections(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<unknown>;
 };
 
 export type TrailerStore = Store<Trailer> & {
     /** `POST trailers/{id}/attach` */
-    attach(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<unknown>;
+    attach(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<AssetConnectionAttributes>;
     /** `POST trailers/{id}/detach` */
-    detach(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<unknown>;
+    detach(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<TrailerDetachResponse>;
     /** `GET trailers/{id}/connections` */
     connections(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<unknown>;
     /** `PATCH trailers/{id}/track` */
@@ -84,7 +83,7 @@ export type ManifestStopStore = Store<ManifestStop>;
 
 export type WorkOrderStore = Store<WorkOrder> & {
     /** `POST work-orders/{id}/send` */
-    send(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<unknown>;
+    send(id: Identifier, params?: ResourceAttributes, options?: RequestOptions): Promise<WorkOrderSendResponse>;
 };
 
 export type OrganizationStore = Store<Organization> & {
@@ -118,10 +117,6 @@ export default class Fleetbase {
     fuelReports: Store<FuelReport>;
     issues: Store<Issue>;
     workOrders: WorkOrderStore;
-    /** Available from the FleetOps release that ships the driver inspection API. */
-    inspectionForms: Store<InspectionForm>;
-    /** Available from the FleetOps release that ships the driver inspection API. */
-    inspections: Store<Inspection>;
 
     constructor(publicKey: string, config: FleetbaseConfig = {}, debug = false) {
         if (typeof publicKey !== 'string' || publicKey.length === 0) {
@@ -159,8 +154,6 @@ export default class Fleetbase {
         this.fuelReports = new Store<FuelReport>('fuel-report', this.adapter);
         this.issues = new Store<Issue>('issue', this.adapter);
         this.workOrders = new Store<WorkOrder>('work-order', this.adapter).extendActions(workOrderActions) as WorkOrderStore;
-        this.inspectionForms = new Store<InspectionForm>('inspection-form', this.adapter);
-        this.inspections = new Store<Inspection>('inspection', this.adapter);
     }
 
     static newInstance(...params: ConstructorParameters<typeof Fleetbase>): Fleetbase {
@@ -198,8 +191,6 @@ export default class Fleetbase {
             this.fuelReports,
             this.issues,
             this.workOrders,
-            this.inspectionForms,
-            this.inspections,
         ];
     }
 }

@@ -18,8 +18,6 @@ import Fleetbase, {
     FleetbaseError,
     FuelReport,
     GoogleAddress,
-    Inspection,
-    InspectionForm,
     isResource,
     isCollection,
     Issue,
@@ -457,15 +455,13 @@ describe('driver app stores', () => {
         expect(sdk.fuelReports.namespace).toBe('fuel-reports');
         expect(sdk.issues.namespace).toBe('issues');
         expect(sdk.workOrders.namespace).toBe('work-orders');
-        expect(sdk.inspectionForms.namespace).toBe('inspection-forms');
-        expect(sdk.inspections.namespace).toBe('inspections');
         const replacement = new RecordingAdapter();
         sdk.setAdapter(replacement);
-        for (const store of [sdk.manifests, sdk.manifestStops, sdk.trailers, sdk.fuelReports, sdk.issues, sdk.workOrders, sdk.inspectionForms, sdk.inspections]) {
+        for (const store of [sdk.manifests, sdk.manifestStops, sdk.trailers, sdk.fuelReports, sdk.issues, sdk.workOrders]) {
             expect(store).toBeInstanceOf(Store);
             expect(store.adapter).toBe(replacement);
         }
-        for (const Constructor of [FuelReport, Inspection, InspectionForm, Issue, Manifest, ManifestStop, Trailer, WorkOrder]) {
+        for (const Constructor of [FuelReport, Issue, Manifest, ManifestStop, Trailer, WorkOrder]) {
             expect(resolveResource<Resource>(Constructor.name, {})).toBeInstanceOf(Constructor);
         }
     });
@@ -521,13 +517,15 @@ describe('driver app stores', () => {
         await sdk.trailers.destroy('trailer_1');
         expect(lastCall(adapter)).toEqual({ method: 'DELETE', path: 'trailers/trailer_1', body: {} });
 
-        expect(await sdk.trailers.attach('trailer_1', { vehicle: 'vehicle_1', connected_at: '2026-09-09T08:00:00Z', source: 'driver', position: 1 })).toBeInstanceOf(Trailer);
+        adapter.response = { id: 'asset_connection_1', trailer: { id: 'trailer_1' }, vehicle: { id: 'vehicle_1' } };
+        expect(await sdk.trailers.attach('trailer_1', { vehicle: 'vehicle_1', connected_at: '2026-09-09T08:00:00Z', source: 'driver', position: 1 })).toEqual(adapter.response);
         expect(lastCall(adapter)).toEqual({
             method: 'POST',
             path: 'trailers/trailer_1/attach',
             body: { vehicle: 'vehicle_1', connected_at: '2026-09-09T08:00:00Z', source: 'driver', position: 1 },
         });
-        expect(await sdk.trailers.detach('trailer_1', { disconnected_at: '2026-09-09T17:00:00Z', notes: 'end of shift' })).toBeInstanceOf(Trailer);
+        adapter.response = { status: 'ok', connection: null };
+        expect(await sdk.trailers.detach('trailer_1', { disconnected_at: '2026-09-09T17:00:00Z', notes: 'end of shift' })).toEqual(adapter.response);
         expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'trailers/trailer_1/detach', body: { disconnected_at: '2026-09-09T17:00:00Z', notes: 'end of shift' } });
 
         adapter.response = [{ id: 'connection_1' }];
@@ -602,45 +600,53 @@ describe('driver app stores', () => {
         expect(lastCall(adapter)).toEqual({ method: 'PUT', path: 'work-orders/work_order_1', body: { status: 'in_progress' } });
         await sdk.workOrders.destroy('work_order_1');
         expect(lastCall(adapter)).toEqual({ method: 'DELETE', path: 'work-orders/work_order_1', body: {} });
-        expect(await sdk.workOrders.send('work_order_1')).toBeInstanceOf(WorkOrder);
+        adapter.response = { status: 'ok', message: 'Work order sent.' };
+        expect(await sdk.workOrders.send('work_order_1')).toEqual(adapter.response);
         expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'work-orders/work_order_1/send', body: {} });
         const workOrder = new WorkOrder({ id: 'work_order_1' }, adapter);
         await workOrder.send({ notify: true });
         expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'work-orders/work_order_1/send', body: { notify: true } });
     });
 
-    it('reads inspection forms and submits and reads inspections', async () => {
+    it('preserves resource identity across connection and acknowledgement actions', async () => {
         const adapter = new RecordingAdapter();
-        const sdk = new Fleetbase('pk_test', { adapter });
-
-        adapter.response = [{ id: 'inspection_form_1' }];
-        const forms = (await sdk.inspectionForms.query({ vehicle: 'vehicle_1', type: 'dvir' })) as Collection<InspectionForm>;
-        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'inspection-forms', body: { vehicle: 'vehicle_1', type: 'dvir' } });
-        expect(forms[0]).toBeInstanceOf(InspectionForm);
-        adapter.response = { id: 'inspection_form_1' };
-        expect(await sdk.inspectionForms.findRecord('inspection_form_1')).toBeInstanceOf(InspectionForm);
-        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'inspection-forms/inspection_form_1', body: {} });
-
-        adapter.response = { id: 'inspection_1' };
-        expect(await sdk.inspections.create({ inspection_form: 'inspection_form_1', vehicle: 'vehicle_1', answers: {} })).toBeInstanceOf(Inspection);
-        expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'inspections', body: { inspection_form: 'inspection_form_1', vehicle: 'vehicle_1', answers: {} } });
-        adapter.response = [{ id: 'inspection_1' }];
-        const inspections = (await sdk.inspections.query({ vehicle: 'vehicle_1' })) as Collection<Inspection>;
-        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'inspections', body: { vehicle: 'vehicle_1' } });
-        expect(inspections[0]).toBeInstanceOf(Inspection);
-        adapter.response = { id: 'inspection_1' };
-        expect(await sdk.inspections.findRecord('inspection_1')).toBeInstanceOf(Inspection);
-        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'inspections/inspection_1', body: {} });
-
-        adapter.response = [{ id: 'inspection_1' }, { id: 'inspection_2' }];
-        const history = (await sdk.vehicles.inspections('vehicle_1', { limit: 10 })) as Collection<Inspection>;
-        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'vehicles/vehicle_1/inspections', body: { limit: 10 } });
-        expect(history).toHaveLength(2);
-        expect(history[0]).toBeInstanceOf(Inspection);
-        adapter.response = { id: 'inspection_1' };
-        const vehicle = new Vehicle({ id: 'vehicle_1' }, adapter);
-        expect(await vehicle.inspections()).toBeInstanceOf(Inspection);
-        expect(lastCall(adapter)).toEqual({ method: 'GET', path: 'vehicles/vehicle_1/inspections', body: {} });
+        const trailer = new Trailer({ id: 'trailer_1', name: 'T-1' }, adapter);
+        const original = trailer.serialize();
+        const connection = { id: 'asset_connection_1', trailer: { id: 'trailer_1' }, vehicle: { id: 'vehicle_1' } };
+        adapter.response = connection;
+        expect(await trailer.attach({ vehicle: 'vehicle_1' })).toBe(connection);
+        expect(trailer.serialize()).toEqual(original);
+        for (const detachedConnection of [connection, null]) {
+            const ack = { status: 'ok', connection: detachedConnection };
+            adapter.response = ack;
+            expect(await trailer.detach()).toBe(ack);
+            expect(trailer.id).toBe('trailer_1');
+            expect(trailer.serialize()).toEqual(original);
+        }
+        adapter.response = { id: 'trailer_1', name: 'T-1', odometer: 10 };
+        await trailer.track({ odometer: 10 });
+        expect(lastCall(adapter).path).toBe('trailers/trailer_1/track');
+        expect(trailer.getAttribute('odometer')).toBe(10);
+        const workOrder = new WorkOrder({ id: 'work_order_1', status: 'open' }, adapter);
+        const workAttributes = workOrder.serialize();
+        adapter.response = { status: 'ok', message: 'Work order sent.' };
+        expect(await workOrder.send()).toBe(adapter.response);
+        expect(workOrder.serialize()).toEqual(workAttributes);
+        expect(workOrder.id).toBe('work_order_1');
+        expect(workOrder.getAttribute('status')).toBe('open');
+        adapter.response = { id: 'work_order_1', status: 'in_progress' };
+        await workOrder.update({ status: 'in_progress' });
+        expect(lastCall(adapter).path).toBe('work-orders/work_order_1');
+        adapter.failure = new Error('denied');
+        await expect(trailer.attach()).rejects.toThrow('denied');
+        await expect(trailer.detach()).rejects.toThrow('denied');
+        await expect(workOrder.send()).rejects.toThrow('denied');
+        expect(trailer.id).toBe('trailer_1');
+        expect(workOrder.id).toBe('work_order_1');
+        const sdk = new Fleetbase('pk', { adapter });
+        expect('inspections' in sdk).toBe(false);
+        expect('inspectionForms' in sdk).toBe(false);
+        expect('inspections' in sdk.vehicles).toBe(false);
     });
 
     it('changes, forgets, and resets driver passwords', async () => {

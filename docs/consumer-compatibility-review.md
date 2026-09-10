@@ -12,6 +12,10 @@ Release metadata now consistently targets 2.0.0. The tag-triggered, protected np
 
 PR #35 response handling and type exports are addressed separately on its own branch, keeping review history intact. Its final results are recorded in that PR. The historical findings and original test evidence below are retained for traceability.
 
+On the fixed PR #35 candidate, trailer attach returns connection attributes, detach returns its acknowledgement, and work-order send returns its acknowledgement without hydrating either resource. Regression tests cover both detach response variants, subsequent operations using the original ID, and rejected requests. Named store/response types are exported and compile through ESM, CJS, bundler, and the legacy declaration entry with TypeScript 5.0.4. Unreleased inspection stores/actions are deferred entirely, removing the speculative backend dependency from this PR without changing the published v1 surface.
+
+PR #35 verification: 34 SDK tests; 100% statements (762/762), branches (657/657), functions (379/379), and lines (705/705). Package validation passes with 13 files and 97 matching runtime exports. All 12 consumer/response probes pass against the exact packed candidate on Node 20.19.4; the actual Storefront hook also passes. No npm publication or PR merge was performed.
+
 ## Reviewed revisions and scope
 
 | Component                | Revision                                               | Context                                                                         |

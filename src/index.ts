@@ -46,3 +46,5 @@ export {
 } from './utils.js';
 export { isResource } from './resource.js';
 export type * from './types.js';
+
+export type { DriverStore, ManifestStore, ManifestStopStore, OrderStore, OrganizationStore, ServiceQuoteStore, TrailerStore, VehicleStore, WorkOrderStore } from './fleetbase.js';

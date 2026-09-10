@@ -76,7 +76,7 @@ const quotes = await fleetbase.serviceQuotes.fromPreliminary({
 });
 ```
 
-Driver-app stores cover the FleetOps driver workflow — `manifests`, `manifestStops`, `trailers`, `fuelReports`, `issues`, `workOrders`, `inspectionForms`, and `inspections` — alongside the driver-scoped helpers on existing stores:
+Driver-app stores cover the FleetOps driver workflow — `manifests`, `manifestStops`, `trailers`, `fuelReports`, `issues`, and `workOrders` — alongside the driver-scoped helpers on existing stores:
 
 ```ts
 const manifests = await fleetbase.drivers.manifests('driver_123', { status: 'active' });
@@ -87,7 +87,7 @@ const trailers = await fleetbase.vehicles.trailers('vehicle_123');
 await fleetbase.drivers.changePassword('driver_123', { password: 'current', new_password: 'next', new_password_confirmation: 'next' });
 ```
 
-`inspectionForms`, `inspections`, and `vehicles.inspections()` become usable with the FleetOps release that ships the driver inspection API.
+Inspection stores and vehicle inspection actions are deferred until a released Fleet-Ops driver inspection API can be verified. Trailer attach returns a raw connection; detach and work-order send return acknowledgements without replacing the resource's attributes.
 
 Resource instances can also be created directly:
 
