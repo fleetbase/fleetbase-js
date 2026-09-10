@@ -6,7 +6,7 @@ This is a coordinated release step. Draft PR #36 prepares repository files for `
 
 `main` is now the GitHub default branch and PR #36 targets it. GitHub refused an in-place rename because a protection rule already targeted `main`. Instead, `main` was created at the exact existing `master` commit (`681c8cb272e35a3ba69988f43b006968bf611ef7`), preserving that rule and retaining `master` for compatibility. No release PR was merged. The local remote HEAD now resolves to `origin/main`.
 
-The existing rule requires one approving review but does not require status checks. Add required CI/CodeQL checks as an owner release gate. Older PRs still targeting the retained `master` branch should be migrated when they are next reviewed. The v2 workflow changes become the default-branch implementation only after PR #36 is approved and merged.
+The existing one-reviewer rule is preserved and now requires `CI success` and `CodeQL`, with strict up-to-date status checks. Older PRs still targeting the retained `master` branch should be migrated when they are next reviewed. The v2 workflow changes become the default-branch implementation only after PR #36 is approved and merged.
 
 ## Preconditions
 

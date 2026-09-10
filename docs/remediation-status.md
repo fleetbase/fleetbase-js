@@ -13,6 +13,7 @@ Updated: 2026-09-10.
 - Added Node 20.19.4 packed runtime checks separately from modern build tools; TypeScript 5.0.4 and 6.0.2 consumers cover ESM/CJS resolution.
 - Restored gated tag-triggered npm publication, release validation, provenance, and registry checksum checks. Version metadata is aligned to 2.0.0; dry-run publication passed.
 - Made `main` the default, preserving its existing protection rule and retaining `master`. PR #36 targets `main`.
+- Required strict `CI success` and `CodeQL` checks on `main`, preserving its existing one-reviewer requirement.
 
 ## Verified evidence
 
@@ -30,12 +31,19 @@ Updated: 2026-09-10.
 | Workflow syntax and version validation                                        | Passed                                                     |
 | Publication                                                                   | Dry run only; nothing published                            |
 
-Navigator's compiler has 15 pre-existing camera/theme diagnostics with the installed SDK; the fixed base returns to that baseline. Neither application's source or lockfiles were changed. Existing Storefront Podfile.lock edits and Navigator's untracked legacy directory remain intact.
+Navigator's compiler has 15 pre-existing camera/theme diagnostics with the installed SDK; both fixed candidates return to that baseline. Neither application's source or lockfiles were changed. Existing Storefront Podfile.lock edits and Navigator's untracked legacy directory remain intact.
+
+Production Android Metro bundles pass in both actual app checkouts with the fixed PR #35 package. The initial isolated run could not find Babel helpers from the externally extracted package; pointing its test resolver at the app's existing node_modules reproduced normal package installation and both bundles completed. Existing React Native export-map fallback warnings remain; no SDK bundling error remains. Reproduce with the app dependencies installed:
+
+```sh
+node scripts/review-metro-consumer.mjs /absolute/path/to/app /absolute/path/to/extracted/package /absolute/path/to/output-bundle android
+```
+
+This uses the app's existing Metro configuration, overrides only SDK/dependency resolution for the external tarball, and does not edit the app. It verifies bundling, not a native binary or device runtime. Hosted checks also passed on the subsequent base documentation commit `6d2a02c` (44 checks).
 
 ## Remaining release gates
 
 - Native iOS/Android device acceptance for real login, restored sessions, offline replay, tracking, and chat. Bundling alone does not validate native runtime behavior.
-- One approving review already protects `main`; required CI status checks still need owner configuration.
 - The protected `npm` environment, npm trusted publisher for `publish.yml`, and explicit `NPM_PUBLISH_ENABLED=true` setting must be configured before publication can run. Verify the shared tag secret as well.
 - Review PR #35 before including the driver-store additions in the v2 release. Approve draft PR #36 only after acceptance; neither PR was merged.
 
