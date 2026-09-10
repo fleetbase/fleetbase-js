@@ -49,16 +49,16 @@ jobs:
                       echo "::error::NPM_AUTH_TOKEN must be available to this repository and authorized to publish @fleetbase/sdk."
                       exit 1
                   fi
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   # Never tag whatever main happens to point at when the job starts.
                   ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
                   fetch-depth: 0
                   persist-credentials: false
-            - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@v6
               with:
                   run_install: false
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: 24.15.0
                   cache: pnpm
@@ -87,7 +87,7 @@ jobs:
               run: node scripts/verify-published.mjs
             - name: Preserve release evidence
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: npm-release-${{ github.sha }}
                   path: artifacts/
@@ -121,12 +121,12 @@ jobs:
         env:
             RELEASE_TAG: ${{ needs.release.outputs.tag || format('v{0}', inputs.version) }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
                   fetch-depth: 0
                   persist-credentials: false
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version: 24.15.0
                   registry-url: https://npm.pkg.github.com
