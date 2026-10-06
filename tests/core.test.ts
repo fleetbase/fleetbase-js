@@ -39,6 +39,7 @@ import Fleetbase, {
     ServiceArea,
     ServiceQuote,
     ServiceRate,
+    Socket,
     Store,
     StoreActions,
     TrackingStatus,
@@ -670,6 +671,32 @@ describe('driver app stores', () => {
         const driver = new Driver({ id: 'driver_1' }, adapter);
         await driver.changePassword({ password: 'old', new_password: 'new' });
         expect(lastCall(adapter)).toEqual({ method: 'POST', path: 'drivers/driver_1/change-password', body: { password: 'old', new_password: 'new' } });
+    });
+});
+
+describe('realtime socket tokens', () => {
+    it('mints a socket token with POST socket/token and follows adapter replacement', async () => {
+        const adapter = new RecordingAdapter();
+        const minted = { token: 'jwt', expires_in: 900, expires_at: '2026-01-01T00:15:00.000Z' };
+        adapter.response = minted;
+        const sdk = new Fleetbase('pk_test', { adapter });
+        expect(sdk.socket).toBeInstanceOf(Socket);
+        expect(sdk.socket.adapter).toBe(adapter);
+        await expect(sdk.socket.token()).resolves.toEqual(minted);
+        expect(adapter.calls.at(-1)).toEqual(['POST', 'socket/token', {}, {}]);
+        await sdk.socket.token({ headers: { 'X-Request-Id': 'abc' } });
+        expect(adapter.calls.at(-1)).toEqual(['POST', 'socket/token', {}, { headers: { 'X-Request-Id': 'abc' } }]);
+        const replacement = new RecordingAdapter();
+        sdk.setAdapter(replacement);
+        expect(sdk.socket.adapter).toBe(replacement);
+        await sdk.socket.token();
+        expect(replacement.calls).toHaveLength(1);
+    });
+
+    it('propagates mint failures such as a 404 from a server without socket auth', async () => {
+        const adapter = new RecordingAdapter();
+        adapter.failure = new Error('Not Found');
+        await expect(new Socket(adapter).token()).rejects.toThrow('Not Found');
     });
 });
 

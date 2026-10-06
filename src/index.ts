@@ -4,6 +4,7 @@ import EmberJsAdapter from './adapters/ember.js';
 import NodeAdapter from './adapters/node.js';
 import Fleetbase from './fleetbase.js';
 import Resource from './resource.js';
+import Socket from './socket.js';
 import Store from './store.js';
 import { register } from './registry.js';
 
@@ -13,7 +14,7 @@ register('adapter', 'NodeAdapter', NodeAdapter);
 register('adapter', 'EmberJsAdapter', EmberJsAdapter);
 
 export default Fleetbase;
-export { Fleetbase, Adapter, BrowserAdapter, EmberJsAdapter, NodeAdapter, Resource, Store };
+export { Fleetbase, Adapter, BrowserAdapter, EmberJsAdapter, NodeAdapter, Resource, Socket, Store };
 export { detectAdapter } from './adapters/detect.js';
 export { default as Collection, createCollection, isCollection, iter, objectAt, replace, uniqBy } from './collection.js';
 export { FleetbaseError } from './errors.js';
@@ -46,5 +47,6 @@ export {
 } from './utils.js';
 export { isResource } from './resource.js';
 export type * from './types.js';
+export type { SocketTokenResponse } from './socket.js';
 
 export type { DriverStore, ManifestStore, ManifestStopStore, OrderStore, OrganizationStore, ServiceQuoteStore, TrailerStore, VehicleStore, WorkOrderStore } from './fleetbase.js';
