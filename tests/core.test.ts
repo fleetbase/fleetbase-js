@@ -39,6 +39,7 @@ import Fleetbase, {
     ServiceArea,
     ServiceQuote,
     ServiceRate,
+    Socket,
     Store,
     StoreActions,
     TrackingStatus,
@@ -673,6 +674,32 @@ describe('driver app stores', () => {
     });
 });
 
+describe('realtime socket tokens', () => {
+    it('mints a socket token with POST socket/token and follows adapter replacement', async () => {
+        const adapter = new RecordingAdapter();
+        const minted = { token: 'jwt', expires_in: 900, expires_at: '2026-01-01T00:15:00.000Z' };
+        adapter.response = minted;
+        const sdk = new Fleetbase('pk_test', { adapter });
+        expect(sdk.socket).toBeInstanceOf(Socket);
+        expect(sdk.socket.adapter).toBe(adapter);
+        await expect(sdk.socket.token()).resolves.toEqual(minted);
+        expect(adapter.calls.at(-1)).toEqual(['POST', 'socket/token', {}, {}]);
+        await sdk.socket.token({ headers: { 'X-Request-Id': 'abc' } });
+        expect(adapter.calls.at(-1)).toEqual(['POST', 'socket/token', {}, { headers: { 'X-Request-Id': 'abc' } }]);
+        const replacement = new RecordingAdapter();
+        sdk.setAdapter(replacement);
+        expect(sdk.socket.adapter).toBe(replacement);
+        await sdk.socket.token();
+        expect(replacement.calls).toHaveLength(1);
+    });
+
+    it('propagates mint failures such as a 404 from a server without socket auth', async () => {
+        const adapter = new RecordingAdapter();
+        adapter.failure = new Error('Not Found');
+        await expect(new Socket(adapter).token()).rejects.toThrow('Not Found');
+    });
+});
+
 describe('published v1 compatibility snapshot', () => {
     it('preserves every published root export', () => {
         for (const name of contract.exports) {
@@ -861,6 +888,33 @@ describe('edge and failure contracts', () => {
         expect(new Headers(presetBrowser.headers).get('Content-Type')).toBe('text/plain');
         const presetNode = new NodeAdapter({ headers: { 'User-Agent': 'custom' }, fetch: vi.fn() });
         expect(new Headers(presetNode.headers).get('User-Agent')).toBe('custom');
+    });
+
+    it('sends Node requests to the right URL with the method, body and current headers', async () => {
+        const fetchMock = vi.fn(() => Promise.resolve(new Response('{"id":"order_1"}', { status: 200 })));
+        const node = new NodeAdapter({ host: 'https://api.test', namespace: 'v1', publicKey: 'pk', fetch: fetchMock });
+        node.setHeaders({ 'Customer-Token': 'token_1' });
+
+        await expect(node.get('orders', { status: 'active' })).resolves.toEqual({ id: 'order_1' });
+        await node.post('orders', { id: 1 });
+        await node.delete('orders/1', {}, { headers: { 'X-Request': 'yes' } });
+
+        const [getUrl, getInit] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+        expect(getUrl).toBe('https://api.test/v1/orders?status=active');
+        expect(getInit.method).toBe('GET');
+        const getHeaders = new Headers(getInit.headers);
+        expect(getHeaders.get('Authorization')).toBe('Bearer pk');
+        expect(getHeaders.get('Customer-Token')).toBe('token_1');
+        expect(getHeaders.get('User-Agent')).toBe('@fleetbase/sdk;node');
+
+        const [postUrl, postInit] = fetchMock.mock.calls[1] as unknown as [string, RequestInit];
+        expect(postUrl).toBe('https://api.test/v1/orders');
+        expect(postInit).toMatchObject({ method: 'POST', body: '{"id":1}' });
+
+        const [deleteUrl, deleteInit] = fetchMock.mock.calls[2] as unknown as [string, RequestInit];
+        expect(deleteUrl).toBe('https://api.test/v1/orders/1');
+        expect(deleteInit.method).toBe('DELETE');
+        expect(new Headers(deleteInit.headers).get('X-Request')).toBe('yes');
     });
 
     it('covers UUID fallback and sparse address data', () => {

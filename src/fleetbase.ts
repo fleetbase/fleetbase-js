@@ -1,4 +1,5 @@
 import { detectAdapter } from './adapters/detect.js';
+import Socket from './socket.js';
 import Store from './store.js';
 import {
     driverActions,
@@ -117,6 +118,8 @@ export default class Fleetbase {
     fuelReports: Store<FuelReport>;
     issues: Store<Issue>;
     workOrders: WorkOrderStore;
+    /** Realtime helpers, e.g. `socket.token()` to mint a short-lived socket token server-side. */
+    socket: Socket;
 
     constructor(publicKey: string, config: FleetbaseConfig = {}, debug = false) {
         if (typeof publicKey !== 'string' || publicKey.length === 0) {
@@ -154,6 +157,7 @@ export default class Fleetbase {
         this.fuelReports = new Store<FuelReport>('fuel-report', this.adapter);
         this.issues = new Store<Issue>('issue', this.adapter);
         this.workOrders = new Store<WorkOrder>('work-order', this.adapter).extendActions(workOrderActions) as WorkOrderStore;
+        this.socket = new Socket(this.adapter);
     }
 
     static newInstance(...params: ConstructorParameters<typeof Fleetbase>): Fleetbase {
@@ -162,6 +166,7 @@ export default class Fleetbase {
 
     setAdapter(adapter: AdapterLike): void {
         this.adapter = adapter;
+        this.socket.adapter = adapter;
         for (const store of this.stores()) {
             store.adapter = adapter;
         }
