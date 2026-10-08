@@ -21,9 +21,13 @@ const expectedHash = createHash('sha256')
 const registry = new URL(process.env.npm_config_registry ?? 'https://registry.npmjs.org/');
 const metadataUrl = new URL(`${encodeURIComponent(packageJson.name)}/${packageJson.version}`, registry);
 
+// npm can take several minutes to serve a version it has just accepted, so keep asking
+// for up to about ten minutes, backing off from 10 to 60 seconds between attempts.
+const RETRY_DELAYS_MS = [10, 15, 20, 30, 45, 60, 60, 60, 60, 60, 60, 60, 60, 60].map((seconds) => seconds * 1000);
+
 async function registryMetadata() {
     let lastError;
-    for (let attempt = 1; attempt <= 6; attempt += 1) {
+    for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
         try {
             const response = await fetch(metadataUrl, { signal: AbortSignal.timeout(10_000) });
             if (response.ok) {
@@ -33,8 +37,8 @@ async function registryMetadata() {
         } catch (error) {
             lastError = error;
         }
-        if (attempt < 6) {
-            await new Promise((resolveDelay) => setTimeout(resolveDelay, 10_000));
+        if (attempt < RETRY_DELAYS_MS.length) {
+            await new Promise((resolveDelay) => setTimeout(resolveDelay, RETRY_DELAYS_MS[attempt]));
         }
     }
     throw new Error('The published version did not become available from the registry.', { cause: lastError });
