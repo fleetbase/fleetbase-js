@@ -243,10 +243,18 @@ describe('fetch adapters', () => {
     it('constructs URLs and serializes query values', () => {
         expect(buildUrl({ host: 'https://api.test/', namespace: '/v1/' }, '/orders')).toBe('https://api.test/v1/orders');
         expect(buildUrl({}, 'orders', 'https://override.test')).toBe('https://override.test');
-        const url = appendQuery('https://api.test/orders?first=1', { ids: [1, 2], at: new Date('2026-01-01T00:00:00.000Z'), filter: { active: true }, skip: null });
-        expect(url).toContain('ids=1');
-        expect(url).toContain('ids=2');
-        expect(url).toContain('filter=%7B%22active%22%3Atrue%7D');
+        const url = appendQuery('https://api.test/orders?first=1', {
+            ids: [1, 2, null],
+            at: new Date('2026-01-01T00:00:00.000Z'),
+            filter: { active: true, tags: ['a', 'b'], since: new Date('2026-01-02T00:00:00.000Z'), none: undefined },
+            stops: [{ id: 's1' }, ['x']],
+            empty: [],
+            skip: null,
+        });
+        // PHP and Laravel read lists and nested values only in bracket form.
+        expect(decodeURIComponent(url)).toBe(
+            'https://api.test/orders?first=1&ids[]=1&ids[]=2&at=2026-01-01T00:00:00.000Z&filter[active]=true&filter[tags][]=a&filter[tags][]=b&filter[since]=2026-01-02T00:00:00.000Z&stops[0][id]=s1&stops[1][]=x'
+        );
         expect(appendQuery('x', {})).toBe('x');
         expect(appendQuery('x', { skip: undefined })).toBe('x');
     });

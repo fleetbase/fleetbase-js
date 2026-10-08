@@ -21,7 +21,7 @@ describe('first-party consumer contracts', () => {
         await adapter.delete('orders/2', {}, { cache: 'no-store' });
         expect(adapter.calls).toEqual([
             ...['POST', 'PUT', 'PATCH'].map((method) => ['messages', method, { body: JSON.stringify(payload) }, {}]),
-            ['orders?active=true&page=2&ids=1&ids=2', 'GET', {}, {}],
+            ['orders?active=true&page=2&ids%5B%5D=1&ids%5B%5D=2', 'GET', {}, {}],
             ['orders?page=3', 'GET', {}, { url: 'https://other.test/orders?active=true&page=3' }],
             ['orders/1', 'DELETE', {}, { cache: 'reload' }],
             ['orders/2', 'DELETE', {}, { cache: 'no-store' }],
