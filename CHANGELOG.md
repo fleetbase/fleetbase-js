@@ -2,6 +2,12 @@
 
 All notable changes to the Fleetbase JavaScript SDK are documented here. This project follows semantic versioning.
 
+## 2.1.1
+
+### Fixed
+
+- Query lists and nested values are sent in bracket form (`ids[]=1&ids[]=2`, `filter[active]=true`) so PHP and Laravel read every value; v2.0 and v2.1.0 repeated the key, which the server reads as the last value only.
+
 ## 2.1.0
 
 ### Added
