@@ -2,6 +2,17 @@
 
 All notable changes to the Fleetbase JavaScript SDK are documented here. This project follows semantic versioning.
 
+## 2.1.0
+
+### Added
+
+- Fleet-Ops driver workflow stores and resources: `manifests` (with `optimize` and `drivers.manifests`), `manifestStops` (PATCH `update`), `trailers` (CRUD plus `attach`, `detach`, `connections`, `track` and `vehicles.trailers`), `fuelReports`, `issues` and `workOrders` (with `send`), and the driver password actions `changePassword`, `forgotPassword` and `resetPassword`.
+- `fleetbase.socket.token()` to mint realtime socket tokens.
+
+### Fixed
+
+- `NodeAdapter` sent GET requests to the wrong path and ignored headers set after construction; it now shares the browser Fetch transport.
+
 ## 2.0.0
 
 ### Changed
