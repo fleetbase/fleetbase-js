@@ -20,27 +20,16 @@ export function buildUrl(config: AdapterConfig, path: string, override?: string)
     return [host, namespace, cleanPath].filter(Boolean).join('/');
 }
 
+/**
+ * Append query values the way PHP and Laravel read them, as SDK v1 did on native
+ * (axios): a list is `key[]=a&key[]=b`, a nested object `key[field]=value`, a list of
+ * objects `key[0][field]=value`. Repeating a plain key (`key=a&key=b`) would leave the
+ * server with only the last value.
+ */
 export function appendQuery(url: string, query: ResourceAttributes = {}): string {
-    const entries = Object.entries(query);
-    if (entries.length === 0) {
-        return url;
-    }
-
     const params = new URLSearchParams();
-    for (const [key, rawValue] of entries) {
-        const values = Array.isArray(rawValue) ? rawValue : [rawValue];
-        for (const value of values) {
-            if (value === null || value === undefined) {
-                continue;
-            }
-            if (value instanceof Date) {
-                params.append(key, value.toISOString());
-            } else if (typeof value === 'object') {
-                params.append(key, JSON.stringify(value));
-            } else {
-                params.append(key, String(value));
-            }
-        }
+    for (const [key, value] of Object.entries(query)) {
+        appendValue(params, key, value);
     }
 
     const serialized = params.toString();
@@ -48,6 +37,27 @@ export function appendQuery(url: string, query: ResourceAttributes = {}): string
         return url;
     }
     return `${url}${url.includes('?') ? '&' : '?'}${serialized}`;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date);
+}
+
+function appendValue(params: URLSearchParams, key: string, value: unknown): void {
+    if (value === null || value === undefined) {
+        return;
+    }
+    if (value instanceof Date) {
+        params.append(key, value.toISOString());
+    } else if (Array.isArray(value)) {
+        value.forEach((item, index) => appendValue(params, isPlainObject(item) || Array.isArray(item) ? `${key}[${index}]` : `${key}[]`, item));
+    } else if (isPlainObject(value)) {
+        for (const [field, nested] of Object.entries(value)) {
+            appendValue(params, `${key}[${field}]`, nested);
+        }
+    } else {
+        params.append(key, String(value));
+    }
 }
 
 function errorMessage(payload: unknown, fallback: string): string {
