@@ -890,6 +890,33 @@ describe('edge and failure contracts', () => {
         expect(new Headers(presetNode.headers).get('User-Agent')).toBe('custom');
     });
 
+    it('sends Node requests to the right URL with the method, body and current headers', async () => {
+        const fetchMock = vi.fn(() => Promise.resolve(new Response('{"id":"order_1"}', { status: 200 })));
+        const node = new NodeAdapter({ host: 'https://api.test', namespace: 'v1', publicKey: 'pk', fetch: fetchMock });
+        node.setHeaders({ 'Customer-Token': 'token_1' });
+
+        await expect(node.get('orders', { status: 'active' })).resolves.toEqual({ id: 'order_1' });
+        await node.post('orders', { id: 1 });
+        await node.delete('orders/1', {}, { headers: { 'X-Request': 'yes' } });
+
+        const [getUrl, getInit] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+        expect(getUrl).toBe('https://api.test/v1/orders?status=active');
+        expect(getInit.method).toBe('GET');
+        const getHeaders = new Headers(getInit.headers);
+        expect(getHeaders.get('Authorization')).toBe('Bearer pk');
+        expect(getHeaders.get('Customer-Token')).toBe('token_1');
+        expect(getHeaders.get('User-Agent')).toBe('@fleetbase/sdk;node');
+
+        const [postUrl, postInit] = fetchMock.mock.calls[1] as unknown as [string, RequestInit];
+        expect(postUrl).toBe('https://api.test/v1/orders');
+        expect(postInit).toMatchObject({ method: 'POST', body: '{"id":1}' });
+
+        const [deleteUrl, deleteInit] = fetchMock.mock.calls[2] as unknown as [string, RequestInit];
+        expect(deleteUrl).toBe('https://api.test/v1/orders/1');
+        expect(deleteInit.method).toBe('DELETE');
+        expect(new Headers(deleteInit.headers).get('X-Request')).toBe('yes');
+    });
+
     it('covers UUID fallback and sparse address data', () => {
         const originalCrypto = globalThis.crypto;
         vi.stubGlobal('crypto', {});
