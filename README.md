@@ -102,6 +102,70 @@ const place = new Place({
 
 The root package exports the existing resource classes, adapters, collection helpers, resolver and registry hooks, string helpers, validation utilities, and TypeScript request/configuration types.
 
+## Realtime socket tokens
+
+Fleetbase publishes realtime events over SocketCluster. Channel subscriptions are authorized with a short-lived socket token, so the flow is always:
+
+1. **On your server**, use your secret key to mint a token with `fleetbase.socket.token()` (`POST /v1/socket/token`).
+2. Send **only the token** to the browser or device. Never send the API key.
+3. In the browser, connect with `socketcluster-client`, present the token (`socket.authenticate(token)` or an in-memory `authEngine`), then subscribe.
+
+```ts
+// server.ts: runs on your backend, never in the browser
+import Fleetbase from '@fleetbase/sdk';
+
+const fleetbase = new Fleetbase(process.env.FLEETBASE_SECRET_KEY!);
+
+app.post('/realtime-token', requireSignedInUser, async (_req, res) => {
+    // { token, expires_in, expires_at }
+    res.json(await fleetbase.socket.token());
+});
+```
+
+```ts
+// browser.ts
+import { create } from 'socketcluster-client';
+
+async function fetchSocketToken(): Promise<{ token: string; expires_in: number }> {
+    const response = await fetch('/realtime-token', { method: 'POST', credentials: 'include' });
+    if (!response.ok) throw new Error(`Token request failed: ${response.status}`);
+    return response.json();
+}
+
+// Keep the token in memory only. SocketCluster calls loadToken() before every (re)connect,
+// so the token travels in the handshake and subscriptions are authorized from the start.
+let current: { token: string; refreshAt: number } | null = null;
+const remember = ({ token, expires_in }: { token: string; expires_in: number }) => {
+    current = { token, refreshAt: Date.now() + (expires_in - 60) * 1000 };
+    return token;
+};
+const authEngine = {
+    saveToken: async (_name: string, token: string) => token,
+    removeToken: async () => {
+        const token = current?.token ?? null;
+        current = null;
+        return token;
+    },
+    loadToken: async () => (current && Date.now() < current.refreshAt ? current.token : remember(await fetchSocketToken())),
+};
+
+const socket = create({ hostname: 'socket.example.com', secure: true, port: 443, authEngine });
+
+// Refresh about 60 seconds before expiry without dropping subscriptions.
+setInterval(async () => {
+    if (current && Date.now() >= current.refreshAt) {
+        await socket.authenticate(remember(await fetchSocketToken()));
+    }
+}, 15_000);
+
+const channel = socket.subscribe(`company.${companyUuid}`);
+for await (const event of channel) {
+    console.log(event);
+}
+```
+
+A token minted with an API key may subscribe to its company channel (`company.{company uuid}`), its own key channel (`api.{key id}`), and channels of resources that belong to the same company (for example `order.{order uuid or public id}`). A server that does not have realtime authentication configured answers the mint request with `404`; in that case connect without a token as before.
+
 ## Custom adapters
 
 Implement the stable adapter interface when requests need to use an application-specific transport:
