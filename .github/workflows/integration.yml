@@ -42,13 +42,13 @@ jobs:
             - name: Record skipped scheduled run
               if: github.event_name == 'schedule' && env.FLEETBASE_PUBLIC_KEY == ''
               run: echo 'Live API smoke skipped because FLEETBASE_PUBLIC_KEY is not configured.' >> "$GITHUB_STEP_SUMMARY"
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               if: env.FLEETBASE_PUBLIC_KEY != ''
-            - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@v6
               if: env.FLEETBASE_PUBLIC_KEY != ''
               with:
                   run_install: false
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               if: env.FLEETBASE_PUBLIC_KEY != ''
               with:
                   node-version: 22.13.0
